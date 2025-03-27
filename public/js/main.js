@@ -268,8 +268,36 @@ document.addEventListener('DOMContentLoaded', () => {
       return 'mermaid';
     }
     
-    // 默认返回Markdown - 这是一个重要的变化
-    return 'markdown';
+    // 更智能的类型检测
+    // 如果包含 HTML 标签，但不是完整的 HTML 文档，我们需要进一步判断
+    if (trimmedCode.includes('<') && trimmedCode.includes('>')) {
+      // 计算 HTML 标签的数量
+      const htmlTagsCount = (trimmedCode.match(/<\/?[a-z][\s\S]*?>/gi) || []).length;
+      // 计算 Markdown 特征的数量
+      const markdownFeaturesCount = (
+        (trimmedCode.match(/#{1,6}\s.+/gm) || []).length +
+        (trimmedCode.match(/^-\s.+/gm) || []).length +
+        (trimmedCode.match(/^\*\s.+/gm) || []).length +
+        (trimmedCode.match(/^\d+\.\s.+/gm) || []).length +
+        (trimmedCode.match(/```[\s\S]*?```/g) || []).length +
+        (trimmedCode.match(/\[.+\]\(.+\)/g) || []).length +
+        (trimmedCode.match(/!\[.+\]\(.+\)/g) || []).length +
+        (trimmedCode.match(/^>\s.+/gm) || []).length +
+        (trimmedCode.match(/\*\*.+\*\*/g) || []).length +
+        (trimmedCode.match(/__.+__/g) || []).length
+      );
+      
+      // 如果 Markdown 特征数量大于 HTML 标签数量，则返回 Markdown
+      if (markdownFeaturesCount > htmlTagsCount) {
+        return 'markdown';
+      }
+      
+      // 否则返回 HTML
+      return 'html';
+    }
+    
+    // 如果没有明确的特征，默认返回 HTML
+    return 'html';
   }
 
   // 显示代码类型标记

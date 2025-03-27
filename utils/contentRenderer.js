@@ -471,17 +471,27 @@ function escapeHtml(unsafe) {
  * @returns {Promise<string>} - u6e32u67d3u540eu7684HTML
  */
 async function renderContent(content, contentType) {
+  console.log(`[DEBUG] renderContent 被调用，内容类型: ${contentType}`);
+  console.log(`[DEBUG] 内容长度: ${content.length} 字符`);
+  
   switch (contentType) {
     case CODE_TYPES.HTML:
+      console.log('[DEBUG] 使用 HTML 渲染器');
       return renderHtml(content);
     case CODE_TYPES.MARKDOWN:
-      return await renderMarkdown(content);
+      console.log('[DEBUG] 使用 Markdown 渲染器');
+      const markdownResult = await renderMarkdown(content);
+      console.log(`[DEBUG] Markdown 渲染完成，结果长度: ${markdownResult.length} 字符`);
+      return markdownResult;
     case CODE_TYPES.SVG:
+      console.log('[DEBUG] 使用 SVG 渲染器');
       return renderSvg(content);
     case CODE_TYPES.MERMAID:
+      console.log('[DEBUG] 使用 Mermaid 渲染器');
       return await renderMermaid(content);
     default:
       // 默认使用Markdown渲染器，与代码检测逻辑保持一致
+      console.log(`[DEBUG] 使用默认渲染器 (Markdown)，因为内容类型 '${contentType}' 未知`);
       return await renderMarkdown(content);
   }
 }

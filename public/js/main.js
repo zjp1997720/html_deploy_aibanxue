@@ -201,6 +201,160 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
+  // 代码类型检测函数
+  function detectCodeType(code) {
+    if (!code || typeof code !== 'string') {
+      return 'markdown'; // 默认返回Markdown
+    }
+    
+    const trimmedCode = code.trim();
+    
+    // 首先检查是否包含Markdown标记符号或格式
+    // 这些是明确的Markdown特征
+    if (trimmedCode.includes('###') || 
+        trimmedCode.includes('##') || 
+        trimmedCode.includes('# ') || 
+        /^-\s.+/m.test(trimmedCode) || 
+        /^\*\s.+/m.test(trimmedCode) || 
+        /^\d+\.\s.+/m.test(trimmedCode) || 
+        trimmedCode.includes('```') || 
+        /\[.+\]\(.+\)/.test(trimmedCode) || 
+        /!\[.+\]\(.+\)/.test(trimmedCode) || 
+        /^>\s.+/m.test(trimmedCode) || 
+        /\|.+\|/.test(trimmedCode) || 
+        /\*\*.+\*\*/.test(trimmedCode) || 
+        /__.+__/.test(trimmedCode)) {
+      return 'markdown';
+    }
+    
+    // 检查是否包含SVG或Mermaid代码块标记
+    if (trimmedCode.includes('```svg') || 
+        trimmedCode.includes('```mermaid')) {
+      return 'markdown';
+    }
+    
+    // 检测HTML - 只有明确的HTML文档才识别为HTML
+    if (trimmedCode.startsWith('<!DOCTYPE html>') || 
+        trimmedCode.startsWith('<html') ||
+        (trimmedCode.startsWith('<') && 
+         (trimmedCode.includes('<div') || 
+          trimmedCode.includes('<p') || 
+          trimmedCode.includes('<span') || 
+          trimmedCode.includes('<h1') || 
+          trimmedCode.includes('<body') || 
+          trimmedCode.includes('<head')))) {
+      return 'html';
+    }
+    
+    // 检测纯文本 - 任何纯文本内容都应该被识别为Markdown
+    if (!trimmedCode.includes('<') && !trimmedCode.includes('>')) {
+      return 'markdown';
+    }
+
+    // 检测纯SVG - 只有当它是一个完整的SVG标签并且没有Markdown特征时
+    if (trimmedCode.startsWith('<svg') && 
+        trimmedCode.includes('</svg>') && 
+        trimmedCode.includes('xmlns="http://www.w3.org/2000/svg"')) {
+      return 'svg';
+    }
+    
+    // 检测纯Mermaid - 只有当它是一个完整的Mermaid图表时
+    if ((trimmedCode.startsWith('graph ') || 
+        trimmedCode.startsWith('sequenceDiagram') || 
+        trimmedCode.startsWith('classDiagram') || 
+        trimmedCode.startsWith('gantt') || 
+        trimmedCode.startsWith('pie') || 
+        trimmedCode.startsWith('flowchart'))) {
+      return 'mermaid';
+    }
+    
+    // 默认返回Markdown - 这是一个重要的变化
+    return 'markdown';
+  }
+
+  // 显示代码类型标记
+  function updateCodeTypeIndicator(codeType, content) {
+    // 获取已存在的指示器
+    const indicator = document.getElementById('code-type-indicator');
+    const codeTypeText = document.getElementById('code-type-text');
+    
+    if (!indicator || !codeTypeText) {
+      console.error('代码类型指示器元素不存在');
+      return;
+    }
+    
+    // 如果没有内容，隐藏指示器
+    if (!content || content.trim() === '') {
+      indicator.style.display = 'none';
+      return;
+    } else {
+      indicator.style.display = 'flex';
+    }
+    
+    // 根据代码类型设置样式和图标
+    let iconClass = '';
+    let label = '';
+    let className = '';
+    
+    switch(codeType) {
+      case 'html':
+        iconClass = 'fas fa-code';
+        label = 'HTML';
+        className = 'html-type';
+        break;
+      case 'markdown':
+        iconClass = 'fab fa-markdown';
+        label = 'Markdown';
+        className = 'markdown-type';
+        break;
+      case 'svg':
+        iconClass = 'fas fa-bezier-curve';
+        label = 'SVG';
+        className = 'svg-type';
+        break;
+      case 'mermaid':
+        iconClass = 'fas fa-project-diagram';
+        label = 'Mermaid';
+        className = 'mermaid-type';
+        break;
+      default:
+        iconClass = 'fas fa-code';
+        label = 'Code';
+        className = 'default-type';
+    }
+    
+    // 更新指示器类名
+    indicator.className = `code-type-indicator ${className}`;
+    
+    // 更新图标和文本
+    const iconElement = indicator.querySelector('i');
+    if (iconElement) {
+      iconElement.className = iconClass;
+    }
+    
+    // 更新文本
+    codeTypeText.textContent = label;
+  }
+
+  // 在输入框内容变化时检测代码类型
+  if (htmlInput) {
+    htmlInput.addEventListener('input', () => {
+      const content = htmlInput.value;
+      const codeType = detectCodeType(content);
+      updateCodeTypeIndicator(codeType, content);
+    });
+    
+    // 页面加载时检测初始内容
+    if (htmlInput.value) {
+      const content = htmlInput.value;
+      const codeType = detectCodeType(content);
+      updateCodeTypeIndicator(codeType, content);
+    } else {
+      // 初始时如果没有内容，隐藏指示器
+      updateCodeTypeIndicator('html', '');
+    }
+  }
+
   // 生成链接
   if (generateButton) {
     generateButton.addEventListener('click', async () => {
@@ -221,12 +375,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       try {
-        // 添加加载动画
+        // 显示加载指示器
+        loadingIndicator.classList.add('show');
+        
+        // 添加按钮加载动画
         generateButton.innerHTML = '<i class="fas fa-spinner fa-spin loading-spinner"></i> 处理中...';
         generateButton.disabled = true;
         
         // 检查是否启用密码保护
         const isProtected = passwordToggle ? passwordToggle.checked : false;
+        
+        // 检测代码类型
+        const codeType = detectCodeType(htmlContent);
+        console.log('检测到的代码类型:', codeType);
         
         // 调用 API 生成链接
         const response = await fetch('/api/pages/create', {
@@ -234,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ htmlContent, isProtected }),
+          body: JSON.stringify({ htmlContent, isProtected, codeType }),
         });
         
         const data = await response.json();
@@ -283,6 +444,9 @@ document.addEventListener('DOMContentLoaded', () => {
             generateButton.classList.remove('success-pulse');
           }, 500);
           
+          // 隐藏加载指示器
+          loadingIndicator.classList.remove('show');
+          
           // 不需要显示生成链接的toast提示
         } else {
           throw new Error(data.error || '生成链接失败');
@@ -291,6 +455,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 恢复按钮状态
         generateButton.innerHTML = '<i class="fas fa-link mr-1"></i>生成链接';
         generateButton.disabled = false;
+        
+        // 隐藏加载指示器
+        loadingIndicator.classList.remove('show');
       } catch (error) {
         console.error('生成链接错误:', error);
         showErrorToast('生成链接时发生错误');
@@ -298,6 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 恢复按钮状态
         generateButton.innerHTML = '<i class="fas fa-link mr-1"></i>生成链接';
         generateButton.disabled = false;
+        
+        // 隐藏加载指示器
+        loadingIndicator.classList.remove('show');
       }
     });
   }

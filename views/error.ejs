@@ -1,0 +1,24 @@
+<%- include('partials/header', { title }) %>
+
+<div class="main-container">
+  <header class="app-header">
+    <h1 class="app-title">HTML-Go</h1>
+  </header>
+
+  <div class="card error-card">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h2 class="error-title"><%= title %></h2>
+    <p class="error-message"><%= message %></p>
+    <a href="/" class="back-btn">
+      <i class="fas fa-arrow-left"></i> 返回首页
+    </a>
+  </div>
+  
+  <footer class="app-footer">
+    <p>&copy; 2025 HTML-Go | 快速分享 HTML 代码</p>
+  </footer>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,32 @@
+{
+  "name": "html-go-express",
+  "version": "1.0.0",
+  "description": "HTML代码分享工具 - Express版本",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "html",
+    "share",
+    "express",
+    "ejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

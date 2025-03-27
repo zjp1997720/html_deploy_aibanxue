@@ -13,7 +13,8 @@ const pagesRoutes = require('./routes/pages');
 
 // 初始化应用
 const app = express();
-const PORT = config.port; // 使用配置文件中的端口设置
+// 确保在服务器上使用正确的端口
+const PORT = process.env.NODE_ENV === 'production' ? 8888 : config.port;
 
 // 中间件设置
 app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别

@@ -94,17 +94,16 @@ app.get('/view/:id', async (req, res) => {
       }
     }
     
-    // 优先使用数据库中保存的代码类型，如果没有则重新检测
-    let contentType = page.code_type;
-    
-    // 如果数据库中没有代码类型信息或不是有效的类型，则重新检测
+    // 始终重新检测内容类型，确保正确渲染
     const validTypes = ['html', 'markdown', 'svg', 'mermaid'];
-    if (!contentType || !validTypes.includes(contentType)) {
-      contentType = detectCodeType(page.html_content);
-      console.log(`检测到的内容类型: ${contentType}`);
-    } else {
-      console.log(`使用数据库中的内容类型: ${contentType}`);
-    }
+    
+    // 优先使用检测到的类型，而不是数据库中的类型
+    const detectedType = detectCodeType(page.html_content);
+    console.log(`检测到的内容类型: ${detectedType}`);
+    console.log(`数据库中的内容类型: ${page.code_type}`);
+    
+    // 使用检测到的类型，确保正确渲染
+    const contentType = validTypes.includes(detectedType) ? detectedType : 'html';
     
     // 根据不同的内容类型进行渲染
     const renderedContent = await renderContent(page.html_content, contentType);
@@ -132,8 +131,23 @@ app.use((req, res) => {
 
 // 启动应用
 initDatabase().then(() => {
+  // 添加更多调试日志
+  console.log('数据库初始化成功');
+  console.log(`当前环境: ${process.env.NODE_ENV}`);
+  console.log(`配置端口: ${config.port}`);
+  console.log(`实际使用端口: ${PORT}`);
+  console.log(`日志级别: ${config.logLevel}`);
+  
   app.listen(PORT, () => {
     console.log(`服务器运行在 http://localhost:${PORT}`);
+    
+    // 添加路由处理器日志
+    console.log('已注册的路由:');
+    app._router.stack.forEach(middleware => {
+      if(middleware.route) { // 路由
+        console.log(`${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
+      }
+    });
   });
 }).catch(err => {
   console.error('数据库初始化失败:', err);

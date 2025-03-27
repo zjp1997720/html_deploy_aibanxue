@@ -312,8 +312,18 @@ body {
   color: transparent;
   position: relative;
   z-index: 2;
+}
+
+/* 暗色模式下的光晕效果 */
+:root:not([data-theme="light"]) .cyber-title {
   text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
   animation: titleGlow 3s infinite alternate;
+}
+
+/* 浅色模式下的字母循环变色效果 */
+[data-theme="light"] .cyber-title {
+  animation: none;
+  text-shadow: none;
 }
 
 @keyframes titleGlow {
@@ -323,6 +333,84 @@ body {
   100% {
     text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8), 0 0 30px rgba(var(--primary-rgb), 0.6);
   }
+}
+
+/* 浅色模式下的字母循环变色效果 */
+[data-theme="light"] .cyber-title span {
+  display: inline-block;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(1) {
+  animation-name: letterColor1;
+  animation-delay: 0s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(2) {
+  animation-name: letterColor2;
+  animation-delay: 0.2s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(3) {
+  animation-name: letterColor3;
+  animation-delay: 0.4s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(4) {
+  animation-name: letterColor4;
+  animation-delay: 0.6s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(5) {
+  animation-name: letterColor5;
+  animation-delay: 0.8s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(6) {
+  animation-name: letterColor6;
+  animation-delay: 1.0s;
+}
+
+[data-theme="light"] .cyber-title span:nth-child(7) {
+  animation-name: letterColor7;
+  animation-delay: 1.2s;
+}
+
+@keyframes letterColor1 {
+  0%, 100% { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+  50% { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+}
+
+@keyframes letterColor2 {
+  0%, 100% { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+  50% { color: var(--secondary); -webkit-text-fill-color: var(--secondary); }
+}
+
+@keyframes letterColor3 {
+  0%, 100% { color: var(--secondary); -webkit-text-fill-color: var(--secondary); }
+  50% { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+}
+
+@keyframes letterColor4 {
+  0%, 100% { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+  50% { color: var(--secondary); -webkit-text-fill-color: var(--secondary); }
+}
+
+@keyframes letterColor5 {
+  0%, 100% { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+  50% { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+}
+
+@keyframes letterColor6 {
+  0%, 100% { color: var(--secondary); -webkit-text-fill-color: var(--secondary); }
+  50% { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+}
+
+@keyframes letterColor7 {
+  0%, 100% { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+  50% { color: var(--accent); -webkit-text-fill-color: var(--accent); }
 }
 
 .title-container::before {

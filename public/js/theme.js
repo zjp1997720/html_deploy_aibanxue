@@ -6,11 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('theme');
   const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
   
-  // 设置初始主题
+  // 设置初始主题 - 默认使用深色模式
+  let currentTheme;
   if (savedTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-  } else if (savedTheme === 'dark' || prefersDarkScheme || !savedTheme) {
+    currentTheme = 'light';
+  } else {
+    // 默认使用深色模式
     document.documentElement.setAttribute('data-theme', 'dark');
+    currentTheme = 'dark';
+    // 如果没有保存过主题设置，将深色模式保存到本地存储
+    if (!savedTheme) {
+      localStorage.setItem('theme', 'dark');
+    }
   }
   
   // 如果是密码页面，不添加主题切换按钮
@@ -26,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 按照设计惯例，图标应该表示“点击后将变成什么”
     // 亮色模式下显示月亮（点击后切换到暗色）
     // 暗色模式下显示太阳（点击后切换到亮色）
-    themeToggleBtn.innerHTML = '<i class="fas ' + (savedTheme === 'light' ? 'fa-moon' : 'fa-sun') + '"></i>';
+    themeToggleBtn.innerHTML = '<i class="fas ' + (currentTheme === 'light' ? 'fa-moon' : 'fa-sun') + '"></i>';
     document.body.appendChild(themeToggleBtn);
   }
   

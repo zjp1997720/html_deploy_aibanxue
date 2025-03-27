@@ -25,7 +25,8 @@ function initDatabase() {
           html_content TEXT NOT NULL,
           created_at INTEGER NOT NULL,
           password TEXT,
-          is_protected INTEGER DEFAULT 0
+          is_protected INTEGER DEFAULT 0,
+          code_type TEXT DEFAULT 'html'
         )
       `, (err) => {
         if (err) {

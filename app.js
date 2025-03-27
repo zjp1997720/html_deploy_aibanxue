@@ -10,7 +10,7 @@ const pagesRoutes = require('./routes/pages');
 
 // 初始化应用
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8888;
 
 // 中间件设置
 app.use(morgan('dev')); // 日志

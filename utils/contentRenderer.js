@@ -481,7 +481,8 @@ async function renderContent(content, contentType) {
     case CODE_TYPES.MERMAID:
       return await renderMermaid(content);
     default:
-      return renderHtml(content);
+      // 默认使用Markdown渲染器，与代码检测逻辑保持一致
+      return await renderMarkdown(content);
   }
 }
 

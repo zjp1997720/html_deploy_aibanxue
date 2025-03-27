@@ -5,15 +5,18 @@ const morgan = require('morgan');
 const cors = require('cors');
 const { initDatabase } = require('./models/db');
 
+// 导入配置
+const config = require('./config');
+
 // 路由导入
 const pagesRoutes = require('./routes/pages');
 
 // 初始化应用
 const app = express();
-const PORT = process.env.PORT || 5678; // 修改为5678端口，避免与已运行的服务冲突
+const PORT = config.port; // 使用配置文件中的端口设置
 
 // 中间件设置
-app.use(morgan('dev')); // 日志
+app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
 app.use(cors()); // 跨域支持
 app.use(bodyParser.json()); // JSON 解析
 app.use(bodyParser.urlencoded({ extended: true }));

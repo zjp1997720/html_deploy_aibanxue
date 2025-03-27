@@ -4,9 +4,10 @@
   "description": "HTML代码分享工具 - Express版本",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_ENV=production node app.js",
+    "dev": "NODE_ENV=development nodemon app.js",
+    "test": "NODE_ENV=test node app.js",
+    "prod": "NODE_ENV=production node app.js"
   },
   "keywords": [
     "html",

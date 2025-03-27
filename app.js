@@ -26,6 +26,33 @@ app.set('view engine', 'ejs');
 // 路由设置
 app.use('/api/pages', pagesRoutes);
 
+// 密码验证路由 - 用于AJAX验证
+app.get('/validate-password/:id', async (req, res) => {
+  try {
+    const { getPageById } = require('./models/pages');
+    const { id } = req.params;
+    const { password } = req.query;
+    
+    if (!password) {
+      return res.json({ valid: false });
+    }
+    
+    const page = await getPageById(id);
+    
+    if (!page) {
+      return res.json({ valid: false });
+    }
+    
+    // 检查密码是否正确
+    const isValid = page.is_protected === 1 && password === page.password;
+    
+    return res.json({ valid: isValid });
+  } catch (error) {
+    console.error('密码验证错误:', error);
+    return res.status(500).json({ valid: false, error: '服务器错误' });
+  }
+});
+
 // 首页路由
 app.get('/', (req, res) => {
   res.render('index', { title: 'HTML-Go | 分享 HTML 代码的简单方式' });

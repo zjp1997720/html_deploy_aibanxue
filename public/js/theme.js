@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const themeToggleBtn = document.getElementById('theme-toggle-btn');
-  const themeIcon = themeToggleBtn.querySelector('i');
+  // 检查是否是密码页面
+  const isPasswordPage = document.documentElement.getAttribute('data-page') === 'password-page';
   
   // 检查本地存储中的主题设置
   const savedTheme = localStorage.getItem('theme');
@@ -9,13 +9,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // 设置初始主题
   if (savedTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
   } else if (savedTheme === 'dark' || prefersDarkScheme || !savedTheme) {
     document.documentElement.setAttribute('data-theme', 'dark');
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
   }
+  
+  // 如果是密码页面，不添加主题切换按钮
+  if (isPasswordPage) {
+    return;
+  }
+  
+  // 创建并添加主题切换按钮
+  if (!document.getElementById('theme-toggle-btn')) {
+    const themeToggleBtn = document.createElement('button');
+    themeToggleBtn.id = 'theme-toggle-btn';
+    themeToggleBtn.className = 'theme-toggle';
+    // 按照设计惯例，图标应该表示“点击后将变成什么”
+    // 亮色模式下显示月亮（点击后切换到暗色）
+    // 暗色模式下显示太阳（点击后切换到亮色）
+    themeToggleBtn.innerHTML = '<i class="fas ' + (savedTheme === 'light' ? 'fa-moon' : 'fa-sun') + '"></i>';
+    document.body.appendChild(themeToggleBtn);
+  }
+  
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const themeIcon = themeToggleBtn.querySelector('i');
   
   // 主题切换事件
   themeToggleBtn.addEventListener('click', () => {
@@ -25,13 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 更新 DOM
     document.documentElement.setAttribute('data-theme', newTheme);
     
-    // 更新图标
+    // 更新图标 - 图标表示“点击后将变成什么”
     if (newTheme === 'light') {
-      themeIcon.classList.remove('fa-moon');
-      themeIcon.classList.add('fa-sun');
-    } else {
+      // 当前是亮色模式，显示月亮图标（点击后切换到暗色）
       themeIcon.classList.remove('fa-sun');
       themeIcon.classList.add('fa-moon');
+    } else {
+      // 当前是暗色模式，显示太阳图标（点击后切换到亮色）
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
     }
     
     // 保存到本地存储

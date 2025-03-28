@@ -636,6 +636,15 @@ body {
   background: var(--primary);
 }
 
+/* 代码输入容器 */
+#code-input-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 1rem;
+}
+
 /* 输入区域 */
 .cyber-input {
   width: 100%;
@@ -653,6 +662,9 @@ body {
   overflow: auto;
   white-space: pre-wrap;
   word-break: break-word;
+  position: relative;
+  z-index: 1;
+  display: block;
 }
 
 .cyber-input:focus {
@@ -1990,8 +2002,8 @@ label[for="html-file"] {
 /* 代码类型指示器样式 */
 .code-type-indicator {
   position: absolute;
-  top: 32px;
-  right: 32px;
+  top: 10px;
+  right: 10px;
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -2001,9 +2013,10 @@ label[for="html-file"] {
   gap: 5px;
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 1000;
   transition: all 0.3s ease;
-  opacity: 0.7;
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .code-type-indicator i {

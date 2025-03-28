@@ -289,21 +289,48 @@ function renderSvg(content) {
  * @returns {Promise<string>} - u6e32u67d3u540eu7684HTML
  */
 async function renderMermaid(content) {
+  console.log('[DEBUG] renderMermaid 被调用');
+  console.log(`[DEBUG] Mermaid 原始内容长度: ${content.length}`);
+  console.log(`[DEBUG] Mermaid 原始内容前100字符: ${content.substring(0, 100)}...`);
+  
   try {
-    // u5904u7406u53efu80fdu7684Markdownu5305u88f9
+    // 处理可能的Markdown包裹
     let mermaidCode = content;
-    if (content.includes('```mermaid')) {
+    
+    // 检查是否是纯 Mermaid 语法（不带 ```mermaid 标记）
+    if (!content.includes('```mermaid') && 
+        (content.trim().startsWith('graph ') || 
+         content.trim().startsWith('sequenceDiagram') || 
+         content.trim().startsWith('classDiagram') || 
+         content.trim().startsWith('gantt') || 
+         content.trim().startsWith('pie') || 
+         content.trim().startsWith('flowchart'))) {
+      console.log('[DEBUG] 检测到纯 Mermaid 语法');
+      mermaidCode = content.trim();
+    }
+    // 处理 Markdown 包裹的 Mermaid
+    else if (content.includes('```mermaid')) {
+      console.log('[DEBUG] 检测到 Markdown 包裹的 Mermaid 内容');
       const match = content.match(/```mermaid\n([\s\S]+?)\n```/);
       if (match && match[1]) {
         mermaidCode = match[1].trim();
+        console.log(`[DEBUG] 提取的 Mermaid 代码长度: ${mermaidCode.length}`);
+      } else {
+        console.log('[DEBUG] 无法提取 Mermaid 代码');
       }
     }
     
-    // u4f7fu7528mermaid-renderu6e32u67d3u56feu8868
+    console.log('[DEBUG] 尝试使用 mermaid-render 渲染图表');
+    console.log(`[DEBUG] 传递给 mermaidRenderer 的代码: ${mermaidCode}`);
+    
+    // 使用mermaid-render渲染图表
     const svg = await mermaidRenderer(mermaidCode, {
       theme: 'default',
       backgroundColor: 'transparent'
     });
+    
+    console.log('[DEBUG] Mermaid 渲染成功');
+    console.log(`[DEBUG] 生成的 SVG 长度: ${svg.length} 字符`);
     
     // u8fd4u56deu5305u542bu6e32u67d3u540eu56feu8868u7684HTML
     return `
@@ -372,7 +399,9 @@ async function renderMermaid(content) {
       </html>
     `;
   } catch (error) {
-    console.error('Mermaidu6e32u67d3u9519u8bef:', error);
+    console.error('Mermaid渲染错误:', error);
+    console.log(`[DEBUG] Mermaid 渲染错误详情: ${error.message}`);
+    console.log(`[DEBUG] 错误堆栈: ${error.stack}`);
     // u5982u679cu6e32u67d3u5931u8d25uff0cu8fd4u56deu9519u8befu4fe1u606f
     return `
       <!DOCTYPE html>

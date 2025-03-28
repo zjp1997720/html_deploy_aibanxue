@@ -614,6 +614,23 @@ document.addEventListener('DOMContentLoaded', () => {
             // 使用 setTimeout 确保动画效果正确显示
             setTimeout(() => {
               resultSection.classList.add('fade-in');
+              // 添加光影效果和流动效果，只出现一次
+              // 先移除之前的类，确保动画可以重新触发
+              resultSection.classList.remove('glow-effect');
+              resultSection.classList.remove('flow-effect');
+              
+              // 使用 setTimeout 确保在下一个渲染周期添加类
+              setTimeout(() => {
+                resultSection.classList.add('glow-effect');
+                resultSection.classList.add('flow-effect');
+                
+                // 动画结束后不需要手动移除类，因为 CSS 中设置了 forwards
+                // 但为了确保下次点击时可以再次触发动画，我们在动画完成后移除类
+                setTimeout(() => {
+                  resultSection.classList.remove('glow-effect');
+                  resultSection.classList.remove('flow-effect');
+                }, 3000);
+              }, 10);
             }, 10);
           }
           

@@ -5,8 +5,10 @@
 
 const { marked } = require('marked');
 const { JSDOM } = require('jsdom');
-const { renderMermaid: mermaidRenderer } = require('mermaid-render');
 const { CODE_TYPES } = require('./codeDetector');
+
+// 使用 mermaid-render 包来渲染 Mermaid 图表
+const { renderMermaid: mermaidRenderer } = require('mermaid-render');
 
 /**
  * u6e32u67d3HTMLu5185u5bb9
@@ -94,8 +96,13 @@ function renderHtml(content) {
  * @returns {string} - u6e32u67d3u540eu7684HTML
  */
 async function renderMarkdown(content) {
-  // 预处理内容，查找并提取 Mermaid 和 SVG 代码块
+  // 预处理内容，处理独立的 Mermaid 代码
   const processedContent = await preprocessMarkdown(content);
+  
+  // 如果是独立的 Mermaid 代码，直接返回预处理结果
+  if (processedContent.markdown.startsWith('<div class="mermaid">')) {
+    return processedContent.markdown;
+  }
   
   // 配置Marked选项
   marked.setOptions({
@@ -104,6 +111,11 @@ async function renderMarkdown(content) {
     smartLists: true,
     smartypants: true,
     highlight: function(code, lang) {
+      // 特殊处理 Mermaid 代码块
+      if (lang === 'mermaid') {
+        return `<div class="mermaid">${code}</div>`;
+      }
+      
       const hljs = require('highlight.js');
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -114,24 +126,181 @@ async function renderMarkdown(content) {
     }
   });
   
-  // 将Markdown转换为HTML
-  const htmlContent = marked.parse(processedContent.markdown);
+  // 自定义 renderer 来处理代码块
+  const renderer = new marked.Renderer();
+  const originalCodeRenderer = renderer.code.bind(renderer);
   
-  // 生成客户端渲染Mermaid图表的脚本
-  let mermaidScript = '';
-  if (processedContent.mermaidCharts && processedContent.mermaidCharts.length > 0) {
-    mermaidScript = `
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: 'default',
-        securityLevel: 'loose',
-        flowchart: { useMaxWidth: true }
-      });
-    </script>
-    `;
-  }
+  // 重写代码块渲染器
+  renderer.code = function(code, language, isEscaped) {
+    // 检查是否是 Mermaid 代码
+    const isMermaidCode = (code) => {
+      const mermaidPatterns = [
+        /^(graph|flowchart)\s+(TB|TD|BT|RL|LR)\b/m,
+        /^sequenceDiagram\b/m,
+        /^classDiagram\b/m,
+        /^stateDiagram(-v2)?\b/m,
+        /^erDiagram\b/m,
+        /^gantt\b/m,
+        /^pie\b/m,
+        /^journey\b/m,
+        /^gitGraph\b/m,
+        /^mindmap\b/m,
+        /^timeline\b/m,
+        /^C4Context\b/m
+      ];
+      return mermaidPatterns.some(pattern => pattern.test(code));
+    };
+    
+    // 如果是 Mermaid 代码或语言标记为 mermaid
+    if (language === 'mermaid' || isMermaidCode(code)) {
+      return `<div class="mermaid">${code}</div>`;
+    }
+    
+    // 如果是 SVG 代码
+    if (language === 'svg') {
+      return `<div class="embedded-svg-container">${code}</div>`;
+    }
+    
+    // 否则使用原始渲染器
+    return originalCodeRenderer(code, language, isEscaped);
+  };
+  
+  // 使用自定义渲染器
+  marked.setOptions({ renderer });
+  
+  // 将Markdown转换为HTML
+  const htmlContent = marked.parse(content);
+  
+  // 使用最新版的 Mermaid 库，并增强其兼容性
+  const mermaidScript = `
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    // 配置 Mermaid
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检测暗色模式
+      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      try {
+        // 将 <pre><code class="language-mermaid"> 转换为 <div class="mermaid">
+        const convertMermaidCodeBlocks = function() {
+          const codeBlocks = document.querySelectorAll('pre code.language-mermaid');
+          console.log('Found ' + codeBlocks.length + ' Mermaid code blocks to convert');
+          
+          codeBlocks.forEach(function(codeBlock, index) {
+            // 获取 Mermaid 代码
+            const code = codeBlock.textContent;
+            const pre = codeBlock.parentNode;
+            
+            // 创建新的 div.mermaid 元素
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.id = 'mermaid-converted-' + index;
+            mermaidDiv.textContent = code;
+            
+            // 替换 pre 元素
+            if (pre && pre.parentNode) {
+              pre.parentNode.replaceChild(mermaidDiv, pre);
+              console.log('Converted Mermaid code block #' + index);
+            }
+          });
+          
+          return codeBlocks.length > 0;
+        };
+        
+        // 首先转换代码块
+        convertMermaidCodeBlocks();
+        
+        // 配置 Mermaid
+        mermaid.initialize({
+          startOnLoad: true,  // 自动初始化
+          securityLevel: 'loose',
+          theme: isDarkMode ? 'dark' : 'default',
+          flowchart: { useMaxWidth: true, htmlLabels: true },
+          sequence: { useMaxWidth: true },
+          gantt: { useMaxWidth: true },
+          er: { useMaxWidth: true },
+          pie: { useMaxWidth: true }
+        });
+        
+        // 定时检查是否有未渲染的 Mermaid 元素
+        setTimeout(function checkMermaidElements() {
+          // 再次转换代码块，以防动态加载的内容
+          const hasNewCodeBlocks = convertMermaidCodeBlocks();
+          
+          const mermaidElements = document.querySelectorAll('.mermaid');
+          console.log('Found ' + mermaidElements.length + ' Mermaid elements in total');
+          
+          let hasUnrenderedElements = hasNewCodeBlocks; // 如果有新转换的代码块，就需要继续尝试渲染
+          
+          // 检查是否有未渲染的 Mermaid 元素
+          mermaidElements.forEach(function(el) {
+            if (el.querySelector('svg') === null && !el.classList.contains('mermaid-error')) {
+              hasUnrenderedElements = true;
+              console.log('Found unrendered Mermaid element, trying to render manually');
+              try {
+                // 尝试使用不同版本的 API
+                if (typeof mermaid.init === 'function') {
+                  mermaid.init(undefined, el);
+                } else if (typeof mermaid.run === 'function') {
+                  mermaid.run({ nodes: [el] });
+                }
+              } catch (err) {
+                console.error('Failed to render Mermaid diagram:', err);
+                // 显示原始代码
+                el.innerHTML = '<pre>' + el.textContent + '</pre>';
+                el.classList.add('mermaid-error');
+              }
+            }
+          });
+          
+          // 如果还有未渲染的元素，继续尝试
+          if (hasUnrenderedElements) {
+            setTimeout(checkMermaidElements, 1000);
+          }
+        }, 500);
+      } catch (e) {
+        console.error('Error initializing Mermaid:', e);
+      }
+    });
+  </script>
+  `;
+  
+  // 添加 Mermaid 相关的 CSS 样式
+  const mermaidStyles = `
+  <style>
+    .mermaid {
+      margin: 20px 0;
+      text-align: center;
+      overflow: auto;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .mermaid-error {
+      margin: 20px 0;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff0f0;
+      border: 1px solid #ffcccc;
+      color: #cc0000;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .mermaid {
+        background-color: #2d2d2d;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
+      
+      .mermaid-error {
+        background-color: #3a2222;
+        border-color: #662222;
+        color: #ff6666;
+      }
+    }
+  </style>
+  `;
 
   // 添加嵌入内容的样式
   const embeddedStyles = `
@@ -189,6 +358,7 @@ async function renderMarkdown(content) {
         }
         ${embeddedStyles}
       </style>
+      ${mermaidStyles}
       ${mermaidScript}
     </head>
     <body>
@@ -298,42 +468,56 @@ async function renderMermaid(content) {
     let mermaidCode = content;
     
     // 检查是否是纯 Mermaid 语法（不带 ```mermaid 标记）
-    if (!content.includes('```mermaid') && 
-        (content.trim().startsWith('graph ') || 
-         content.trim().startsWith('sequenceDiagram') || 
-         content.trim().startsWith('classDiagram') || 
-         content.trim().startsWith('gantt') || 
-         content.trim().startsWith('pie') || 
-         content.trim().startsWith('flowchart') ||
-         content.trim().startsWith('sequenceDiagram'))) {
+    const mermaidPatterns = [
+      /^\s*graph\s+[A-Za-z\s]/i,        // 流程图
+      /^\s*flowchart\s+[A-Za-z\s]/i,    // 流程图 (新语法)
+      /^\s*sequenceDiagram/i,           // 序列图
+      /^\s*classDiagram/i,              // 类图
+      /^\s*gantt\s*$/i,                 // 甘特图
+      /^\s*pie\s*$/i,                   // 饼图
+      /^\s*erDiagram/i,                // ER图
+      /^\s*journey/i,                  // 用户旅程图
+      /^\s*stateDiagram/i,             // 状态图
+      /^\s*gitGraph/i                  // Git图
+    ];
+    
+    // 检查是否是纯 Mermaid 语法
+    const isPureMermaid = mermaidPatterns.some(pattern => pattern.test(content.trim()));
+    
+    if (!content.includes('```mermaid') && isPureMermaid) {
       console.log('[DEBUG] 检测到纯 Mermaid 语法');
       mermaidCode = content.trim();
     }
     // 处理 Markdown 包裹的 Mermaid
     else if (content.includes('```mermaid')) {
       console.log('[DEBUG] 检测到 Markdown 包裹的 Mermaid 内容');
-      const match = content.match(/```mermaid\n([\s\S]+?)\n```/);
-      if (match && match[1]) {
-        mermaidCode = match[1].trim();
-        console.log(`[DEBUG] 提取的 Mermaid 代码长度: ${mermaidCode.length}`);
+      // 更健壮的提取方式，处理多个 ```mermaid 块
+      const matches = content.match(/```mermaid\n([\s\S]+?)\n```/g);
+      if (matches && matches.length > 0) {
+        // 只处理第一个 mermaid 块
+        const firstMatch = matches[0].match(/```mermaid\n([\s\S]+?)\n```/);
+        if (firstMatch && firstMatch[1]) {
+          mermaidCode = firstMatch[1].trim();
+          console.log(`[DEBUG] 提取的 Mermaid 代码长度: ${mermaidCode.length}`);
+        } else {
+          console.log('[DEBUG] 无法提取 Mermaid 代码');
+        }
       } else {
-        console.log('[DEBUG] 无法提取 Mermaid 代码');
+        console.log('[DEBUG] 无法匹配 Mermaid 代码块');
       }
     }
     
-    console.log('[DEBUG] 尝试使用 mermaid-render 渲染图表');
-    console.log(`[DEBUG] 传递给 mermaidRenderer 的代码: ${mermaidCode}`);
+    console.log('[DEBUG] 使用客户端渲染方式处理 Mermaid 图表');
     
-    // 使用mermaid-render渲染图表
-    const svg = await mermaidRenderer(mermaidCode, {
-      theme: 'default',
-      backgroundColor: 'transparent'
-    });
+    // 对 Mermaid 代码进行转义，以便在 HTML 中安全使用
+    const escapedMermaidCode = escapeHtml(mermaidCode);
     
-    console.log('[DEBUG] Mermaid 渲染成功');
-    console.log(`[DEBUG] 生成的 SVG 长度: ${svg.length} 字符`);
+    // 记录最终要渲染的代码
+    console.log(`[DEBUG] 最终要渲染的 Mermaid 代码: ${escapedMermaidCode.substring(0, 100)}...`);
     
-    // u8fd4u56deu5305u542bu6e32u67d3u540eu56feu8868u7684HTML
+    console.log('[DEBUG] 准备生成客户端渲染 HTML');
+    
+    // 生成包含 Mermaid 图表的 HTML，使用客户端渲染
     return `
       <!DOCTYPE html>
       <html lang="zh-CN">
@@ -353,6 +537,9 @@ async function renderMermaid(content) {
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="HTML-GO">
+        
+        <!-- 引入 Mermaid 库 -->
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
         
         <style>
           body {
@@ -375,10 +562,32 @@ async function renderMermaid(content) {
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
           }
-          svg {
+          .mermaid {
             display: block;
             max-width: 100%;
-            height: auto;
+            margin: 0 auto;
+          }
+          pre.mermaid-code {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #4a6cf7;
+            display: none; /* 默认隐藏代码 */
+          }
+          .toggle-code-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 14px;
+          }
+          .toggle-code-btn:hover {
+            background-color: #3a56d4;
           }
           @media (prefers-color-scheme: dark) {
             body {
@@ -389,13 +598,57 @@ async function renderMermaid(content) {
               background-color: #2a2a2a;
               box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             }
+            pre.mermaid-code {
+              background-color: #333;
+              border-left: 4px solid #4a6cf7;
+            }
           }
         </style>
       </head>
       <body>
         <div class="mermaid-container">
-          ${svg}
+          <h2>Mermaid 图表查看器</h2>
+          <button class="toggle-code-btn" onclick="toggleCode()">显示/隐藏代码</button>
+          <pre class="mermaid-code"><code>${escapedMermaidCode}</code></pre>
+          <div class="mermaid">
+${escapedMermaidCode}
+          </div>
         </div>
+        
+        <script>
+          // 初始化 Mermaid
+          mermaid.initialize({
+            startOnLoad: true,
+            securityLevel: 'loose',
+            theme: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+            logLevel: 'info',
+            flowchart: { useMaxWidth: true, htmlLabels: true },
+            sequence: { useMaxWidth: true },
+            gantt: { useMaxWidth: true },
+            er: { useMaxWidth: true },
+            pie: { useMaxWidth: true }
+          });
+          
+          // 确保 Mermaid 图表被渲染
+          setTimeout(() => {
+            try {
+              mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+              console.log('Mermaid 图表渲染完成');
+            } catch (e) {
+              console.error('Mermaid 图表渲染失败:', e);
+            }
+          }, 100);
+          
+          // 显示/隐藏代码的函数
+          function toggleCode() {
+            const codeBlock = document.querySelector('.mermaid-code');
+            if (codeBlock.style.display === 'block') {
+              codeBlock.style.display = 'none';
+            } else {
+              codeBlock.style.display = 'block';
+            }
+          }
+        </script>
       </body>
       </html>
     `;
@@ -527,88 +780,50 @@ async function renderContent(content, contentType) {
 }
 
 /**
- * 预处理Markdown内容，提取特殊代码块
+ * 预处理Markdown内容
  * @param {string} content - Markdown内容
- * @returns {Object} - 处理后的Markdown和特殊代码块
+ * @returns {Object} - 处理后的内容
  */
 async function preprocessMarkdown(content) {
-  const mermaidCharts = [];
-  const svgBlocks = [];
-  
-  // 使用正则表达式查找代码块
-  const codeBlockRegex = /```(\w+)\n([\s\S]*?)```/g;
-  
-  // 替换所有代码块
-  let processedMarkdown = content;
-  let match;
-  
-  // 处理所有代码块
-  while ((match = codeBlockRegex.exec(content)) !== null) {
-    const [fullMatch, language, code] = match;
-    const startIndex = match.index;
-    const endIndex = startIndex + fullMatch.length;
+  // 检查是否是独立的 Mermaid 代码
+  const isMermaidContent = (code) => {
+    // 检查是否包含 Mermaid 图表的常见语法元素
+    const mermaidPatterns = [
+      /^(graph|flowchart)\s+(TB|TD|BT|RL|LR)\b/m,  // 流程图
+      /^sequenceDiagram\b/m,                        // 序列图
+      /^classDiagram\b/m,                          // 类图
+      /^stateDiagram(-v2)?\b/m,                    // 状态图
+      /^erDiagram\b/m,                             // ER图
+      /^gantt\b/m,                                 // 甘特图
+      /^pie\b/m,                                   // 饼图
+      /^journey\b/m,                               // 用户旅程图
+      /^gitGraph\b/m,                              // Git图
+      /^mindmap\b/m,                               // 思维导图
+      /^timeline\b/m,                              // 时间线
+      /^C4Context\b/m                              // C4图
+    ];
     
-    // 处理SVG代码块
-    if (language.toLowerCase() === 'svg') {
-      const id = `svg-${svgBlocks.length}`;
-      svgBlocks.push({ id, code });
-      const replacement = `<div class="embedded-svg-container" id="${id}">
-${code}
-</div>`;
-      
-      // 替换原始内容
-      processedMarkdown = processedMarkdown.substring(0, startIndex) + 
-                          replacement + 
-                          processedMarkdown.substring(endIndex);
-      
-      // 调整正则表达式的lastIndex
-      codeBlockRegex.lastIndex = startIndex + replacement.length;
-    }
-    // 处理Mermaid图表
-    else if (language.toLowerCase() === 'mermaid') {
-      try {
-        // 尝试在服务器端预渲染Mermaid
-        const svg = await mermaidRenderer(code, {
-          theme: 'default',
-          backgroundColor: 'transparent'
-        });
-        
-        const replacement = `<div class="embedded-mermaid-container">
-${svg}
-</div>`;
-        
-        // 替换原始内容
-        processedMarkdown = processedMarkdown.substring(0, startIndex) + 
-                            replacement + 
-                            processedMarkdown.substring(endIndex);
-        
-        // 调整正则表达式的lastIndex
-        codeBlockRegex.lastIndex = startIndex + replacement.length;
-      } catch (error) {
-        console.error('Mermaid预渲染错误:', error);
-        // 如果服务器端渲染失败，添加到客户端渲染列表
-        const chartId = `mermaid-${mermaidCharts.length}`;
-        mermaidCharts.push({ id: chartId, code });
-        
-        const replacement = `<div class="mermaid" id="${chartId}">
-${code}
-</div>`;
-        
-        // 替换原始内容
-        processedMarkdown = processedMarkdown.substring(0, startIndex) + 
-                            replacement + 
-                            processedMarkdown.substring(endIndex);
-        
-        // 调整正则表达式的lastIndex
-        codeBlockRegex.lastIndex = startIndex + replacement.length;
-      }
-    }
+    return mermaidPatterns.some(pattern => pattern.test(code));
+  };
+  
+  // 如果是独立的 Mermaid 代码，直接将其包裹在 mermaid 类中
+  if (!content.includes('```') && isMermaidContent(content)) {
+    console.log('[DEBUG] 检测到独立的 Mermaid 代码');
+    return {
+      markdown: `<div class="mermaid">
+${content}
+</div>`,
+      mermaidCharts: [{ id: 'mermaid-standalone', code: content }],
+      svgBlocks: []
+    };
   }
   
+  // 对于 Markdown 内容，我们不需要做特殊处理
+  // 因为我们已经自定义了 marked 渲染器来处理 Mermaid 和 SVG 代码块
   return {
-    markdown: processedMarkdown,
-    mermaidCharts,
-    svgBlocks
+    markdown: content,
+    mermaidCharts: [],
+    svgBlocks: []
   };
 }
 

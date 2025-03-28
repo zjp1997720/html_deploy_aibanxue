@@ -97,8 +97,34 @@ app.get('/view/:id', async (req, res) => {
     // 始终重新检测内容类型，确保正确渲染
     const validTypes = ['html', 'markdown', 'svg', 'mermaid'];
     
-    // 优先使用检测到的类型，而不是数据库中的类型
-    const detectedType = detectCodeType(page.html_content);
+    // 打印原始内容的前100个字符，帮助调试
+    console.log(`原始内容前100字符: ${page.html_content.substring(0, 100)}...`);
+    
+    // 检查是否是 Mermaid 图表
+    const mermaidPatterns = [
+      /^\s*graph\s+[A-Za-z\s]/i,        // 流程图 (包括 graph TD)
+      /^\s*flowchart\s+[A-Za-z\s]/i,    // 流程图 (新语法)
+      /^\s*sequenceDiagram/i,           // 序列图
+      /^\s*classDiagram/i,              // 类图
+      /^\s*gantt/i,                    // 甘特图
+      /^\s*pie/i,                      // 饼图
+      /^\s*erDiagram/i,                // ER图
+      /^\s*journey/i,                  // 用户旅程图
+      /^\s*stateDiagram/i,             // 状态图
+      /^\s*gitGraph/i                  // Git图
+    ];
+    
+    // 检查是否是纯 Mermaid 语法
+    const trimmedContent = page.html_content.trim();
+    const isPureMermaid = mermaidPatterns.some(pattern => pattern.test(trimmedContent));
+    
+    // 强制识别 Mermaid 图表
+    let detectedType = detectCodeType(page.html_content);
+    if (isPureMermaid) {
+      console.log('[DEBUG] 检测到纯 Mermaid 语法，强制设置为 mermaid 类型');
+      detectedType = 'mermaid';
+    }
+    
     console.log(`检测到的内容类型: ${detectedType}`);
     console.log(`数据库中的内容类型: ${page.code_type}`);
     

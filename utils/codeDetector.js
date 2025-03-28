@@ -41,9 +41,13 @@ function detectCodeType(code) {
     return CODE_TYPES.MARKDOWN;
   }
   
-  // 检查是否包含SVG或Mermaid代码块标记
-  if (trimmedCode.includes('```svg') || 
-      trimmedCode.includes('```mermaid')) {
+  // 检查是否包含 Mermaid 代码块标记
+  if (trimmedCode.includes('```mermaid')) {
+    return CODE_TYPES.MERMAID;
+  }
+  
+  // 检查是否包含 SVG 代码块标记
+  if (trimmedCode.includes('```svg')) {
     return CODE_TYPES.MARKDOWN;
   }
   
@@ -74,14 +78,25 @@ function detectCodeType(code) {
     return CODE_TYPES.SVG;
   }
   
-  // 检测纯Mermaid - 只有当它是一个完整的Mermaid图表并且没有Markdown特征时
-  if ((trimmedCode.startsWith('graph ') || 
-      trimmedCode.startsWith('sequenceDiagram') || 
-      trimmedCode.startsWith('classDiagram') || 
-      trimmedCode.startsWith('gantt') || 
-      trimmedCode.startsWith('pie') || 
-      trimmedCode.startsWith('flowchart')) && 
-      !containsMarkdownFeatures(trimmedCode)) {
+  // 检测纯Mermaid - 支持所有 Mermaid 图表类型
+  const mermaidPatterns = [
+    /^\s*graph\s+[A-Za-z\s]/i,        // 流程图 (包括 graph TD)
+    /^\s*flowchart\s+[A-Za-z\s]/i,    // 流程图 (新语法)
+    /^\s*sequenceDiagram/i,           // 序列图
+    /^\s*classDiagram/i,              // 类图
+    /^\s*gantt/i,                    // 甘特图
+    /^\s*pie/i,                      // 饼图
+    /^\s*erDiagram/i,                // ER图
+    /^\s*journey/i,                  // 用户旅程图
+    /^\s*stateDiagram/i,             // 状态图
+    /^\s*gitGraph/i                  // Git图
+  ];
+  
+  // 检查是否是纯 Mermaid 语法
+  const isPureMermaid = mermaidPatterns.some(pattern => pattern.test(trimmedCode));
+  
+  if (isPureMermaid && !containsMarkdownFeatures(trimmedCode)) {
+    console.log('[DEBUG] 检测到纯 Mermaid 语法');
     return CODE_TYPES.MERMAID;
   }
   

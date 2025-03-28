@@ -59,6 +59,36 @@ document.addEventListener('DOMContentLoaded', () => {
   let codeElement = null;
   let highlightEnabled = true;
   
+  // 初始化代码编辑器
+  function initCodeEditor() {
+    if (htmlInput && codeInputContainer) {
+      console.log('初始化代码编辑器');
+      
+      // 创建代码元素
+      codeElement = document.createElement('code');
+      codeElement.className = 'hljs language-html';
+      codeElement.style.position = 'absolute';
+      codeElement.style.top = '0';
+      codeElement.style.left = '0';
+      codeElement.style.width = '100%';
+      codeElement.style.height = '100%';
+      codeElement.style.padding = '15px';
+      codeElement.style.boxSizing = 'border-box';
+      codeElement.style.overflow = 'auto';
+      codeElement.style.backgroundColor = 'transparent';
+      codeElement.style.whiteSpace = 'pre-wrap';
+      codeElement.style.display = 'none'; // 初始时隐藏
+      
+      // 将代码元素添加到容器中
+      codeInputContainer.appendChild(codeElement);
+      
+      // 如果有初始内容，同步到高亮区域
+      if (htmlInput.value) {
+        syncToTextarea();
+      }
+    }
+  }
+  
   // 显示加载指示器
   function showLoading() {
     if (loadingIndicator) {
@@ -77,14 +107,42 @@ document.addEventListener('DOMContentLoaded', () => {
   function syncToTextarea() {
     if (codeElement) {
       codeElement.textContent = htmlInput.value;
-      updateHighlighting();
+      
+      // 如果内容过长，使用requestAnimationFrame延迟处理高亮
+      if (htmlInput.value.length > 10000) {
+        console.log('内容过长，使用requestAnimationFrame延迟处理高亮');
+        requestAnimationFrame(() => {
+          updateHighlighting();
+        });
+      } else {
+        updateHighlighting();
+      }
     }
   }
   
   // 更新语法高亮
   function updateHighlighting() {
     if (codeElement && highlightEnabled) {
-      hljs.highlightElement(codeElement);
+      try {
+        console.log('应用代码高亮');
+        hljs.highlightElement(codeElement);
+        
+        // 确保代码元素可见
+        codeElement.style.display = 'block';
+      } catch (error) {
+        console.error('高亮处理错误:', error);
+      }
+    }
+  }
+  
+  // 切换高亮状态
+  function toggleHighlighting() {
+    highlightEnabled = !highlightEnabled;
+    
+    if (highlightEnabled) {
+      updateHighlighting();
+    } else if (codeElement) {
+      codeElement.className = 'hljs';
     }
   }
   
@@ -418,12 +476,18 @@ document.addEventListener('DOMContentLoaded', () => {
     codeTypeText.textContent = label;
   }
 
-  // 在输入框内容变化时检测代码类型
+  // 初始化代码编辑器
+  initCodeEditor();
+  
+  // 在输入框内容变化时检测代码类型并更新高亮
   if (htmlInput) {
     htmlInput.addEventListener('input', () => {
       const content = htmlInput.value;
       const codeType = detectCodeType(content);
       updateCodeTypeIndicator(codeType, content);
+      
+      // 同步到高亮区域
+      syncToTextarea();
     });
     
     // 页面加载时检测初始内容

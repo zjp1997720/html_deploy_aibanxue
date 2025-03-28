@@ -204,99 +204,153 @@ document.addEventListener('DOMContentLoaded', () => {
   // 代码类型检测函数
   function detectCodeType(code) {
     if (!code || typeof code !== 'string') {
-      return 'markdown'; // 默认返回Markdown
+      return 'html'; // 默认返回HTML而不是Markdown
     }
     
     const trimmedCode = code.trim();
+    console.log('检测代码类型，前50个字符:', trimmedCode.substring(0, 50) + '...');
     
-    // 首先检查是否包含Markdown标记符号或格式
-    // 这些是明确的Markdown特征
-    if (trimmedCode.includes('###') || 
-        trimmedCode.includes('##') || 
-        trimmedCode.includes('# ') || 
-        /^-\s.+/m.test(trimmedCode) || 
-        /^\*\s.+/m.test(trimmedCode) || 
-        /^\d+\.\s.+/m.test(trimmedCode) || 
-        trimmedCode.includes('```') || 
-        /\[.+\]\(.+\)/.test(trimmedCode) || 
-        /!\[.+\]\(.+\)/.test(trimmedCode) || 
-        /^>\s.+/m.test(trimmedCode) || 
-        /\|.+\|/.test(trimmedCode) || 
-        /\*\*.+\*\*/.test(trimmedCode) || 
-        /__.+__/.test(trimmedCode)) {
-      return 'markdown';
-    }
-    
-    // 检查是否包含SVG或Mermaid代码块标记
-    if (trimmedCode.includes('```svg') || 
-        trimmedCode.includes('```mermaid')) {
-      return 'markdown';
-    }
-    
-    // 检测HTML - 只有明确的HTML文档才识别为HTML
-    if (trimmedCode.startsWith('<!DOCTYPE html>') || 
-        trimmedCode.startsWith('<html') ||
-        (trimmedCode.startsWith('<') && 
-         (trimmedCode.includes('<div') || 
-          trimmedCode.includes('<p') || 
-          trimmedCode.includes('<span') || 
-          trimmedCode.includes('<h1') || 
-          trimmedCode.includes('<body') || 
-          trimmedCode.includes('<head')))) {
-      return 'html';
-    }
-    
-    // 检测纯文本 - 任何纯文本内容都应该被识别为Markdown
-    if (!trimmedCode.includes('<') && !trimmedCode.includes('>')) {
-      return 'markdown';
-    }
-
-    // 检测纯SVG - 只有当它是一个完整的SVG标签并且没有Markdown特征时
-    if (trimmedCode.startsWith('<svg') && 
-        trimmedCode.includes('</svg>') && 
-        trimmedCode.includes('xmlns="http://www.w3.org/2000/svg"')) {
-      return 'svg';
-    }
-    
-    // 检测纯Mermaid - 只有当它是一个完整的Mermaid图表时
+    // 检测纯Mermaid - 优先检查，因为这是最明确的格式
     if ((trimmedCode.startsWith('graph ') || 
         trimmedCode.startsWith('sequenceDiagram') || 
         trimmedCode.startsWith('classDiagram') || 
         trimmedCode.startsWith('gantt') || 
         trimmedCode.startsWith('pie') || 
         trimmedCode.startsWith('flowchart'))) {
+      console.log('检测到纯Mermaid图表');
       return 'mermaid';
     }
     
-    // 更智能的类型检测
+    // 检测HTML - 只有明确的HTML文档才识别为HTML
+    if (trimmedCode.startsWith('<!DOCTYPE html>') || 
+        trimmedCode.startsWith('<html')) {
+      console.log('检测到完整HTML文档');
+      return 'html';
+    }
+    
+    // 检测纯SVG - 只有当它是一个完整的SVG标签时
+    if (trimmedCode.startsWith('<svg') && 
+        trimmedCode.includes('</svg>') && 
+        trimmedCode.includes('xmlns="http://www.w3.org/2000/svg"')) {
+      console.log('检测到纯SVG');
+      return 'svg';
+    }
+    
+    // 检查是否包含明确的Markdown特征
+    // 计算Markdown特征的数量和权重
+    let markdownScore = 0;
+    
+    // 标题 (权重高)
+    if (trimmedCode.includes('# ')) markdownScore += 2;
+    if (trimmedCode.includes('## ')) markdownScore += 2;
+    if (trimmedCode.includes('### ')) markdownScore += 2;
+    
+    // 列表
+    if (/^-\s.+/m.test(trimmedCode)) markdownScore += 1;
+    if (/^\*\s.+/m.test(trimmedCode)) markdownScore += 1;
+    if (/^\d+\.\s.+/m.test(trimmedCode)) markdownScore += 1;
+    
+    // 代码块 (权重高)
+    if (trimmedCode.includes('```')) markdownScore += 3;
+    
+    // 链接和图片 (权重高)
+    if (/\[.+\]\(.+\)/.test(trimmedCode)) markdownScore += 2;
+    if (/!\[.+\]\(.+\)/.test(trimmedCode)) markdownScore += 2;
+    
+    // 引用
+    if (/^>\s.+/m.test(trimmedCode)) markdownScore += 2;
+    
+    // 表格
+    if (/\|.+\|/.test(trimmedCode)) markdownScore += 2;
+    
+    // 格式化文本
+    if (/\*\*.+\*\*/.test(trimmedCode)) markdownScore += 1;
+    if (/__.+__/.test(trimmedCode)) markdownScore += 1;
+    
+    console.log('Markdown特征分数:', markdownScore);
+    
+    // 如果Markdown分数足够高，则返回Markdown
+    if (markdownScore >= 3) {
+      console.log('检测到Markdown内容');
+      return 'markdown';
+    }
+    
+    // 检查是否包含Markdown代码块标记
+    if (trimmedCode.includes('```svg') || 
+        trimmedCode.includes('```mermaid') ||
+        trimmedCode.includes('```javascript') ||
+        trimmedCode.includes('```python') ||
+        trimmedCode.includes('```java') ||
+        trimmedCode.includes('```html') ||
+        trimmedCode.includes('```css')) {
+      console.log('检测到Markdown代码块');
+      return 'markdown';
+    }
+    
+    // 检测纯文本 - 没有HTML标签的纯文本内容可能是Markdown
+    if (!trimmedCode.includes('<') && !trimmedCode.includes('>')) {
+      // 如果内容很短且没有明显的Markdown特征，可能是普通文本
+      if (trimmedCode.length < 50 && markdownScore < 2) {
+        console.log('检测到短纯文本，可能是HTML');
+        return 'html';
+      }
+      console.log('检测到纯文本，可能是Markdown');
+      return 'markdown';
+    }
+    
+    // 检测HTML片段
+    if (trimmedCode.startsWith('<') && 
+        (trimmedCode.includes('<div') || 
+         trimmedCode.includes('<p') || 
+         trimmedCode.includes('<span') || 
+         trimmedCode.includes('<h1') || 
+         trimmedCode.includes('<body') || 
+         trimmedCode.includes('<head'))) {
+      console.log('检测到HTML片段');
+      return 'html';
+    }
+    
+    // 更智能的类型检测 - 处理混合内容
     // 如果包含 HTML 标签，但不是完整的 HTML 文档，我们需要进一步判断
     if (trimmedCode.includes('<') && trimmedCode.includes('>')) {
       // 计算 HTML 标签的数量
       const htmlTagsCount = (trimmedCode.match(/<\/?[a-z][\s\S]*?>/gi) || []).length;
-      // 计算 Markdown 特征的数量
-      const markdownFeaturesCount = (
-        (trimmedCode.match(/#{1,6}\s.+/gm) || []).length +
-        (trimmedCode.match(/^-\s.+/gm) || []).length +
-        (trimmedCode.match(/^\*\s.+/gm) || []).length +
-        (trimmedCode.match(/^\d+\.\s.+/gm) || []).length +
-        (trimmedCode.match(/```[\s\S]*?```/g) || []).length +
-        (trimmedCode.match(/\[.+\]\(.+\)/g) || []).length +
-        (trimmedCode.match(/!\[.+\]\(.+\)/g) || []).length +
-        (trimmedCode.match(/^>\s.+/gm) || []).length +
-        (trimmedCode.match(/\*\*.+\*\*/g) || []).length +
-        (trimmedCode.match(/__.+__/g) || []).length
-      );
+      console.log('HTML标签数量:', htmlTagsCount);
       
-      // 如果 Markdown 特征数量大于 HTML 标签数量，则返回 Markdown
-      if (markdownFeaturesCount > htmlTagsCount) {
+      // 如果HTML标签数量很少，而Markdown特征分数较高，则可能是Markdown中嵌入了少量HTML
+      if (htmlTagsCount < 5 && markdownScore >= 3) {
+        console.log('检测到Markdown中嵌入了少量HTML');
         return 'markdown';
       }
       
-      // 否则返回 HTML
+      // 如果是SVG标签但嵌入在Markdown中
+      if (trimmedCode.includes('<svg') && 
+          trimmedCode.includes('</svg>') && 
+          trimmedCode.includes('xmlns="http://www.w3.org/2000/svg"') &&
+          markdownScore >= 3) {
+        console.log('检测到Markdown中嵌入了SVG');
+        return 'markdown';
+      }
+      
+      // 如果内容中有大量HTML标签，可能是HTML
+      if (htmlTagsCount > 10) {
+        console.log('检测到大量HTML标签，可能是HTML');
+        return 'html';
+      }
+      
+      // 如果Markdown特征分数明显高于HTML标签数量
+      if (markdownScore > htmlTagsCount * 1.5) {
+        console.log('Markdown特征明显多于HTML标签');
+        return 'markdown';
+      }
+      
+      // 默认返回HTML
+      console.log('默认判断为HTML');
       return 'html';
     }
     
-    // 如果没有明确的特征，默认返回 HTML
+    // 如果没有明确的特征，默认返回HTML
+    console.log('没有明确特征，默认返回HTML');
     return 'html';
   }
 

@@ -304,7 +304,8 @@ async function renderMermaid(content) {
          content.trim().startsWith('classDiagram') || 
          content.trim().startsWith('gantt') || 
          content.trim().startsWith('pie') || 
-         content.trim().startsWith('flowchart'))) {
+         content.trim().startsWith('flowchart') ||
+         content.trim().startsWith('sequenceDiagram'))) {
       console.log('[DEBUG] 检测到纯 Mermaid 语法');
       mermaidCode = content.trim();
     }

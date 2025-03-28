@@ -1900,3 +1900,62 @@ label[for="html-file"] {
   transform: scale(1.2);
   box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
 }
+
+/* 代码类型指示器样式 */
+.code-type-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100; /* 增加 z-index 确保它始终显示在最上层 */
+  transition: all 0.3s ease;
+  opacity: 0.9; /* 增加透明度使其更明显 */
+}
+
+.code-type-indicator i {
+  font-size: 0.9rem;
+}
+
+/* 移除鼠标悬浮动效 */
+/* .code-type-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+} */
+
+/* HTML类型 */
+.code-type-indicator.html-type {
+  background: linear-gradient(135deg, #e44d26, #f16529);
+  border: 1px solid #e44d26;
+}
+
+/* Markdown类型 */
+.code-type-indicator.markdown-type {
+  background: linear-gradient(135deg, #755AB5, #6C5FC7);
+  border: 1px solid #755AB5;
+}
+
+/* SVG类型 */
+.code-type-indicator.svg-type {
+  background: linear-gradient(135deg, #FFB13B, #FF9A3B);
+  border: 1px solid #FFB13B;
+}
+
+/* Mermaid类型 */
+.code-type-indicator.mermaid-type {
+  background: linear-gradient(135deg, #0099e5, #5CC3F0);
+  border: 1px solid #0099e5;
+}
+
+/* 默认类型 */
+.code-type-indicator.default-type {
+  background: linear-gradient(135deg, #607d8b, #78909c);
+  border: 1px solid #607d8b;
+}

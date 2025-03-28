@@ -640,6 +640,7 @@ body {
 .cyber-input {
   width: 100%;
   min-height: 200px;
+  max-height: 500px;
   padding: 1rem;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
@@ -649,6 +650,9 @@ body {
   font-size: 14px;
   resize: vertical;
   outline: none;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .cyber-input:focus {

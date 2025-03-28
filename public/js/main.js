@@ -375,7 +375,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // 页面加载时检测初始内容
     if (htmlInput.value) {
       const content = htmlInput.value;
-      const codeType = detectCodeType(content);
+      
+      // 检查是否在编辑页面上
+      const isEditPage = window.location.pathname.includes('/edit/') || window.location.pathname.includes('/view/');
+      
+      // 如果是编辑页面，尝试从多个来源获取代码类型
+      let codeType = 'html';
+      if (isEditPage) {
+        // 1. 尝试从 meta 标签中获取代码类型
+        const metaCodeType = document.querySelector('meta[name="code-type"]');
+        if (metaCodeType && metaCodeType.getAttribute('content')) {
+          const typeFromMeta = metaCodeType.getAttribute('content');
+          if (['html', 'markdown', 'svg', 'mermaid'].includes(typeFromMeta)) {
+            codeType = typeFromMeta;
+            console.log(`从 meta 标签中获取代码类型: ${codeType}`);
+          }
+        } else {
+          // 2. 尝试从 URL 参数中获取代码类型
+          const urlParams = new URLSearchParams(window.location.search);
+          const typeFromUrl = urlParams.get('type');
+          
+          if (typeFromUrl && ['html', 'markdown', 'svg', 'mermaid'].includes(typeFromUrl)) {
+            codeType = typeFromUrl;
+            console.log(`从 URL 参数中获取代码类型: ${codeType}`);
+          } else {
+            // 3. 如果以上方法都失败，则使用检测函数
+            codeType = detectCodeType(content);
+            console.log(`检测到的代码类型: ${codeType}`);
+          }
+        }
+      } else {
+        // 如果不是编辑页面，使用检测函数
+        codeType = detectCodeType(content);
+      }
+      
       updateCodeTypeIndicator(codeType, content);
     } else {
       // 初始时如果没有内容，隐藏指示器

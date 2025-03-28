@@ -108,8 +108,16 @@ app.get('/view/:id', async (req, res) => {
     // 根据不同的内容类型进行渲染
     const renderedContent = await renderContent(page.html_content, contentType);
     
+    // 在渲染内容中添加代码类型信息
+    // 使用正则表达式在 head 标签结束前添加一个元数据标签
+    const contentWithTypeInfo = renderedContent.replace(
+      '</head>',
+      `<meta name="code-type" content="${contentType}">
+</head>`
+    );
+    
     // 返回渲染后的内容
-    res.send(renderedContent);
+    res.send(contentWithTypeInfo);
   } catch (error) {
     console.error('查看页面错误:', error);
     res.status(500).render('error', { 

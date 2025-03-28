@@ -643,6 +643,88 @@ body {
   overflow: hidden;
   display: block;
   margin-bottom: 1rem;
+  /* 添加背景覆盖层 */
+  background: var(--bg-card);
+  z-index: 5;
+}
+
+/* 隐藏底部固定文本 */
+.input-card::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* 调整高度以覆盖底部文本 */
+  background: var(--bg-card);
+  z-index: 4;
+}
+
+/* 确保按钮区域在覆盖层上方 */
+.input-card .mt-4 {
+  position: relative;
+  z-index: 6;
+  background: var(--bg-card);
+  padding-top: 10px;
+  margin-top: 0 !important;
+}
+
+/* 防止输入框下方出现重复文本 - 更精确的解决方案 */
+#code-input-container::after,
+#code-input-container::before {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* 确保输入框内容不会溢出 */
+.input-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 强制只显示必要元素 */
+.cyber-input {
+  position: relative !important;
+  z-index: 10 !important;
+  background-color: var(--bg-input) !important;
+}
+
+/* 确保文本选中有清晰的视觉反馈 */
+::selection {
+  background: var(--primary) !important;
+  color: white !important;
+  opacity: 0.7 !important;
+}
+
+/* 为输入框添加特殊样式防止文本重叠 */
+#html-input {
+  position: relative;
+  z-index: 10;
+  background: var(--bg-input) !important;
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--bg-input), 0 0 20px rgba(0, 0, 0, 0.2);
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* 防止底部文字透出 */
+  margin-bottom: 0;
+  padding-bottom: 20px;
+  /* 确保可以选择和复制 */
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }
 
 /* 输入区域 */
@@ -651,7 +733,8 @@ body {
   min-height: 200px;
   max-height: 500px;
   padding: 1rem;
-  background: var(--bg-input);
+  background: var(--bg-input) !important;
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-primary);
@@ -665,6 +748,7 @@ body {
   position: relative;
   z-index: 1;
   display: block;
+  opacity: 1 !important;
 }
 
 .cyber-input:focus {

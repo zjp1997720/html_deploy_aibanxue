@@ -59,32 +59,34 @@ document.addEventListener('DOMContentLoaded', () => {
   let codeElement = null;
   let highlightEnabled = true;
   
-  // 初始化代码编辑器
+  // 初始化代码编辑器 - 简化版本，不使用双层结构
   function initCodeEditor() {
     if (htmlInput && codeInputContainer) {
-      console.log('初始化代码编辑器');
+      console.log('初始化简化版代码编辑器');
       
-      // 创建代码元素
-      codeElement = document.createElement('code');
-      codeElement.className = 'hljs language-html';
-      codeElement.style.position = 'absolute';
-      codeElement.style.top = '0';
-      codeElement.style.left = '0';
-      codeElement.style.width = '100%';
-      codeElement.style.height = '100%';
-      codeElement.style.padding = '15px';
-      codeElement.style.boxSizing = 'border-box';
-      codeElement.style.overflow = 'auto';
-      codeElement.style.backgroundColor = 'transparent';
-      codeElement.style.whiteSpace = 'pre-wrap';
-      codeElement.style.display = 'none'; // 初始时隐藏
+      // 不创建额外的代码元素，直接使用 textarea
+      htmlInput.style.fontFamily = 'monospace';
+      htmlInput.style.fontSize = '14px';
+      htmlInput.style.lineHeight = '1.5';
+      htmlInput.style.color = 'var(--text-primary)';
+      htmlInput.style.backgroundColor = 'var(--bg-input)';
+      htmlInput.style.border = '1px solid var(--border-color)';
+      htmlInput.style.borderRadius = '8px';
+      htmlInput.style.padding = '15px';
+      htmlInput.style.boxSizing = 'border-box';
+      htmlInput.style.width = '100%';
+      htmlInput.style.minHeight = '200px';
+      htmlInput.style.maxHeight = '500px';
+      htmlInput.style.overflow = 'auto';
+      htmlInput.style.whiteSpace = 'pre-wrap';
+      htmlInput.style.wordBreak = 'break-word';
+      htmlInput.style.resize = 'vertical';
+      htmlInput.style.outline = 'none';
       
-      // 将代码元素添加到容器中
-      codeInputContainer.appendChild(codeElement);
-      
-      // 如果有初始内容，同步到高亮区域
+      // 如果有初始内容，更新代码类型指示器
       if (htmlInput.value) {
-        syncToTextarea();
+        const codeType = detectCodeType(htmlInput.value);
+        updateCodeTypeIndicator(codeType, htmlInput.value);
       }
     }
   }
@@ -103,47 +105,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // 同步textarea内容到高亮显示区域
+  // 同步内容 - 简化版本，只更新代码类型指示器
   function syncToTextarea() {
-    if (codeElement) {
-      codeElement.textContent = htmlInput.value;
-      
-      // 如果内容过长，使用requestAnimationFrame延迟处理高亮
-      if (htmlInput.value.length > 10000) {
-        console.log('内容过长，使用requestAnimationFrame延迟处理高亮');
-        requestAnimationFrame(() => {
-          updateHighlighting();
-        });
-      } else {
-        updateHighlighting();
-      }
+    if (htmlInput) {
+      // 只更新代码类型指示器
+      const codeType = detectCodeType(htmlInput.value);
+      updateCodeTypeIndicator(codeType, htmlInput.value);
     }
   }
   
-  // 更新语法高亮
+  // 更新语法高亮 - 简化版本
   function updateHighlighting() {
-    if (codeElement && highlightEnabled) {
-      try {
-        console.log('应用代码高亮');
-        hljs.highlightElement(codeElement);
-        
-        // 确保代码元素可见
-        codeElement.style.display = 'block';
-      } catch (error) {
-        console.error('高亮处理错误:', error);
-      }
-    }
+    // 简化版本不需要高亮功能
+    console.log('简化版本不使用语法高亮');
   }
   
-  // 切换高亮状态
+  // 切换高亮状态 - 简化版本
   function toggleHighlighting() {
-    highlightEnabled = !highlightEnabled;
-    
-    if (highlightEnabled) {
-      updateHighlighting();
-    } else if (codeElement) {
-      codeElement.className = 'hljs';
-    }
+    // 简化版本不需要高亮功能
+    console.log('简化版本不使用语法高亮切换');
   }
   
   // 格式化 URL 显示

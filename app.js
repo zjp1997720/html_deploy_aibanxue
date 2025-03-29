@@ -19,8 +19,8 @@ const PORT = process.env.NODE_ENV === 'production' ? 8888 : config.port;
 // 中间件设置
 app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
 app.use(cors()); // 跨域支持
-app.use(bodyParser.json()); // JSON 解析
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15MB
+app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
 app.use(express.static(path.join(__dirname, 'public'))); // 静态文件
 
 // 设置视图引擎

@@ -118,9 +118,17 @@ app.get('/view/:id', async (req, res) => {
     const trimmedContent = page.html_content.trim();
     const isPureMermaid = mermaidPatterns.some(pattern => pattern.test(trimmedContent));
     
-    // 强制识别 Mermaid 图表
+    // 强制识别 HTML 和 Mermaid 图表
     let detectedType = detectCodeType(page.html_content);
-    if (isPureMermaid) {
+    
+    // 安全检查: 如果内容以<!DOCTYPE html>或<html开头，强制识别为HTML
+    if (page.html_content.trim().startsWith('<!DOCTYPE html>') || 
+        page.html_content.trim().startsWith('<html')) {
+      console.log('[DEBUG] 强制识别为完整HTML文档');
+      detectedType = 'html';
+    } 
+    // 如果是纯 Mermaid 语法，强制设置为 mermaid 类型
+    else if (isPureMermaid) {
       console.log('[DEBUG] 检测到纯 Mermaid 语法，强制设置为 mermaid 类型');
       detectedType = 'mermaid';
     }

@@ -6,6 +6,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const fs = require('fs');
@@ -42,6 +43,7 @@ app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
 app.use(cors()); // 跨域支持
 app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15MB
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
+app.use(cookieParser()); // 解析 Cookie
 app.use(express.static(path.join(__dirname, 'public'))); // 静态文件
 
 // 创建会话目录
@@ -84,8 +86,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24小时
+    // 只在 HTTPS 环境下设置 secure为 true
+    secure: false, // 如果您使用 HTTPS，请设置为 true
+    maxAge: 24 * 60 * 60 * 1000, // 24小时
+    httpOnly: true,
+    sameSite: 'lax'
   }
 }));
 
@@ -122,19 +127,25 @@ app.post('/login', (req, res) => {
 
   // 检查密码是否正确
   if (password === config.authPassword) {
-    // 设置认证标记
-    req.session.isAuthenticated = true;
-    console.log('- 认证成功，设置会话:', req.session);
+    console.log('- 密码正确，设置认证');
 
-    // 保存会话并重定向
-    req.session.save(err => {
-      if (err) {
-        console.error('- 会话保存失败:', err);
-        return res.status(500).send('会话保存失败，请稍后重试');
-      }
-      console.log('- 会话保存成功，重定向到首页');
-      return res.redirect('/');
+    // 同时使用会话和 Cookie 来存储认证状态
+    // 1. 设置会话
+    req.session.isAuthenticated = true;
+    console.log('- 设置会话认证标记');
+
+    // 2. 设置 Cookie
+    res.cookie('auth', 'true', {
+      maxAge: 24 * 60 * 60 * 1000, // 24小时
+      httpOnly: true,
+      secure: false, // 如果使用 HTTPS，设置为 true
+      sameSite: 'lax'
     });
+    console.log('- 设置认证 Cookie');
+
+    // 先尝试直接重定向，不等待会话保存
+    console.log('- 重定向到首页');
+    return res.redirect('/');
   } else {
     console.log('- 密码不匹配，显示错误');
     // 密码错误，显示错误信息

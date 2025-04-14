@@ -163,8 +163,43 @@ app.get('/logout', (req, res) => {
   res.redirect('/login');
 });
 
-// 受保护的路由设置
-app.use('/api/pages', isAuthenticated, pagesRoutes);
+// API 路由设置
+// 将 API 路由分为两部分：需要认证的和不需要认证的
+
+// 导入路由处理函数
+const { createPage, getPageById, getRecentPages } = require('./models/pages');
+
+// 创建页面的 API 需要认证
+app.post('/api/pages/create', isAuthenticated, async (req, res) => {
+  try {
+    const { htmlContent, isProtected } = req.body;
+
+    if (!htmlContent) {
+      return res.status(400).json({
+        success: false,
+        error: '请提供HTML内容'
+      });
+    }
+
+    const result = await createPage(htmlContent, isProtected);
+
+    res.json({
+      success: true,
+      urlId: result.urlId,
+      password: result.password,
+      isProtected: !!result.password
+    });
+  } catch (error) {
+    console.error('创建页面API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器错误'
+    });
+  }
+});
+
+// 其他 API 不需要认证
+app.use('/api/pages', pagesRoutes);
 
 // 密码验证路由 - 用于AJAX验证
 app.get('/validate-password/:id', async (req, res) => {
@@ -202,8 +237,8 @@ app.get('/', isAuthenticated, (req, res) => {
 const { detectCodeType, CODE_TYPES } = require('./utils/codeDetector');
 const { renderContent, escapeHtml } = require('./utils/contentRenderer');
 
-// 查看页面路由 - 需要登录才能访问
-app.get('/view/:id', isAuthenticated, async (req, res) => {
+// 查看页面路由 - 无需登录即可访问
+app.get('/view/:id', async (req, res) => {
   try {
     const { getPageById } = require('./models/pages');
     const { id } = req.params;

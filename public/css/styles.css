@@ -69,7 +69,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
 
 /* 全局过渡效果 - 不包括代码编辑器 */
-body, .cyber-card, .cyber-input, .cyber-btn, .file-drop-area, 
+body, .cyber-card, .cyber-input, .cyber-btn, .file-drop-area,
 .result-section, .result-container, .action-btn, .cyber-tab,
 .futuristic-bg, .grid-bg, .particle, .error-toast, .theme-toggle {
   transition: all var(--transition-normal);
@@ -167,7 +167,7 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: 
+  background:
     radial-gradient(circle at 20% 35%, rgba(var(--primary-rgb), 0.15) 0%, transparent 25%),
     radial-gradient(circle at 80% 10%, rgba(var(--accent-rgb), 0.1) 0%, transparent 20%),
     radial-gradient(circle at 40% 80%, rgba(var(--secondary-rgb), 0.1) 0%, transparent 30%);
@@ -186,7 +186,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -725,18 +725,21 @@ body {
   -webkit-user-select: text !important;
   -moz-user-select: text !important;
   -ms-user-select: text !important;
+  /* 为HTML输入框设置更大的高度 */
+  min-height: 200px !important;
+  padding: 1rem !important;
 }
 
 /* 输入区域 */
 .cyber-input {
   width: 100%;
-  min-height: 200px;
+  min-height: 30px;
   max-height: 500px;
-  padding: 1rem;
+  padding: 0.3rem 0.7rem;
   background: var(--bg-input) !important;
   background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--text-primary);
   font-family: monospace;
   font-size: 14px;
@@ -1111,19 +1114,19 @@ label[for="html-file"] {
   .app-title {
     font-size: 2.5rem;
   }
-  
+
   .card {
     padding: 1.5rem;
   }
-  
+
   .main-container {
     padding: 1rem 0.5rem;
   }
-  
+
   .cyber-tabs {
     overflow-x: auto;
   }
-  
+
   .cyber-tab {
     padding: 0.75rem 1rem;
   }
@@ -1133,21 +1136,21 @@ label[for="html-file"] {
   .app-title {
     font-size: 2rem;
   }
-  
+
   .card {
     padding: 1rem;
   }
-  
+
   .result-container {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .action-buttons {
     align-self: flex-end;
     margin-top: 0.5rem;
   }
-  
+
   .cyber-btn {
     padding: 0.5rem 1rem;
   }
@@ -1246,16 +1249,16 @@ label[for="html-file"] {
   .cyber-title {
     font-size: 2.5rem;
   }
-  
+
   .title-container::before {
     font-size: 2.5rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.3rem;
   }
-  
+
   .theme-toggle {
     top: 0.75rem;
     right: 0.75rem;

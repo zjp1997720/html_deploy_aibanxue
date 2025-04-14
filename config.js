@@ -16,19 +16,25 @@ const config = {
   // 开发环境配置
   development: {
     port: process.env.PORT || 5678,
-    logLevel: 'dev'
+    logLevel: 'dev',
+    authEnabled: process.env.AUTH_ENABLED === 'true',
+    authPassword: process.env.AUTH_PASSWORD || 'admin123'
   },
-  
+
   // 生产环境配置
   production: {
     port: process.env.PORT || 8888,
-    logLevel: 'combined'
+    logLevel: 'combined',
+    authEnabled: process.env.AUTH_ENABLED === 'true',
+    authPassword: process.env.AUTH_PASSWORD || 'admin123'
   },
-  
+
   // 测试环境配置
   test: {
     port: process.env.PORT || 3000,
-    logLevel: 'dev'
+    logLevel: 'dev',
+    authEnabled: process.env.AUTH_ENABLED === 'true',
+    authPassword: process.env.AUTH_PASSWORD || 'admin123'
   }
 };
 

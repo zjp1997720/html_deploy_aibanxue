@@ -28,6 +28,9 @@ coverage/
 *.db
 *.sqlite
 
+# 会话文件
+sessions/
+
 # 操作系统文件
 .DS_Store
 Thumbs.db

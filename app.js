@@ -1,10 +1,24 @@
+// 加载环境变量
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const fs = require('fs');
 const { initDatabase } = require('./models/db');
+
+// 添加调试日志
+console.log('应用启动...');
+console.log('当前工作目录:', process.cwd());
+console.log('环境变量:', {
+  NODE_ENV: process.env.NODE_ENV,
+  AUTH_ENABLED: process.env.AUTH_ENABLED,
+  AUTH_PASSWORD: process.env.AUTH_PASSWORD
+});
 
 // 导入认证中间件
 const { isAuthenticated } = require('./middleware/auth');
@@ -30,8 +44,42 @@ app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15M
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
 app.use(express.static(path.join(__dirname, 'public'))); // 静态文件
 
-// 使用会话中间件
+// 创建会话目录
+const sessionDir = path.join(__dirname, 'sessions');
+console.log('会话目录:', sessionDir);
+if (!fs.existsSync(sessionDir)) {
+  console.log('创建会话目录...');
+  fs.mkdirSync(sessionDir, { recursive: true });
+}
+
+// 确保会话目录有正确的权限
+try {
+  fs.accessSync(sessionDir, fs.constants.R_OK | fs.constants.W_OK);
+  console.log('会话目录权限正确');
+} catch (err) {
+  console.error('会话目录权限错误:', err);
+  console.log('尝试修复权限...');
+  try {
+    // 尝试设置权限，但这可能需要root权限
+    fs.chmodSync(sessionDir, 0o700);
+    console.log('权限修复成功');
+  } catch (chmodErr) {
+    console.error('无法修复权限:', chmodErr);
+    console.log('请手动设置会话目录权限: chmod -R 700 ' + sessionDir);
+  }
+}
+
+// 使用文件存储会话
 app.use(session({
+  store: new FileStore({
+    path: sessionDir,
+    ttl: 86400, // 会话有效期（秒）
+    retries: 0, // 读取会话文件的重试次数
+    secret: 'html-go-secret-key', // 用于加密会话文件
+    logFn: function(message) {
+      console.log('[session-file-store]', message);
+    }
+  }),
   secret: 'html-go-secret-key',
   resave: false,
   saveUninitialized: false,
@@ -59,10 +107,16 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const { password, remember } = req.body;
+  const { password } = req.body;
+
+  console.log('登录尝试:');
+  console.log('- 密码:', password);
+  console.log('- 配置密码:', config.authPassword);
+  console.log('- 密码匹配:', password === config.authPassword);
 
   // 如果认证功能未启用，直接重定向到首页
   if (!config.authEnabled) {
+    console.log('- 认证未启用，直接重定向到首页');
     return res.redirect('/');
   }
 
@@ -70,21 +124,25 @@ app.post('/login', (req, res) => {
   if (password === config.authPassword) {
     // 设置认证标记
     req.session.isAuthenticated = true;
+    console.log('- 认证成功，设置会话:', req.session);
 
-    // 如果用户选择了“记住我”，设置更长的会话过期时间
-    if (remember) {
-      // 设置会话过期时间为30天
-      req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30天
-    }
-
-    return res.redirect('/');
+    // 保存会话并重定向
+    req.session.save(err => {
+      if (err) {
+        console.error('- 会话保存失败:', err);
+        return res.status(500).send('会话保存失败，请稍后重试');
+      }
+      console.log('- 会话保存成功，重定向到首页');
+      return res.redirect('/');
+    });
+  } else {
+    console.log('- 密码不匹配，显示错误');
+    // 密码错误，显示错误信息
+    res.render('login', {
+      title: 'HTML-Go | 登录',
+      error: '密码错误，请重试'
+    });
   }
-
-  // 密码错误，显示错误信息
-  res.render('login', {
-    title: 'HTML-Go | 登录',
-    error: '密码错误，请重试'
-  });
 });
 
 // 退出登录路由

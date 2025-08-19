@@ -32,6 +32,9 @@ const pagesRoutes = require('./routes/pages');
 
 // 初始化应用
 const app = express();
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 // 确保在服务器上使用正确的端口
 const PORT = process.env.NODE_ENV === 'production' ? 8888 : config.port;
 
@@ -78,17 +81,17 @@ app.use(session({
     path: sessionDir,
     ttl: 86400, // 会话有效期（秒）
     retries: 0, // 读取会话文件的重试次数
-    secret: 'html-go-secret-key', // 用于加密会话文件
+    secret: process.env.SESSION_SECRET || 'html-go-secret-key', // 用于加密会话文件
     logFn: function(message) {
       console.log('[session-file-store]', message);
     }
   }),
-  secret: 'html-go-secret-key',
+  secret: process.env.SESSION_SECRET || 'html-go-secret-key',
   resave: false,
   saveUninitialized: false,
   cookie: {
     // 只在 HTTPS 环境下设置 secure为 true
-    secure: false, // 如果您使用 HTTPS，请设置为 true
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 24 * 60 * 60 * 1000, // 24小时
     httpOnly: true,
     sameSite: 'lax'
@@ -179,16 +182,17 @@ app.post('/api/pages/create', isAuthenticated, async (req, res) => {
       return res.status(400).json({ success: false, error: '请提供HTML内容' });
     }
 
-    const result = await createPage(htmlContent, isProtected, codeType);
+    const isProtectedBool = isProtected === true || isProtected === 1 || isProtected === '1' || String(isProtected).toLowerCase() === 'true';
+
+    const result = await createPage(htmlContent, isProtectedBool, codeType);
     const url = `${req.protocol}://${req.get('host')}/view/${result.urlId}`;
 
     // 返回适配 Coze 插件的格式
     res.json({
       success: true,
       url: url,  // 返回完整URL
-      // 保留 password 和 isProtected 供网页端使用
       password: result.password,
-      isProtected: !!result.password,
+      isProtected: isProtectedBool,
       debug_info: `Page created with ID: ${result.urlId}`
     });
   } catch (error) {

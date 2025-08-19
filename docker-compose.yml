@@ -1,26 +1,23 @@
 version: '3.8'
 
 services:
-  html-go-express:
+  html-go:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: html-go-express
+    container_name: html-go
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8888:8888"
     volumes:
-      - html-go-data:/usr/src/app/data
-    environment:
-      - NODE_ENV=production
-      - PORT=8888
+      - ./db:/usr/src/app/db
+      - ./sessions:/usr/src/app/sessions
+      - ./public:/usr/src/app/public:ro
     networks:
-      - html-go-network
-
-volumes:
-  html-go-data:
-    driver: local
+      - web
 
 networks:
-  html-go-network:
+  web:
     driver: bridge

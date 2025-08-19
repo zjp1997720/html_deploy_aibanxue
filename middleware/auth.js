@@ -8,36 +8,37 @@
  * 如果未认证，重定向到登录页面
  */
 function isAuthenticated(req, res, next) {
-  console.log('认证检查:');
-  console.log('- 请求路径:', req.path);
-  console.log('- 会话 ID:', req.session?.id);
-  console.log('- 会话认证状态:', req.session?.isAuthenticated);
-  console.log('- Cookie 认证状态:', req.cookies?.auth);
-  console.log('- 认证功能启用:', req.app.locals.config.authEnabled);
+  const { authEnabled, apiToken } = req.app.locals.config;
 
   // 如果认证功能未启用，直接通过
-  if (!req.app.locals.config.authEnabled) {
-    console.log('- 认证功能未启用，直接通过');
+  if (!authEnabled) {
     return next();
   }
 
-  // 检查会话中是否有认证标记
+  // 方式一：检查网页端 session 和 cookie
   if (req.session && req.session.isAuthenticated) {
-    console.log('- 会话认证成功，允许访问');
     return next();
   }
-
-  // 检查 Cookie 中是否有认证标记
   if (req.cookies && req.cookies.auth === 'true') {
-    console.log('- Cookie 认证成功，允许访问');
-    // 如果只有 Cookie 认证成功，同步到会话
     req.session.isAuthenticated = true;
     return next();
   }
 
-  // 未认证，重定向到登录页面
-  console.log('- 未认证，重定向到登录页面');
-  res.redirect('/login');
+  // 方式二：检查 API Token
+  const authHeader = req.headers['authorization'];
+  if (apiToken && authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7); // 提取 "Bearer " 后面的 token
+    if (token === apiToken) {
+      return next(); // Token 验证成功
+    }
+  }
+
+  // 如果两种认证都失败，对于API请求返回401，对于网页请求重定向
+  if (req.path.startsWith('/api/')) {
+    return res.status(401).json({ success: false, error: 'Unauthorized: Invalid API Token' });
+  } else {
+    return res.redirect('/login');
+  }
 }
 
 module.exports = {

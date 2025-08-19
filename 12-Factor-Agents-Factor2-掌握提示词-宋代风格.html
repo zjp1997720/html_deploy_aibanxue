@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12-Factor Agents：Factor 2 - 掌握你的提示词</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f8f9fa;">
+
+<!-- 主文章结构 -->
+<table id="wrapper" style="width: 100%; max-width: 800px; margin: 0 auto; border-collapse: collapse; background-color: #FAF8F5; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <tbody>
+        <tr>
+            <td id="content-container" style="padding: 40px; font-family: 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif; line-height: 1.8; color: #3E3E3E; background-color: #FAF8F5; background: linear-gradient(180deg, #FAF8F5 0%, #F5F2ED 100%);">
+                
+                <!-- H1 标题 -->
+                <h1 style="font-size: 28px; font-weight: 300; color: #2C2C2C; text-align: center; letter-spacing: 8px; padding: 24px 0; border-bottom: 1px solid #E5E2DD; margin: 0 0 32px 0;">12-Factor Agents：Factor 2 - 掌握你的提示词</h1>
+
+                <!-- H2 标题：项目简介 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 20px 0; text-align: left;">
+                    <span style="display: inline-block; vertical-align: middle; width: 3px; height: 24px; background-color: #7B9AAD;"></span>
+                    <span style="display: inline-block; width: 12px; height: 1px;"></span>
+                    <span style="vertical-align: middle; letter-spacing: 2px;">项目简介</span>
+                </h2>
+
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8;"><a href="https://github.com/humanlayer/12-factor-agents" style="color: #7B9AAD; text-decoration: none;">12-Factor Agents</a> 是一个开源项目，提供了构建可靠的大语言模型（LLM）应用的设计指南。这是一份专为打造生产级智能体（AI Agent）应用而编写的设计指南。</p>
+
+                <!-- H2 标题：Factor 2：掌握你的提示词 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 20px 0; text-align: center; position: relative;">
+                    <span style="background: transparent; padding: 0 20px; position: relative; z-index: 1; letter-spacing: 3px; text-shadow: -2px 0 4px rgba(250,248,245,0.9), 2px 0 4px rgba(250,248,245,0.9), 0 -2px 4px rgba(250,248,245,0.9), 0 2px 4px rgba(250,248,245,0.9);">Factor 2：掌握你的提示词</span>
+                    <span style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, #D4C5B9 25%, #D4C5B9 75%, transparent 100%); z-index: 0;"></span>
+                </h2>
+
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8;">本文介绍第二条 AI Agent 的设计原则：<strong style="color: #7B9AAD; font-weight: 500;">掌握你的提示词</strong>。</p>
+
+                <!-- 引用块 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #F5F2ED; background: linear-gradient(90deg, #F5F2ED 0%, #FAF8F5 100%); border-left: 3px solid #7B9AAD; padding: 20px 24px; color: #3E3E3E; font-style: normal; border-radius: 0;">
+                                <p style="margin: 0; font-size: 15px; line-height: 1.8; font-style: italic; opacity: 0.9;">参考链接：&#8288;https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-02-own-your-prompts.md</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- H3 标题：核心原则 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; padding-left: 12px; border-left: 2px solid #D4C5B9; letter-spacing: 1px;">核心原则</h3>
+
+                <p style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.8;">开发者应完全掌控AI智能体的提示词，强调：&#8288;</p>
+                <ul style="margin: 0 0 20px 0; padding-left: 24px; line-height: 1.8;">
+                    <li style="margin-bottom: 8px;">提示词的透明度</li>
+                    <li style="margin-bottom: 8px;">避免依赖黑盒服务</li>
+                    <li style="margin-bottom: 8px;">直接查看LLM框架生成的原始提示词（Prompt）</li>
+                    <li style="margin-bottom: 8px;">不盲目依赖框架的抽象层</li>
+                </ul>
+
+                <!-- H2 标题：问题分析 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 8px 0; text-align: center; letter-spacing: 3px;">
+                    <span>问题分析：依赖黑箱服务 VS 完全掌控</span>
+                </h2>
+                <hr style="border: none; height: 1px; background: #E5E2DD; margin: 0 0 3px 0;" />
+                <hr style="border: none; height: 1px; background: linear-gradient(90deg, transparent 20%, #7B9AAD 50%, transparent 80%); margin: 0 0 20px 0;" />
+
+                <!-- H3 标题：当前问题 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="display: inline-block; background-color: #FAF8F5; background: linear-gradient(90deg, #FAF8F5 0%, #F5F2ED 100%); border-radius: 2px; padding: 4px 12px; letter-spacing: 1px;">当前问题</span>
+                </h3>
+
+                <p style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.8;">当前流行的某些 Agent 框架过度封装提示词，导致提示词的"黑箱化"：&#8288;</p>
+                <ul style="margin: 0 0 20px 0; padding-left: 24px; line-height: 1.8;">
+                    <li style="margin-bottom: 8px;">通过代码抽象层自动重写或构造提示词</li>
+                    <li style="margin-bottom: 8px;">声称能"优化输出"</li>
+                    <li style="margin-bottom: 8px;">实际隐藏了最终发送给LLM的原始提示词</li>
+                </ul>
+
+                <!-- H3 标题：过度封装的代码示例 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="letter-spacing: 1px;">过度封装的代码示例</span>
+                    <span style="display: inline-block; width: 6px; height: 6px; background-color: #7B9AAD; border-radius: 50%; margin-left: 8px; vertical-align: middle; opacity: 0.5;"></span>
+                </h3>
+
+                <!-- 代码块 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #2C2C2C; background: linear-gradient(135deg, #2C2C2C 0%, #3E3E3E 100%); color: #E5E2DD; padding: 20px; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6; border-radius: 2px; overflow-x: auto;">
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">agent = Agent(</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  role="...",</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  goal="...",</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  personality="...",</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  tools=[tool1, tool2, tool3]</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">)</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">task = Task(</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  instructions="...",</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  expected_output=OutputModel</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">)</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">result = agent.run(task)</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- H3 标题：问题影响 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; padding-left: 12px; border-left: 2px solid #D4C5B9; letter-spacing: 1px;">问题影响</h3>
+
+                <p style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.8;">过度封装、黑盒化提示词往往：&#8288;</p>
+                <ul style="margin: 0 0 20px 0; padding-left: 24px; line-height: 1.8;">
+                    <li style="margin-bottom: 8px;">难以精准调试或逆向拆解</li>
+                    <li style="margin-bottom: 8px;">导致无法让 LLM 模型获得准确的令牌（tokens）</li>
+                </ul>
+
+                <!-- H2 标题：解决方案 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 20px 0; text-align: left; position: relative;">
+                    <span style="letter-spacing: 2px;">解决方案：掌控你的提示词</span>
+                    <span style="display: inline-block; width: 12px; height: 1px;"></span>
+                    <span style="display: inline-block; width: 20px; height: 20px; background-color: #7B9AAD; border-radius: 2px; vertical-align: middle; opacity: 0.6;"></span>
+                </h2>
+
+                <!-- H3 标题：核心理念 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="display: inline-block; background-color: #FAF8F5; background: linear-gradient(90deg, #FAF8F5 0%, #F5F2ED 100%); border-radius: 2px; padding: 4px 12px; letter-spacing: 1px;">核心理念</span>
+                </h3>
+
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8;">开发者应真正掌控自己的提示词，<strong style="color: #7B9AAD; font-weight: 500;">将提示词视作一等代码（first-class code）</strong>来对待。</p>
+
+                <!-- H3 标题：推荐方法 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="letter-spacing: 1px;">推荐方法</span>
+                    <span style="display: inline-block; width: 6px; height: 6px; background-color: #7B9AAD; border-radius: 50%; margin-left: 8px; vertical-align: middle; opacity: 0.5;"></span>
+                </h3>
+
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8;">使用提示工程的框架或工具，自主地生成提示词，完全掌控提示词的生成。</p>
+
+                <!-- H3 标题：BAML 示例 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; padding-left: 12px; border-left: 2px solid #D4C5B9; letter-spacing: 1px;">BAML 示例</h3>
+
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.8;">下面是通过提示工程开发语言 BAML，以函数的形式定义提示词的示例：&#8288;</p>
+
+                <!-- BAML 代码块 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #2C2C2C; background: linear-gradient(135deg, #2C2C2C 0%, #3E3E3E 100%); color: #E5E2DD; padding: 20px; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6; border-radius: 2px; overflow-x: auto;">
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">function DetermineNextStep(thread: string) -> DoneForNow | ListGitTags | DeployBackend | DeployFrontend | RequestMoreInformation {</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  prompt #"</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    {{ _.role("system") }}</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  You are a helpful assistant that manages deployments for frontend and backend systems.</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    You work diligently to ensure safe and successful deployments by following best practices</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  and proper deployment procedures.</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    Before deploying any system, you should check:</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  - The deployment environment (staging vs production)</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - The correct tag/version to deploy</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - The current system status</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  You can use tools like deploy_backend, deploy_frontend, and check_deployment_status</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  to manage deployments. For sensitive deployments, use request_approval to get</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  human verification.</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    Always think about what to do first, like:</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - Check current deployment status</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - Verify the deployment tag exists</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - Request approval if needed</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - Deploy to staging before production</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    - Monitor deployment progress</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  {{ _.role("user") }}</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  {{ thread }}</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;"></p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">  What should the next step be?</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    "#</p>
+                                <p style="margin: 0; white-space: pre-wrap; color: #E5E2DD; font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace; font-size: 14px; line-height: 1.6;">    }</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 引用 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #F5F2ED; background: linear-gradient(90deg, #F5F2ED 0%, #FAF8F5 100%); border-left: 3px solid #7B9AAD; padding: 20px 24px; color: #3E3E3E; font-style: normal; border-radius: 0;">
+                                <p style="margin: 0; font-size: 15px; line-height: 1.8; font-style: italic; opacity: 0.9;">关于BAML的更多信息，可阅读：《提示工程开发语言 BAML 介绍：提示即函数，构建可维护的AI工作流》</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- H2 标题：掌控提示词的具体要求 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 20px 0; text-align: left;">
+                    <span style="display: inline-block; vertical-align: middle; width: 3px; height: 24px; background-color: #7B9AAD;"></span>
+                    <span style="display: inline-block; width: 12px; height: 1px;"></span>
+                    <span style="vertical-align: middle; letter-spacing: 2px;">掌控提示词的具体要求</span>
+                </h2>
+
+                <!-- H3 标题：实践要点 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="display: inline-block; background-color: #FAF8F5; background: linear-gradient(90deg, #FAF8F5 0%, #F5F2ED 100%); border-radius: 2px; padding: 4px 12px; letter-spacing: 1px;">实践要点</span>
+                </h3>
+
+                <!-- Info Callout -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #FFFFFF; background: linear-gradient(90deg, #FFFFFF 0%, #FAF8F5 100%); border: 1px solid #E5E2DD; border-radius: 2px; padding: 20px; color: #3E3E3E;">
+                                <ul style="margin: 0; padding-left: 16px; line-height: 1.8;">
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">版本控制</strong>：将提示词视为代码资产，纳入版本控制系统（如Git）</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">配置管理</strong>：避免硬编码提示词，通过配置文件或环境变量管理</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">质量保证</strong>：确保提示词的可测试性、可迭代性和透明度</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- H2 标题：掌控提示词的好处 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 8px 0; text-align: center; letter-spacing: 3px;">
+                    <span>掌控提示词的好处</span>
+                </h2>
+                <hr style="border: none; height: 1px; background: #E5E2DD; margin: 0 0 3px 0;" />
+                <hr style="border: none; height: 1px; background: linear-gradient(90deg, transparent 20%, #7B9AAD 50%, transparent 80%); margin: 0 0 20px 0;" />
+
+                <!-- H3 标题：核心优势 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="letter-spacing: 1px;">核心优势</span>
+                    <span style="display: inline-block; width: 6px; height: 6px; background-color: #7B9AAD; border-radius: 50%; margin-left: 8px; vertical-align: middle; opacity: 0.5;"></span>
+                </h3>
+
+                <!-- Info Callout -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #FFFFFF; background: linear-gradient(90deg, #FFFFFF 0%, #FAF8F5 100%); border: 1px solid #E5E2DD; border-radius: 2px; padding: 20px; color: #3E3E3E;">
+                                <ul style="margin: 0; padding-left: 16px; line-height: 1.8;">
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">完全控制</strong>：编写智能体所需的确切指令，没有黑盒抽象</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">测试与评估</strong>：为提示词构建测试和评估，就像为任何其他代码所做的那样</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">迭代优化</strong>：根据实际表现快速修改提示词</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">透明度</strong>：确切知道智能体正在使用什么指令</li>
+                                    <li style="margin-bottom: 8px;"><strong style="color: #7B9AAD; font-weight: 500;">角色黑客（Role Hacking）</strong>：可以通过非标准方式操纵LLM对话角色（user/assistant）以实现非常规效果（突破标准对话角色的限制）</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- H2 标题：总结 -->
+                <h2 style="font-size: 24px; font-weight: 400; color: #2C2C2C; margin: 32px 0 20px 0; text-align: left; position: relative;">
+                    <span style="letter-spacing: 2px;">总结</span>
+                    <span style="display: inline-block; width: 12px; height: 1px;"></span>
+                    <span style="display: inline-block; width: 20px; height: 20px; background-color: #7B9AAD; border-radius: 2px; vertical-align: middle; opacity: 0.6;"></span>
+                </h2>
+
+                <!-- H3 标题：核心观点 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; padding-left: 12px; border-left: 2px solid #D4C5B9; letter-spacing: 1px;">核心观点</h3>
+
+                <!-- 引用 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #F5F2ED; background: linear-gradient(90deg, #F5F2ED 0%, #FAF8F5 100%); border-left: 3px solid #7B9AAD; padding: 20px 24px; color: #3E3E3E; font-style: normal; border-radius: 0;">
+                                <p style="margin: 0; font-size: 15px; line-height: 1.8; font-style: italic; opacity: 0.9;">你的提示词（prompts）是应用程序逻辑与大语言模型（LLM）之间的核心接口。</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.8;">对提示词拥有充分掌控权，能给予你在生产级智能体（production-grade agents）中所必需的：&#8288;</p>
+                <ul style="margin: 0 0 20px 0; padding-left: 24px; line-height: 1.8;">
+                    <li style="margin-bottom: 8px;">灵活性</li>
+                    <li style="margin-bottom: 8px;">提示控制力</li>
+                </ul>
+
+                <!-- H3 标题：设计哲学 -->
+                <h3 style="font-size: 20px; font-weight: 400; color: #3E3E3E; margin: 24px 0 16px 0; text-align: left;">
+                    <span style="display: inline-block; background-color: #FAF8F5; background: linear-gradient(90deg, #FAF8F5 0%, #F5F2ED 100%); border-radius: 2px; padding: 4px 12px; letter-spacing: 1px;">设计哲学</span>
+                </h3>
+
+                <!-- 引用 -->
+                <table style="width: 100%; border-collapse: collapse; margin: 0 0 20px 0;">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: #F5F2ED; background: linear-gradient(90deg, #F5F2ED 0%, #FAF8F5 100%); border-left: 3px solid #7B9AAD; padding: 20px 24px; color: #3E3E3E; font-style: normal; border-radius: 0;">
+                                <p style="margin: 0; font-size: 15px; line-height: 1.8; font-style: italic; opacity: 0.9;">我不知道什么是最好的提示词，但我知道你希望拥有能够尝试"一切可能性"的灵活性。</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 分隔线 -->
+                <hr style="border: none; height: 1px; background: linear-gradient(90deg, transparent 10%, #D4C5B9 50%, transparent 90%); margin: 30px 0;" />
+
+                <p style="margin: 0; font-size: 16px; line-height: 1.8; text-align: center; color: #7B9AAD;">以上是 AI 智能体应用的设计原则"Factor 2：掌握你的提示词"的介绍。这一原则强调了在构建生产级AI应用时，开发者对提示词完全掌控的重要性。</p>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- === 复制按钮开始 === -->
+<div id="copy-button-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    <button id="copy-btn" onclick="copyArticle()" style="background-color: #007aff; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); transition: all 0.2s ease;">
+        复制全文
+    </button>
+</div>
+<script>
+    function copyArticle() {
+        // 目标是主文章的 td 元素
+        const contentToCopy = document.getElementById('content-container');
+        const range = document.createRange();
+        range.selectNode(contentToCopy);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+          
+        try {
+            document.execCommand('copy');
+            const btn = document.getElementById('copy-btn');
+            btn.textContent = '复制成功!';
+            btn.style.backgroundColor = '#34c759';
+            setTimeout(() => {
+                btn.textContent = '复制全文';
+                btn.style.backgroundColor = '#007aff';
+            }, 2000);
+        } catch (err) {
+            console.error('复制失败!', err);
+            alert('复制失败，请手动复制。');
+        }
+          
+        window.getSelection().removeAllRanges();
+    }
+</script>
+<!-- === 复制按钮结束 === -->
+
+</body>
+</html> 

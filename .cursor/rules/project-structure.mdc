@@ -1,0 +1,15 @@
+# 项目结构说明
+
+- 主入口文件为 [app.js](mdc:app.js)
+- 配置文件为 [config.js](mdc:config.js)
+- 路由定义在 [routes/](mdc:routes/) 目录
+- 数据模型在 [models/](mdc:models/) 目录
+- 中间件在 [middleware/](mdc:middleware/) 目录
+- 静态资源在 [public/](mdc:public/) 目录
+- 视图模板在 [views/](mdc:views/) 目录
+- 数据库相关脚本在 [db/](mdc:db/) 目录
+- 实用工具函数在 [utils/](mdc:utils/) 目录
+description:
+globs:
+alwaysApply: false
+---

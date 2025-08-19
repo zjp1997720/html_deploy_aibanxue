@@ -44,7 +44,8 @@ app.use(cors()); // 跨域支持
 app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15MB
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
 app.use(cookieParser()); // 解析 Cookie
-app.use(express.static(path.join(__dirname, 'public'))); // 静态文件
+app.use('/static', express.static(path.join(__dirname, 'public'))); // 静态文件
+app.use(express.static(path.join(__dirname, 'public'))); // 兼容旧路径 /css /js /icon
 
 // 创建会话目录
 const sessionDir = path.join(__dirname, 'sessions');
@@ -167,34 +168,32 @@ app.get('/logout', (req, res) => {
 // 将 API 路由分为两部分：需要认证的和不需要认证的
 
 // 导入路由处理函数
-const { createPage, getPageById, getRecentPages } = require('./models/pages');
+const { createPage, getPageById, getRecentPages, getAllPages } = require('./models/pages');
 
 // 创建页面的 API 需要认证
 app.post('/api/pages/create', isAuthenticated, async (req, res) => {
   try {
-    const { htmlContent, isProtected } = req.body;
+    const { htmlContent, isProtected, codeType } = req.body; // 接收 codeType
 
     if (!htmlContent) {
-      return res.status(400).json({
-        success: false,
-        error: '请提供HTML内容'
-      });
+      return res.status(400).json({ success: false, error: '请提供HTML内容' });
     }
 
-    const result = await createPage(htmlContent, isProtected);
+    const result = await createPage(htmlContent, isProtected, codeType);
+    const url = `${req.protocol}://${req.get('host')}/view/${result.urlId}`;
 
+    // 返回适配 Coze 插件的格式
     res.json({
       success: true,
-      urlId: result.urlId,
+      url: url,  // 返回完整URL
+      // 保留 password 和 isProtected 供网页端使用
       password: result.password,
-      isProtected: !!result.password
+      isProtected: !!result.password,
+      debug_info: `Page created with ID: ${result.urlId}`
     });
   } catch (error) {
     console.error('创建页面API错误:', error);
-    res.status(500).json({
-      success: false,
-      error: '服务器错误'
-    });
+    res.status(500).json({ success: false, error: '服务器错误' });
   }
 });
 
@@ -231,6 +230,25 @@ app.get('/validate-password/:id', async (req, res) => {
 // 首页路由 - 需要登录才能访问
 app.get('/', isAuthenticated, (req, res) => {
   res.render('index', { title: 'HTML-Go | 分享 HTML 代码的简单方式' });
+});
+
+// 后台管理页面路由
+app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
+  try {
+    const pages = await getAllPages();
+    res.render('dashboard', {
+      title: 'HTML-Go | 后台管理',
+      pages: pages,
+      // 将 Date.now() 毫秒时间戳转换为可读日期
+      formatDate: (timestamp) => new Date(timestamp).toLocaleString()
+    });
+  } catch (error) {
+    console.error('无法加载后台管理页面:', error);
+    res.status(500).render('error', {
+      title: '服务器错误',
+      message: '加载后台管理页面失败'
+    });
+  }
 });
 
 // 导入代码类型检测和内容渲染工具

@@ -81,8 +81,26 @@ async function getRecentPages(limit = 10) {
   }
 }
 
+
+/**
+ * 获取所有页面列表，用于后台管理
+ * @returns {Promise<Array>} 返回所有页面的列表
+ */
+async function getAllPages() {
+  try {
+    // 选择需要的字段，并按创建时间降序排列
+    return await query(
+      'SELECT id, created_at, is_protected, code_type FROM pages ORDER BY created_at DESC'
+    );
+  } catch (error) {
+    console.error('获取所有页面错误:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   createPage,
   getPageById,
-  getRecentPages
+  getRecentPages,
+  getAllPages
 };

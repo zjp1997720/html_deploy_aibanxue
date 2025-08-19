@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('API响应数据:', data); // 调试输出
         
         if (data.success) {
-          const url = `${window.location.origin}/view/${data.urlId}`;
+          const url = data.url || `${window.location.origin}/view/${data.urlId}`;
           
           // 格式化 URL 显示
           const formattedUrl = formatUrl(url);

@@ -1,0 +1,62 @@
+<%- include('partials/header', { title }) %>
+
+<style>
+  .dashboard-container { max-width: 1200px; margin: 2rem auto; padding: 2rem; }
+  .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  .dashboard-table th, .dashboard-table td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; }
+  .dashboard-table th { background-color: rgba(var(--primary-rgb), 0.1); font-family: 'Orbitron', sans-serif; }
+  .dashboard-table a { color: var(--primary); text-decoration: none; }
+  .dashboard-table a:hover { text-decoration: underline; }
+  .status-protected { color: #f43f5e; font-weight: bold; }
+  .status-public { color: #10b981; }
+</style>
+
+<div class="main-container">
+  <header class="app-header">
+    <div class="title-container">
+      <h1 class="cyber-title"><span>A</span><span>D</span><span>M</span><span>I</span><span>N</span></h1>
+    </div>
+    <p class="app-description">已部署页面列表</p>
+  </header>
+
+  <div class="card dashboard-container">
+    <table class="dashboard-table">
+      <thead>
+        <tr>
+          <th>页面 ID</th>
+          <th>代码类型</th>
+          <th>创建时间</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (pages.length > 0) { %>
+          <% pages.forEach(function(page) { %>
+            <tr>
+              <td><a href="/view/<%= page.id %>" target="_blank"><%= page.id %></a></td>
+              <td><%= page.code_type.toUpperCase() %></td>
+              <td><%= formatDate(page.created_at) %></td>
+              <td>
+                <% if (page.is_protected) { %>
+                  <span class="status-protected">加密</span>
+                <% } else { %>
+                  <span class="status-public">公开</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="4" style="text-align: center;">暂无已部署的页面</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="app-footer">
+    <p class="footer-text">@2025 <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer">向阳乔木</a></p>
+  </footer>
+</div>
+
+<%- include('partials/footer') %>

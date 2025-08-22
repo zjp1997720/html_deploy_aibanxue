@@ -48,7 +48,9 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
           set -e
-          cd $WORKDIR
+          WORKDIR="/root/html_deploy_aibanxue"
+          mkdir -p "$WORKDIR"
+          cd "$WORKDIR"
           
           # 备份当前.env文件
           if [ -f .env ]; then
@@ -57,7 +59,7 @@ jobs:
           fi
           
           # 解压新代码（git archive仅包含受管文件，.env不会被覆盖）
-          tar -xzf /tmp/release.tar.gz -C $WORKDIR
+          tar -xzf /tmp/release.tar.gz -C "$WORKDIR"
           echo "✅ Extracted new code"
           
           # 恢复.env文件

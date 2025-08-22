@@ -423,28 +423,31 @@ app.use((req, res) => {
   });
 });
 
-// 启动应用
-initDatabase().then(() => {
-  // 数据库初始化成功后，再启动服务器
-  console.log('数据库初始化成功');
-  console.log(`当前环境: ${process.env.NODE_ENV}`);
-  console.log(`配置端口: ${config.port}`);
-  console.log(`实际使用端口: ${PORT}`);
-  console.log(`日志级别: ${config.logLevel}`);
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`服务器运行在 http://0.0.0.0:${PORT}`);
-
-    // 添加路由处理器日志
-    console.log('已注册的路由:');
-    app._router.stack.forEach(middleware => {
-      if (middleware.route) { // 路由
-        console.log(`${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
-      }
+    // 启动应用
+    initDatabase().then(() => {
+      // 数据库初始化成功后，再启动服务器
+      console.log('数据库初始化成功');
+      console.log(`当前环境: ${process.env.NODE_ENV}`);
+      console.log(`配置端口: ${config.port}`);
+      console.log(`实际使用端口: ${PORT}`);
+      console.log(`日志级别: ${config.logLevel}`);
+    
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`服务器运行在 http://0.0.0.0:${PORT}`);
+    
+        // 添加路由处理器日志
+        console.log('已注册的路由:');
+        app._router.stack.forEach(middleware => {
+          if (middleware.route) { // 路由
+            console.log(`${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
+          }
+        });
+      });
+    
+    }).catch(err => {
+      console.error('数据库初始化失败，应用无法启动:', err);
+      process.exit(1); // 初始化失败时，直接退出进程
     });
-  });
-
-}).catch(err => {
-  console.error('数据库初始化失败，应用无法启动:', err);
-  process.exit(1); // 初始化失败时，直接退出进程
-});
+    
+    module.exports = app;
+    

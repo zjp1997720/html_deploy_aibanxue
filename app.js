@@ -243,8 +243,24 @@ app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
     res.render('dashboard', {
       title: 'HTML-Go | 后台管理',
       pages: pages,
-      // 将 Date.now() 毫秒时间戳转换为可读日期
-      formatDate: (timestamp) => new Date(timestamp).toLocaleString()
+      // 安全的时间格式化函数
+      formatDate: (timestamp) => {
+        try {
+          if (!timestamp) return '未知时间';
+          const date = new Date(parseInt(timestamp));
+          if (isNaN(date.getTime())) return '无效时间';
+          return date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch (error) {
+          console.error('时间格式化错误:', error, 'timestamp:', timestamp);
+          return '时间错误';
+        }
+      }
     });
   } catch (error) {
     console.error('无法加载后台管理页面:', error);
@@ -253,6 +269,90 @@ app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
       message: '加载后台管理页面失败'
     });
   }
+});
+
+// 临时路由 - 页面管理 (将在下一阶段完整实现)
+app.get('/admin/pages', isAuthenticated, (req, res) => {
+  res.status(200).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>页面管理 - HTML-GO Admin</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        .title { color: #1e40af; margin-bottom: 1rem; }
+        .btn { padding: 0.5rem 1rem; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="icon">🚧</div>
+        <h1 class="title">页面管理功能开发中</h1>
+        <p>此功能将在Phase 2中实现，敬请期待！</p>
+        <p>计划功能：搜索、筛选、批量操作、编辑等</p>
+        <a href="/admin/dashboard" class="btn">返回概览</a>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// 临时路由 - API Key管理 (将在下一阶段完整实现)
+app.get('/admin/apikeys', isAuthenticated, (req, res) => {
+  res.status(200).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>API Key管理 - HTML-GO Admin</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        .title { color: #1e40af; margin-bottom: 1rem; }
+        .btn { padding: 0.5rem 1rem; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="icon">🔑</div>
+        <h1 class="title">API Key管理功能开发中</h1>
+        <p>此功能将在Phase 2中实现，敬请期待！</p>
+        <p>计划功能：生成Key、权限控制、使用统计等</p>
+        <a href="/admin/dashboard" class="btn">返回概览</a>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// 临时路由 - 系统设置 (将在下一阶段完整实现)
+app.get('/admin/settings', isAuthenticated, (req, res) => {
+  res.status(200).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>系统设置 - HTML-GO Admin</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        .title { color: #1e40af; margin-bottom: 1rem; }
+        .btn { padding: 0.5rem 1rem; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="icon">⚙️</div>
+        <h1 class="title">系统设置功能开发中</h1>
+        <p>此功能将在Phase 3中实现，敬请期待！</p>
+        <p>计划功能：环境配置、安全设置、备份等</p>
+        <a href="/admin/dashboard" class="btn">返回概览</a>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
 // 导入代码类型检测和内容渲染工具

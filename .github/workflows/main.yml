@@ -33,11 +33,11 @@ jobs:
           node -v
           echo "✅ Environment check complete"
 
-      - name: Archive project files (exclude git and node_modules)
+      - name: Archive project files (git archive, exclude untracked)
         run: |
-          ls -la
-          tar --exclude='.git' --exclude='node_modules' --exclude='.env' --exclude='release.tar.gz' -czf release.tar.gz .
-          ls -la release.tar.gz
+          git status --porcelain
+          git archive --format=tar.gz -o release.tar.gz HEAD
+          ls -lh release.tar.gz
 
       - name: Copy files to server via sshpass+scp
         run: |
@@ -56,8 +56,8 @@ jobs:
             echo "✅ Backed up .env file"
           fi
           
-          # 解压新代码（排除.env以保护现有配置）
-          tar --exclude='.env' -xzf /tmp/release.tar.gz -C $WORKDIR
+          # 解压新代码（git archive仅包含受管文件，.env不会被覆盖）
+          tar -xzf /tmp/release.tar.gz -C $WORKDIR
           echo "✅ Extracted new code"
           
           # 恢复.env文件

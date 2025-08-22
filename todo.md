@@ -21,31 +21,36 @@
 
 ### 1.3 运行方式选择（二选一，推荐 Docker）
 #### Docker/Compose 方式（推荐）
-- [ ] 使用现有 `Dockerfile` 和 `docker-compose.yml`
-- [ ] 配置卷挂载确保持久化：
-  - [ ] `./db` 目录挂载
-  - [ ] `./sessions` 目录挂载
-  - [ ] `.env` 文件挂载
+- [x] 使用现有 `Dockerfile` 和 `docker-compose.yml`
+- [x] 配置卷挂载确保持久化：
+  - [x] `./db` 目录挂载
+  - [x] `./sessions` 目录挂载
+  - [x] `.env` 文件挂载
 
 #### PM2/系统服务方式
 - [ ] Node.js 直接运行并用 PM2 守护
 - [ ] 配置 `systemd` 自启动服务
 
 ### 1.4 反向代理与 HTTPS
-- [ ] 安装并配置 Nginx 或 Caddy
+- [x] 准备 Nginx 配置示例文件 `nginx.conf.example`
+- [x] 准备一键证书申请脚本 `scripts/setup-cert.sh`
+- [ ] 在服务器上安装并配置 Nginx 或 Caddy
 - [ ] 配置反向代理：`http://127.0.0.1:8888` → `https://你的域名`
 - [ ] 申请 Let's Encrypt 证书
 - [ ] 配置证书自动续期
 - [ ] 强制 HTTP 80 → HTTPS 443 跳转
 
 ### 1.5 生产环境变量配置
-- [ ] 创建生产环境 `.env` 文件：
+- [x] 创建环境变量模板 `env.example`
+- [x] 本地生成 `.env` 文件（包含默认占位值）
+- [ ] 在服务器上编辑 `.env` 文件，替换为真实强密码：
   ```env
   NODE_ENV=production
   PORT=8888
   AUTH_ENABLED=true
   AUTH_PASSWORD=<强密码>
   API_TOKEN=<强随机token>
+  SESSION_SECRET=<强随机secret>
   DB_PATH=./db/html-go.db
   ```
 
@@ -54,14 +59,16 @@
 ## 二、后端接口与配置优化（建议尽快完成）
 
 ### 2.1 API 契约稳定
-- [ ] 确认创建接口返回 `url` 字段
+- [x] 确认创建接口返回 `url` 字段
+- [x] 前端修正为使用 `data.url` 而非 `data.urlId`
 - [ ] 添加返回 `urlId` 字段（兼容性）
 - [ ] 兼容请求体键名：`htmlContent` 与 `html_content`
-- [ ] 修正返回体的 `isProtected` 语义（当前恒为 true 的问题）
+- [x] 修正返回体的 `isProtected` 语义（当前恒为 true 的问题）
 
 ### 2.2 生产配置细节
-- [ ] 添加 `app.set('trust proxy', 1)`
-- [ ] 根据环境切换 `cookie.secure` 设置
+- [x] 添加 `app.set('trust proxy', 1)`
+- [x] 根据环境切换 `cookie.secure` 设置
+- [x] 添加 `SESSION_SECRET` 环境变量支持
 - [ ] 评估 `bodyParser` 上限（当前 15MB）
 
 ### 2.3 安全与稳定性增强
@@ -153,13 +160,14 @@
 ## 最短路径部署步骤
 
 1. **云服务器准备**
-   - [ ] 火山引擎创建 ECS 实例
-   - [ ] 配置安全组和防火墙
+   - [x] 火山引擎创建 ECS 实例
+   - [x] 配置安全组和防火墙
    - [ ] 安装 Docker 和 Docker Compose
 
 2. **应用部署**
-   - [ ] 上传项目代码到服务器
-   - [ ] 配置生产环境 `.env` 文件
+   - [x] 代码已推送到 GitHub：`https://github.com/zjp1997720/html_deploy_aibanxue.git`
+   - [ ] 在服务器上 clone 项目代码
+   - [ ] 配置生产环境 `.env` 文件（替换默认密钥）
    - [ ] 使用 Docker Compose 启动应用
 
 3. **反向代理配置**
@@ -177,8 +185,54 @@
 ## 当前状态
 - ✅ 基础功能开发完成
 - ✅ 本地测试通过
-- ⏳ 准备部署到生产环境
+- ✅ 生产环境配置文件准备完成
+- ✅ 代码已推送到 GitHub
+- ⏳ 服务器部署进行中
 - ⏳ 扣子插件开发待开始
+
+---
+
+## 🚀 下一步操作指引
+
+### 在你的火山引擎服务器上执行：
+
+```bash
+# 1. 安装基础软件
+sudo apt update
+sudo apt install -y git curl ca-certificates gnupg
+
+# 2. 安装 Docker
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+# 重新登录或执行: newgrp docker
+
+# 3. 拉取代码
+cd /opt
+sudo git clone https://github.com/zjp1997720/html_deploy_aibanxue.git html-go
+sudo chown -R $USER:$USER html-go
+cd html-go
+
+# 4. 配置环境变量
+cp env.example .env
+# 编辑 .env 文件，替换密码和密钥为真实值
+nano .env
+
+# 5. 启动应用
+bash scripts/deploy.sh
+
+# 6. 配置 Nginx 和 HTTPS
+sudo apt install -y nginx
+sudo cp nginx.conf.example /etc/nginx/conf.d/html-go.conf
+# 编辑配置文件，替换 YOUR_DOMAIN 为你的域名
+sudo nano /etc/nginx/conf.d/html-go.conf
+# 申请证书（替换为你的域名和邮箱）
+sudo bash scripts/setup-cert.sh agent.aibanxue.top 1009326159@qq.com
+```
+
+### 验证部署：
+- 检查应用状态：`docker compose ps`
+- 检查日志：`docker compose logs -f`
+- 访问：`https://你的域名`
 
 ---
 

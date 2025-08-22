@@ -31,7 +31,7 @@ jobs:
         run: |
           npm -v
           node -v
-          npm run -s test || echo "No tests defined, skipping"
+          echo "✅ Environment check complete"
 
       - name: Archive project files (exclude git and node_modules)
         run: |

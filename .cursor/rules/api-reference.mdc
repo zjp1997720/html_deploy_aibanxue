@@ -1,0 +1,253 @@
+# API 参考文档
+
+## 🔗 页面管理 API
+
+### 创建页面
+```http
+POST /api/pages/create
+Content-Type: application/json
+Authorization: Bearer <API_TOKEN>  # 可选
+
+{
+  "html_content": "<h1>Hello World</h1>",
+  "password": "optional_password",
+  "code_type": "html"
+}
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "id": "abc123",
+  "url": "https://yourdomain.com/view/abc123",
+  "protected": false
+}
+```
+
+### 获取页面信息
+```http
+GET /api/pages/:id
+Authorization: Bearer <API_TOKEN>  # 可选
+```
+
+**响应示例：**
+```json
+{
+  "id": "abc123",
+  "html_content": "<h1>Hello World</h1>",
+  "created_at": "2024-01-01T12:00:00.000Z",
+  "is_protected": false,
+  "code_type": "html"
+}
+```
+
+### 获取最近页面列表
+```http
+GET /api/pages/list/recent?limit=10
+Authorization: Bearer <API_TOKEN>  # 必需
+```
+
+**响应示例：**
+```json
+{
+  "pages": [
+    {
+      "id": "abc123",
+      "created_at": "2024-01-01T12:00:00.000Z",
+      "is_protected": false,
+      "code_type": "html",
+      "preview": "Hello World..."
+    }
+  ]
+}
+```
+
+## 🔐 认证相关 API
+
+### 密码验证
+```http
+POST /validate-password/:id
+Content-Type: application/json
+
+{
+  "password": "user_password"
+}
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "redirect": "/view/abc123"
+}
+```
+
+### 管理员登录
+```http
+POST /login
+Content-Type: application/x-www-form-urlencoded
+
+password=admin_password
+```
+
+## 🖥️ 页面路由
+
+### 查看页面
+```http
+GET /view/:id
+```
+- 返回渲染后的HTML页面
+- 如果页面受密码保护，显示密码输入表单
+- 支持多种内容类型（HTML、Markdown、SVG、Mermaid）
+
+### 管理面板
+```http
+GET /admin/dashboard
+```
+- 需要管理员认证
+- 显示最近创建的页面列表
+- 提供页面管理功能
+
+### 主页
+```http
+GET /
+```
+- 项目主页
+- 显示创建表单和功能介绍
+
+## 📋 支持的内容类型
+
+### HTML 内容
+```javascript
+{
+  "html_content": "<div><h1>标题</h1><p>内容</p></div>",
+  "code_type": "html"
+}
+```
+
+### Markdown 内容
+```javascript
+{
+  "html_content": "# 标题\n\n这是**Markdown**内容",
+  "code_type": "markdown"
+}
+```
+
+### SVG 图形
+```javascript
+{
+  "html_content": "<svg>...</svg>",
+  "code_type": "svg"
+}
+```
+
+### Mermaid 图表
+```javascript
+{
+  "html_content": "graph TD\nA-->B",
+  "code_type": "mermaid"
+}
+```
+
+## 🔒 认证方式
+
+### API Token 认证（推荐）
+```http
+Authorization: Bearer <your_api_token>
+```
+- 设置环境变量 `API_TOKEN`
+- 适用于程序化访问
+
+### 会话认证
+- 通过 `/login` 登录获得会话
+- 使用Cookie维持认证状态
+- 适用于Web界面访问
+
+## 📊 错误响应
+
+### 常见错误码
+- **400 Bad Request**：请求参数错误
+- **401 Unauthorized**：需要认证
+- **403 Forbidden**：密码错误或权限不足
+- **404 Not Found**：页面不存在
+- **500 Internal Server Error**：服务器内部错误
+
+### 错误响应格式
+```json
+{
+  "error": "Error description",
+  "code": "ERROR_CODE"
+}
+```
+
+## 🔧 开发调试
+
+### 健康检查
+```http
+GET /health
+```
+**响应：**
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+### 测试API（开发环境）
+```bash
+# 创建测试页面
+curl -X POST http://localhost:5678/api/pages/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_api_token" \
+  -d '{"html_content":"<h1>Test</h1>","code_type":"html"}'
+
+# 获取页面
+curl http://localhost:5678/api/pages/abc123 \
+  -H "Authorization: Bearer your_api_token"
+```
+
+## 📝 使用示例
+
+### 扣子插件集成
+```javascript
+// 创建HTML页面并返回链接
+const createHTMLPage = async (content) => {
+  const response = await fetch('/api/pages/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_TOKEN}`
+    },
+    body: JSON.stringify({
+      html_content: content,
+      code_type: 'html'
+    })
+  });
+  
+  const result = await response.json();
+  return result.url;
+};
+```
+
+### 批量处理
+```javascript
+// 批量创建页面
+const createMultiplePages = async (pages) => {
+  const promises = pages.map(page => 
+    fetch('/api/pages/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_TOKEN}`
+      },
+      body: JSON.stringify(page)
+    })
+  );
+  
+  const responses = await Promise.all(promises);
+  return responses.map(r => r.json());
+};
+```
+

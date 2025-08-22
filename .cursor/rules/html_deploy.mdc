@@ -1,4 +1,9 @@
-# CLAUDE 项目开发与运行指南
+---
+alwaysApply: true
+description: "html_deploy项目开发与运行的核心指南"
+---
+
+# html_deploy 项目开发与运行指南
 
 - 启动命令：
   - `npm install` 安装依赖
@@ -28,7 +33,3 @@
 - 常见内容类型：HTML、Markdown、SVG、Mermaid
 - 调试与常见问题：端口冲突、数据库/会话目录权限、内容渲染、详细日志
 - 数据库表结构：pages（id, html_content, created_at, password, is_protected, code_type）
-description:
-globs:
-alwaysApply: false
----

@@ -1,0 +1,63 @@
+# 中文开发指南
+
+## 🚀 快速开始
+
+### 安装和启动
+```bash
+npm install          # 安装项目依赖
+npm run dev         # 启动开发环境（端口5678）
+npm start           # 启动生产环境（端口8888）
+```
+
+### 访问地址
+- 开发环境：http://localhost:5678
+- 生产环境：http://localhost:8888
+
+## 📁 重要文件说明
+
+- **[app.js](mdc:app.js)** - 项目主文件，所有功能的入口
+- **[config.js](mdc:config.js)** - 配置文件，设置各种参数
+- **[package.json](mdc:package.json)** - 项目信息和依赖包列表
+- **[todo.md](mdc:todo.md)** - 任务管理文档（始终使用这个文件管理任务）
+
+## 🔧 常用操作
+
+### 查看日志
+```bash
+npm run dev         # 开发模式会显示详细日志
+```
+
+### 数据库操作
+- 数据库文件：`./db/html-go.db`
+- 重置数据库：删除 `./db/html-go.db` 文件后重启服务
+
+### 环境变量配置
+1. 复制 `env.example` 为 `.env`
+2. 根据需要修改配置项
+3. 重启服务生效
+
+## 🚨 常见问题解决
+
+### 端口被占用
+```bash
+# 查找占用端口的进程
+netstat -ano | findstr :5678
+# 杀死进程（Windows）
+taskkill /PID <进程ID> /F
+```
+
+### 权限问题
+- 确保 `./db/` 和 `./sessions/` 目录有写入权限
+
+### 服务无法启动
+1. 检查 Node.js 版本（建议 18+）
+2. 删除 `node_modules` 重新安装：`rm -rf node_modules && npm install`
+3. 检查环境变量配置
+
+## 📝 开发规范
+
+- 所有任务使用 [todo.md](mdc:todo.md) 文档管理
+- 代码修改前先理解现有结构
+- 遇到问题优先查看日志和文档
+- 重要修改前做好备份
+

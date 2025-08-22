@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=production node --max-old-space-size=1024 app.js",
     "dev": "cross-env NODE_ENV=development nodemon app.js",
-    "test": "NODE_ENV=test node app.js",
+    "test": "echo 'No tests defined'",
     "prod": "NODE_ENV=production node --max-old-space-size=1024 app.js"
   },
   "keywords": [

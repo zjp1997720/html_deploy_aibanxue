@@ -1,0 +1,177 @@
+# 部署指南
+
+## 🐳 Docker 部署（推荐）
+
+### 快速启动
+```bash
+# 1. 配置环境变量
+cp env.example .env
+# 编辑 .env 文件，设置生产环境参数
+
+# 2. 构建和启动服务
+docker-compose up -d
+
+# 3. 查看运行状态
+docker-compose ps
+docker-compose logs -f
+```
+
+### Docker 配置说明
+- **[Dockerfile](mdc:Dockerfile)** - 容器构建配置
+- **[docker-compose.yml](mdc:docker-compose.yml)** - 服务编排配置
+- 数据持久化：`./db` 和 `./sessions` 目录自动挂载
+- 默认端口：8888（可通过环境变量修改）
+
+## 🌐 域名和 HTTPS 配置
+
+### Nginx 反向代理
+```bash
+# 1. 安装 Nginx（Ubuntu/Debian）
+sudo apt update && sudo apt install nginx
+
+# 2. 复制配置模板
+sudo cp nginx.conf.example /etc/nginx/sites-available/你的域名.conf
+sudo ln -s /etc/nginx/sites-available/你的域名.conf /etc/nginx/sites-enabled/
+
+# 3. 修改配置文件
+sudo nano /etc/nginx/sites-available/你的域名.conf
+# 替换 your-domain.com 为你的实际域名
+
+# 4. 测试配置
+sudo nginx -t
+
+# 5. 重启 Nginx
+sudo systemctl restart nginx
+```
+
+### SSL 证书申请
+```bash
+# 使用项目提供的脚本（推荐）
+chmod +x scripts/setup-cert.sh
+sudo ./scripts/setup-cert.sh 你的域名.com
+
+# 或手动安装 Certbot
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d 你的域名.com
+```
+
+## ⚙️ 生产环境配置
+
+### 环境变量设置
+在 `.env` 文件中配置以下关键参数：
+
+```bash
+# 运行环境
+NODE_ENV=production
+PORT=8888
+
+# 认证配置
+AUTH_ENABLED=true
+AUTH_PASSWORD=你的强密码
+API_TOKEN=你的API密钥
+
+# 数据库路径
+DB_PATH=./db/html-go.db
+
+# 会话配置
+SESSION_SECRET=你的会话密钥
+SESSION_NAME=html_go_session
+SESSION_MAX_AGE=86400000
+
+# 安全配置
+ALLOWED_ORIGINS=https://你的域名.com
+TRUST_PROXY=true
+```
+
+### 安全最佳实践
+1. **强密码设置**：认证密码长度至少12位，包含大小写字母、数字和特殊字符
+2. **API密钥生成**：使用随机生成的32位字符串
+3. **会话密钥**：使用强随机字符串，定期更新
+4. **CORS配置**：仅允许信任的域名访问
+5. **HTTPS强制**：禁用HTTP访问，强制HTTPS
+
+## 🔧 服务管理
+
+### Docker Compose 命令
+```bash
+# 启动服务
+docker-compose up -d
+
+# 停止服务
+docker-compose down
+
+# 重启服务
+docker-compose restart
+
+# 查看日志
+docker-compose logs -f
+
+# 更新服务（拉取最新镜像）
+docker-compose pull
+docker-compose up -d
+
+# 清理未使用的资源
+docker system prune -f
+```
+
+### 数据备份
+```bash
+# 数据库备份
+cp ./db/html-go.db ./db/html-go-backup-$(date +%Y%m%d).db
+
+# 完整备份脚本
+tar -czf backup-$(date +%Y%m%d).tar.gz \
+  ./db/ ./sessions/ ./.env ./nginx.conf
+```
+
+## 📊 监控和维护
+
+### 健康检查
+```bash
+# 检查服务状态
+curl -f http://localhost:8888/health || echo "Service is down"
+
+# 检查 Docker 容器状态
+docker-compose ps
+
+# 检查系统资源
+docker stats
+```
+
+### 日志管理
+```bash
+# 查看应用日志
+docker-compose logs --tail=100 -f app
+
+# 清理旧日志（避免磁盘空间不足）
+docker-compose logs --tail=1000 app > logs/app-$(date +%Y%m%d).log
+docker-compose restart app
+```
+
+### 性能优化
+- **内存限制**：生产环境已设置 `--max-old-space-size=1024`
+- **数据库优化**：定期清理过期会话和临时数据
+- **静态资源缓存**：Nginx 自动配置静态文件缓存
+- **压缩传输**：启用 gzip 压缩减少传输量
+
+## 🚨 故障排除
+
+### 常见问题
+1. **端口冲突**：修改 `.env` 中的 `PORT` 设置
+2. **权限问题**：确保 `./db` 和 `./sessions` 目录可写
+3. **内存不足**：调整 Docker 内存限制或服务器配置
+4. **SSL证书过期**：设置自动续期或手动更新证书
+
+### 应急恢复
+```bash
+# 快速重启服务
+docker-compose down && docker-compose up -d
+
+# 恢复备份数据
+cp ./db/html-go-backup-YYYYMMDD.db ./db/html-go.db
+docker-compose restart
+
+# 查看详细错误信息
+docker-compose logs app
+```
+

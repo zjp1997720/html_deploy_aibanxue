@@ -1,3 +1,8 @@
+---
+alwaysApply: true
+description: "项目文件结构和目录说明"
+---
+
 # 项目结构说明
 
 - 主入口文件为 [app.js](mdc:app.js)
@@ -9,7 +14,3 @@
 - 视图模板在 [views/](mdc:views/) 目录
 - 数据库相关脚本在 [db/](mdc:db/) 目录
 - 实用工具函数在 [utils/](mdc:utils/) 目录
-description:
-globs:
-alwaysApply: false
----

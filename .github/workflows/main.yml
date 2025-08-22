@@ -35,7 +35,9 @@ jobs:
 
       - name: Archive project files (exclude git and node_modules)
         run: |
-          tar --exclude='.git' --exclude='node_modules' --exclude='.env' -czf release.tar.gz .
+          ls -la
+          tar --exclude='.git' --exclude='node_modules' --exclude='.env' --exclude='release.tar.gz' -czf release.tar.gz .
+          ls -la release.tar.gz
 
       - name: Copy files to server via sshpass+scp
         run: |

@@ -130,8 +130,8 @@ app.get('/login', (req, res) => {
     return res.redirect('/');
   }
 
-  res.render('login', {
-    title: 'HTML-Go | 登录',
+  res.render('login-modern', {
+    title: '登录',
     error: null
   });
 });
@@ -174,8 +174,8 @@ app.post('/login', (req, res) => {
   } else {
     console.log('- 密码不匹配，显示错误');
     // 密码错误，显示错误信息
-    res.render('login', {
-      title: 'HTML-Go | 登录',
+    res.render('login-modern', {
+      title: '登录',
       error: '密码错误，请重试'
     });
   }
@@ -252,17 +252,24 @@ app.get('/validate-password/:id', async (req, res) => {
   }
 });
 
+// 测试路由已移除 - 新设计已完全集成到正式路由中
+
 // 首页路由 - 需要登录才能访问
 app.get('/', isAuthenticated, (req, res) => {
-  res.render('index', { title: 'HTML-Go | 分享 HTML 代码的简单方式' });
+  res.render('index-modern', { 
+    title: '首页',
+    layout: 'layouts/modern',
+    scripts: ['/js/main.js']
+  });
 });
 
 // 后台管理页面路由
 app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
   try {
     const pages = await getAllPages();
-    res.render('dashboard', {
-      title: 'HTML-Go | 后台管理',
+    res.render('dashboard-modern', {
+      title: '概览',
+      currentPath: '/admin/dashboard',
       pages: pages,
       // 安全的时间格式化函数
       formatDate: (timestamp) => {

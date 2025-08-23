@@ -330,7 +330,9 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
     .sidebar {
+        width: 280px; /* 移动端适配宽度 */
         transform: translateX(-100%);
+        box-shadow: var(--admin-shadow-lg);
     }
     
     .sidebar.mobile-open {
@@ -339,6 +341,7 @@
     
     .main-content {
         margin-left: 0;
+        padding-left: 0;
     }
     
     .mobile-overlay.show {
@@ -355,6 +358,58 @@
     
     .breadcrumb {
         font-size: 0.75rem;
+    }
+    
+    /* 移动端统计卡片优化 */
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    /* 移动端表格优化 */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .data-table {
+        min-width: 600px;
+        font-size: 0.875rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+    
+    /* 移动端按钮优化 */
+    .btn {
+        min-height: 44px; /* 符合移动端触摸标准 */
+        padding: 0.75rem 1rem;
+    }
+    
+    .btn-sm {
+        min-height: 36px;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    /* 移动端快捷操作优化 */
+    .quick-actions {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .quick-action {
+        padding: 0.75rem;
+        min-height: 80px;
     }
     
     .page-content {

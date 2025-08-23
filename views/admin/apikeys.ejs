@@ -1,10 +1,97 @@
-<%- include('../layouts/admin', { 
-  title: 'API Key管理 - HTML-GO Admin',
-  currentPath: '/admin/apikeys',
-  currentPage: 'apikeys'
-}) %>
+<% 
+// 设置页面数据
+const currentPath = '/admin/apikeys';
+const title = 'API Key管理';
+const breadcrumb = [
+    { title: '管理后台', url: '/admin/dashboard' },
+    { title: 'API Key管理' }
+];
+%>
 
-<div class="page-header">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - HTML-GO 管理后台</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="/icon/web/favicon.ico">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <!-- 顶部导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <span class="brand-icon">🚀</span>
+                    <span class="brand-text">HTML-GO Admin</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span class="toggle-icon">☰</span>
+                </button>
+            </div>
+            <div class="nav-right">
+                <div class="user-menu">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name">管理员</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 侧边导航栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="/admin/dashboard" class="nav-link">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-text">概览</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/pages" class="nav-link">
+                                <span class="nav-icon">📄</span>
+                                <span class="nav-text">页面管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/apikeys" class="nav-link active">
+                                <span class="nav-icon">🔑</span>
+                                <span class="nav-text">API Key管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/settings" class="nav-link">
+                                <span class="nav-icon">⚙️</span>
+                                <span class="nav-text">系统设置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="sidebar-footer">
+                    <a href="/" class="btn btn-sm btn-outline">🌐 前台</a>
+                    <a href="/admin/pages/new" class="btn btn-sm btn-primary">➕ 新建</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 面包屑导航 -->
+            <div class="breadcrumb-container">
+                <nav class="breadcrumb">
+                    <a href="/admin/dashboard" class="breadcrumb-item">管理后台</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item current">API Key管理</span>
+                </nav>
+            </div>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
   <div class="page-header-content">
     <h1 class="page-title">
       <i class="fas fa-key"></i>
@@ -801,4 +888,16 @@ function formatDate(timestamp) {
     flex-direction: column;
   }
 }
-</style> 
+</style>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端遮罩 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 脚本文件 -->
+    <script src="/js/admin-common.js"></script>
+</body>
+</html> 

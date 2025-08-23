@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - HTML-GO</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="HTML-GO - 分享AI生成内容的最佳方式">
+  <meta name="keywords" content="HTML,分享,AI,代码,预览">
+  <meta name="author" content="HTML-GO">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="<%= title %> - HTML-GO">
+  <meta property="og:description" content="分享AI生成内容的最佳方式">
+  <meta property="og:type" content="website">
+  
+  <!-- Favicons -->
+  <link rel="icon" href="/icon/web/favicon.ico">
+  <link rel="apple-touch-icon" href="/icon/web/apple-touch-icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  
+  <!-- Theme Script (inline to prevent FOUC) -->
+  <script>
+    // 主题管理
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</head>
+<body>
+  <!-- 主应用容器 -->
+  <div id="app" class="min-h-screen bg-primary">
+    <!-- 全局导航 -->
+    <nav class="sticky top-0 z-50 bg-elevated border-b border-primary backdrop-blur-sm">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo和品牌 -->
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-bold text-brand-600">🚀</div>
+            <h1 class="text-xl font-display font-semibold text-primary">
+              HTML-GO
+            </h1>
+          </div>
+          
+          <!-- 导航链接 -->
+          <div class="hidden md:flex items-center gap-6">
+            <a href="/" class="text-sm font-medium text-secondary hover:text-primary transition-colors">
+              首页
+            </a>
+            <a href="/admin/dashboard" class="text-sm font-medium text-secondary hover:text-primary transition-colors">
+              管理后台
+            </a>
+          </div>
+          
+          <!-- 主题切换和设置 -->
+          <div class="flex items-center gap-3">
+            <button 
+              id="theme-toggle" 
+              class="btn btn-ghost btn-sm btn-icon tooltip"
+              data-tooltip="切换主题"
+              aria-label="切换主题"
+            >
+              <i class="fas fa-sun text-sm" id="theme-icon"></i>
+            </button>
+            
+            <div class="hidden md:block w-px h-6 bg-border-primary"></div>
+            
+            <button 
+              class="btn btn-ghost btn-sm tooltip"
+              data-tooltip="关于"
+              aria-label="关于"
+            >
+              <i class="fas fa-info-circle text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- 主内容区域 -->
+    <main class="flex-1">
+      <%- body %>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-secondary border-t border-primary mt-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- 品牌信息 -->
+          <div class="col-span-1 md:col-span-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="text-2xl">🚀</div>
+              <h3 class="text-lg font-display font-semibold text-primary">HTML-GO</h3>
+            </div>
+            <p class="text-sm text-secondary leading-relaxed max-w-md">
+              专业的HTML内容分享平台，让AI生成的内容轻松分享给世界。简单、快速、安全。
+            </p>
+          </div>
+          
+          <!-- 快速链接 -->
+          <div>
+            <h4 class="text-sm font-semibold text-primary mb-4">快速链接</h4>
+            <ul class="space-y-2">
+              <li><a href="/" class="text-sm text-secondary hover:text-primary transition-colors">首页</a></li>
+              <li><a href="/admin/dashboard" class="text-sm text-secondary hover:text-primary transition-colors">管理后台</a></li>
+              <li><a href="#" class="text-sm text-secondary hover:text-primary transition-colors">API文档</a></li>
+            </ul>
+          </div>
+          
+          <!-- 联系信息 -->
+          <div>
+            <h4 class="text-sm font-semibold text-primary mb-4">联系我们</h4>
+            <ul class="space-y-2">
+              <li>
+                <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer" 
+                   class="text-sm text-secondary hover:text-primary transition-colors flex items-center gap-2">
+                  <i class="fab fa-twitter text-xs"></i>
+                  Twitter
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                   class="text-sm text-secondary hover:text-primary transition-colors flex items-center gap-2">
+                  <i class="fab fa-github text-xs"></i>
+                  GitHub
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-primary mt-8 pt-8">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-tertiary">
+              © 2025 HTML-GO. All rights reserved.
+            </p>
+            <p class="text-xs text-tertiary">
+              Made with ❤️ by <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:text-brand-700">向阳乔木</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Toast通知容器 -->
+  <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-2"></div>
+  
+  <!-- 加载遮罩 -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <div class="loading-text">处理中...</div>
+    </div>
+  </div>
+  
+  <!-- 全局JavaScript -->
+  <script>
+    // 主题切换功能
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    function updateThemeIcon() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        themeIcon.className = 'fas fa-moon text-sm';
+      } else {
+        themeIcon.className = 'fas fa-sun text-sm';
+      }
+    }
+    
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+    }
+    
+    // 初始化主题图标
+    updateThemeIcon();
+    
+    // 绑定主题切换事件
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // 全局工具函数
+    window.HTMLGOUtils = {
+      // 显示Toast通知
+      showToast(message, type = 'info', duration = 5000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const iconMap = {
+          success: 'fas fa-check',
+          error: 'fas fa-times',
+          warning: 'fas fa-exclamation-triangle',
+          info: 'fas fa-info-circle'
+        };
+        
+                 toast.innerHTML = 
+           '<div class="toast-icon">' +
+             '<i class="' + (iconMap[type] || iconMap.info) + '"></i>' +
+           '</div>' +
+           '<div class="toast-content">' +
+             '<p class="toast-message">' + message + '</p>' +
+           '</div>' +
+           '<button class="toast-close" onclick="this.parentElement.remove()">' +
+             '<i class="fas fa-times text-xs"></i>' +
+           '</button>';
+        
+        container.appendChild(toast);
+        
+        // 显示动画
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // 自动移除
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      },
+      
+      // 显示/隐藏加载遮罩
+      showLoading() {
+        document.getElementById('loading-overlay').style.display = 'flex';
+      },
+      
+      hideLoading() {
+        document.getElementById('loading-overlay').style.display = 'none';
+      },
+      
+      // 复制到剪贴板
+      async copyToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          this.showToast('已复制到剪贴板', 'success');
+          return true;
+        } catch (err) {
+          console.error('复制失败:', err);
+          this.showToast('复制失败，请手动复制', 'error');
+          return false;
+        }
+      }
+    };
+  </script>
+  
+  <!-- 页面特定脚本 -->
+  <% if (typeof scripts !== 'undefined' && scripts) { %>
+    <% scripts.forEach(script => { %>
+      <script src="<%= script %>"></script>
+    <% }) %>
+  <% } %>
+  
+  <!-- 内联脚本 -->
+  <% if (typeof inlineScript !== 'undefined' && inlineScript) { %>
+    <script><%= inlineScript %></script>
+  <% } %>
+</body>
+</html> 

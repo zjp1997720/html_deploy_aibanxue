@@ -454,7 +454,8 @@ const breadcrumb = [
         document.addEventListener('DOMContentLoaded', () => {
             // 更新时间显示
             document.querySelectorAll('.time-ago').forEach(el => {
-                const date = new Date(el.getAttribute('datetime'));
+                const timestamp = parseInt(el.getAttribute('datetime'));
+                const date = new Date(timestamp);
                 el.textContent = AdminApp.formatDate(date, 'MM-DD HH:mm');
             });
         });

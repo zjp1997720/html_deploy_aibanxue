@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - HTML-GO</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="HTML-GO - 分享AI生成内容的最佳方式">
+  <meta name="keywords" content="HTML,分享,AI,代码,预览">
+  <meta name="author" content="HTML-GO">
+  
+  <!-- Favicons -->
+  <link rel="icon" href="/icon/web/favicon.ico">
+  <link rel="apple-touch-icon" href="/icon/web/apple-touch-icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  <link rel="stylesheet" href="/css/mobile-optimizations.css">
+  
+  <!-- Theme Script (inline to prevent FOUC) -->
+  <script>
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</head>
+<body>
+  <div id="app" class="min-h-screen bg-primary">
+    <!-- 全局导航 -->
+    <nav class="sticky top-0 z-50 bg-elevated border-b border-primary backdrop-blur-sm">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-bold text-brand-600">🚀</div>
+            <h1 class="text-xl font-display font-semibold text-primary">HTML-GO</h1>
+          </div>
+          
+          <div class="hidden md:flex items-center gap-6">
+            <a href="/" class="text-sm font-medium text-secondary hover:text-primary transition-colors">首页</a>
+            <a href="/admin/dashboard" class="text-sm font-medium text-secondary hover:text-primary transition-colors">管理后台</a>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <button 
+              id="theme-toggle" 
+              class="btn btn-ghost btn-sm btn-icon tooltip"
+              data-tooltip="切换主题"
+            >
+              <i class="fas fa-sun text-sm" id="theme-icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <main class="flex-1">
+
+<!-- 英雄区域 -->
+<section class="py-20 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto text-center">
+    <!-- 主标题 -->
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-primary mb-6 leading-tight">
+      分享AI生成内容的
+      <span class="text-brand-600">最佳方式</span>
+    </h1>
+    
+    <!-- 副标题 -->
+    <p class="text-lg sm:text-xl text-secondary mb-12 max-w-2xl mx-auto leading-relaxed">
+      简单、快速、安全地分享HTML、Markdown、SVG等内容。
+      <br class="hidden sm:block">
+      专为AI时代的内容创作者设计。
+    </p>
+    
+    <!-- 快速开始 -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+      <button 
+        onclick="scrollToEditor()"
+        class="btn btn-primary btn-lg"
+      >
+        <i class="fas fa-rocket"></i>
+        立即开始
+      </button>
+      <a 
+        href="/admin/dashboard"
+        class="btn btn-outline btn-lg"
+      >
+        <i class="fas fa-cog"></i>
+        管理后台
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 主编辑器区域 -->
+<section id="editor-section" class="py-12 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- 区域标题 -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl sm:text-3xl font-display font-semibold text-primary mb-4">
+        粘贴您的内容
+      </h2>
+      <p class="text-secondary">
+        支持HTML、Markdown、SVG、Mermaid等多种格式
+      </p>
+    </div>
+    
+    <!-- 编辑器卡片 -->
+    <div class="card">
+      <div class="card-body">
+        <!-- 内容类型指示器 -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <div id="content-type-badge" class="badge badge-primary">
+              <i class="fas fa-code mr-1"></i>
+              HTML
+            </div>
+            <span class="text-xs text-tertiary">自动检测内容类型</span>
+          </div>
+          
+          <!-- 工具栏 -->
+          <div class="flex items-center gap-2">
+            <button 
+              id="clear-btn"
+              class="btn btn-ghost btn-sm tooltip"
+              data-tooltip="清空内容"
+            >
+              <i class="fas fa-eraser"></i>
+            </button>
+            <button 
+              id="format-btn"
+              class="btn btn-ghost btn-sm tooltip"
+              data-tooltip="格式化代码"
+            >
+              <i class="fas fa-magic"></i>
+            </button>
+            <button 
+              id="upload-btn"
+              class="btn btn-ghost btn-sm tooltip"
+              data-tooltip="上传文件"
+            >
+              <i class="fas fa-upload"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 文本编辑区域 -->
+        <div class="relative">
+          <textarea
+            id="content-editor"
+            class="form-input form-textarea font-mono text-sm"
+            rows="12"
+            placeholder="在这里粘贴或输入您的HTML、Markdown、SVG或Mermaid代码..."
+            style="min-height: 300px; resize: vertical;"
+          ></textarea>
+          
+          <!-- 文件上传（隐藏） -->
+          <input
+            type="file"
+            id="file-input"
+            accept=".html,.htm,.md,.markdown,.svg,.mmd"
+            style="display: none;"
+          >
+        </div>
+        
+        <!-- 密码保护选项 -->
+        <div class="mt-6 p-4 bg-secondary rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-medium text-primary mb-1">密码保护</h4>
+              <p class="text-xs text-secondary">为您的内容添加访问密码</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="password-toggle"
+                class="sr-only peer"
+              >
+              <div class="relative w-11 h-6 bg-border-primary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+            </label>
+          </div>
+          
+          <!-- 密码显示区域 -->
+          <div id="password-display" class="mt-3 hidden">
+            <div class="flex items-center gap-3 p-3 bg-primary rounded border border-border-primary">
+              <div class="flex-1">
+                <span class="text-xs text-secondary">生成的密码：</span>
+                <div class="font-mono text-sm text-primary" id="generated-password">
+                  <!-- 密码将通过JS生成 -->
+                </div>
+              </div>
+              <button 
+                id="copy-password-btn"
+                class="btn btn-ghost btn-sm tooltip"
+                data-tooltip="复制密码"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+          <button 
+            id="preview-btn"
+            class="btn btn-secondary"
+            disabled
+          >
+            <i class="fas fa-eye"></i>
+            预览
+          </button>
+          <button 
+            id="generate-btn"
+            class="btn btn-primary"
+            disabled
+          >
+            <i class="fas fa-share"></i>
+            生成分享链接
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 结果显示区域 -->
+    <div id="result-section" class="mt-6 hidden">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-check-circle text-success-600 mr-2"></i>
+            链接生成成功
+          </h3>
+          <p class="card-description">您的内容已成功上传并生成分享链接</p>
+        </div>
+        <div class="card-body">
+          <!-- 分享链接 -->
+          <div class="form-group">
+            <label class="form-label">分享链接</label>
+            <div class="flex gap-2">
+              <input 
+                type="text" 
+                id="share-url"
+                class="form-input flex-1 font-mono text-sm"
+                readonly
+              >
+              <button 
+                id="copy-url-btn"
+                class="btn btn-outline tooltip"
+                data-tooltip="复制链接"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 快速操作 -->
+          <div class="flex flex-wrap gap-3 mt-4">
+            <button 
+              id="open-link-btn"
+              class="btn btn-ghost btn-sm"
+            >
+              <i class="fas fa-external-link-alt"></i>
+              在新窗口打开
+            </button>
+            <button 
+              id="qr-code-btn"
+              class="btn btn-ghost btn-sm"
+            >
+              <i class="fas fa-qrcode"></i>
+              生成二维码
+            </button>
+            <button 
+              id="share-social-btn"
+              class="btn btn-ghost btn-sm"
+            >
+              <i class="fas fa-share-alt"></i>
+              社交分享
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 特性介绍 -->
+<section class="py-20 px-4 sm:px-6 bg-secondary">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-display font-semibold text-primary mb-4">
+        为什么选择 HTML-GO
+      </h2>
+      <p class="text-lg text-secondary max-w-2xl mx-auto">
+        专为现代内容创作者设计的分享平台
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- 特性1 -->
+      <div class="text-center">
+        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-bolt text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-primary mb-2">极速分享</h3>
+        <p class="text-secondary text-sm leading-relaxed">
+          粘贴内容即可立即生成分享链接，无需注册或复杂配置
+        </p>
+      </div>
+      
+      <!-- 特性2 -->
+      <div class="text-center">
+        <div class="w-12 h-12 bg-success-50 text-success-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-shield-alt text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-primary mb-2">安全可靠</h3>
+        <p class="text-secondary text-sm leading-relaxed">
+          支持密码保护，确保您的内容只有授权用户才能访问
+        </p>
+      </div>
+      
+      <!-- 特性3 -->
+      <div class="text-center">
+        <div class="w-12 h-12 bg-warning-50 text-warning-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-magic text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-primary mb-2">智能识别</h3>
+        <p class="text-secondary text-sm leading-relaxed">
+          自动识别HTML、Markdown、SVG、Mermaid等多种内容格式
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 使用统计 -->
+<section class="py-12 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="card">
+      <div class="card-body text-center">
+        <h3 class="text-xl font-semibold text-primary mb-6">平台数据</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div>
+            <div class="text-2xl font-bold text-brand-600 mb-1">1,234</div>
+            <div class="text-sm text-secondary">今日分享</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-brand-600 mb-1">56,789</div>
+            <div class="text-sm text-secondary">总访问量</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-brand-600 mb-1">99.9%</div>
+            <div class="text-sm text-secondary">可用性</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-brand-600 mb-1">< 1s</div>
+            <div class="text-sm text-secondary">响应时间</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 页面脚本 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 获取DOM元素
+  const contentEditor = document.getElementById('content-editor');
+  const contentTypeBadge = document.getElementById('content-type-badge');
+  const passwordToggle = document.getElementById('password-toggle');
+  const passwordDisplay = document.getElementById('password-display');
+  const generatedPassword = document.getElementById('generated-password');
+  const clearBtn = document.getElementById('clear-btn');
+  const formatBtn = document.getElementById('format-btn');
+  const uploadBtn = document.getElementById('upload-btn');
+  const fileInput = document.getElementById('file-input');
+  const previewBtn = document.getElementById('preview-btn');
+  const generateBtn = document.getElementById('generate-btn');
+  const resultSection = document.getElementById('result-section');
+  const shareUrl = document.getElementById('share-url');
+  
+  let currentPassword = null;
+  
+  // 内容类型检测
+  function detectContentType(content) {
+    if (!content.trim()) return 'text';
+    
+    if (content.includes('<!DOCTYPE') || content.includes('<html')) {
+      return 'html';
+    } else if (content.includes('graph') && content.includes('-->')) {
+      return 'mermaid';
+    } else if (content.includes('<svg')) {
+      return 'svg';
+    } else if (content.includes('#') || content.includes('**') || content.includes('```')) {
+      return 'markdown';
+    }
+    
+    return 'text';
+  }
+  
+  // 更新内容类型徽章
+  function updateContentTypeBadge(type) {
+    const typeMap = {
+      html: { icon: 'fas fa-code', text: 'HTML', class: 'badge-primary' },
+      markdown: { icon: 'fab fa-markdown', text: 'Markdown', class: 'badge-secondary' },
+      svg: { icon: 'fas fa-draw-polygon', text: 'SVG', class: 'badge-success' },
+      mermaid: { icon: 'fas fa-project-diagram', text: 'Mermaid', class: 'badge-warning' },
+      text: { icon: 'fas fa-file-alt', text: 'Text', class: 'badge-secondary' }
+    };
+    
+    const config = typeMap[type] || typeMap.text;
+    contentTypeBadge.className = `badge ${config.class}`;
+    contentTypeBadge.innerHTML = `<i class="${config.icon} mr-1"></i>${config.text}`;
+  }
+  
+  // 生成随机密码
+  function generatePassword() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+  
+  // 平滑滚动到编辑器
+  window.scrollToEditor = function() {
+    document.getElementById('editor-section').scrollIntoView({
+      behavior: 'smooth'
+    });
+  };
+  
+  // 监听内容变化
+  contentEditor.addEventListener('input', function() {
+    const content = this.value;
+    const type = detectContentType(content);
+    updateContentTypeBadge(type);
+    
+    // 更新按钮状态
+    const hasContent = content.trim().length > 0;
+    previewBtn.disabled = !hasContent;
+    generateBtn.disabled = !hasContent;
+  });
+  
+  // 密码保护切换
+  passwordToggle.addEventListener('change', function() {
+    if (this.checked) {
+      currentPassword = generatePassword();
+      generatedPassword.textContent = currentPassword;
+      passwordDisplay.classList.remove('hidden');
+    } else {
+      currentPassword = null;
+      passwordDisplay.classList.add('hidden');
+    }
+  });
+  
+  // 清空内容
+  clearBtn.addEventListener('click', function() {
+    if (confirm('确定要清空所有内容吗？')) {
+      contentEditor.value = '';
+      contentEditor.dispatchEvent(new Event('input'));
+      resultSection.classList.add('hidden');
+    }
+  });
+  
+  // 格式化代码
+  formatBtn.addEventListener('click', function() {
+    const content = contentEditor.value;
+    if (!content.trim()) return;
+    
+    // 简单的格式化（实际项目中可能需要更复杂的格式化逻辑）
+    try {
+      const type = detectContentType(content);
+      if (type === 'html') {
+        // 简单的HTML格式化
+        const formatted = content
+          .replace(/></g, '>\n<')
+          .replace(/^\s+|\s+$/g, '');
+        contentEditor.value = formatted;
+      }
+      HTMLGOUtils.showToast('代码已格式化', 'success');
+    } catch (error) {
+      HTMLGOUtils.showToast('格式化失败', 'error');
+    }
+  });
+  
+  // 上传文件
+  uploadBtn.addEventListener('click', function() {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      contentEditor.value = e.target.result;
+      contentEditor.dispatchEvent(new Event('input'));
+      HTMLGOUtils.showToast('文件上传成功', 'success');
+    };
+    reader.readAsText(file);
+  });
+  
+  // 预览功能
+  previewBtn.addEventListener('click', function() {
+    const content = contentEditor.value.trim();
+    if (!content) return;
+    
+    // 在新窗口中预览内容
+    const previewWindow = window.open('', '_blank');
+    const type = detectContentType(content);
+    
+    if (type === 'html') {
+      previewWindow.document.write(content);
+    } else {
+      previewWindow.document.write(`
+        <html>
+          <head><title>预览</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 20px;">
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">${content}</pre>
+          </body>
+        </html>
+      `);
+    }
+    previewWindow.document.close();
+  });
+  
+  // 生成分享链接
+  generateBtn.addEventListener('click', async function() {
+    const content = contentEditor.value.trim();
+    if (!content) return;
+    
+    HTMLGOUtils.showLoading();
+    
+    try {
+      const response = await fetch('/api/pages/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html_content: content,
+          password: currentPassword,
+          is_protected: !!currentPassword
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const url = `${window.location.origin}/view/${data.id}`;
+        shareUrl.value = url;
+        resultSection.classList.remove('hidden');
+        
+        HTMLGOUtils.showToast('链接生成成功', 'success');
+        
+        // 滚动到结果区域
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        HTMLGOUtils.showToast(data.error || '生成失败', 'error');
+      }
+    } catch (error) {
+      console.error('生成链接失败:', error);
+      HTMLGOUtils.showToast('网络错误，请稍后重试', 'error');
+    } finally {
+      HTMLGOUtils.hideLoading();
+    }
+  });
+  
+  // 复制密码
+  document.getElementById('copy-password-btn').addEventListener('click', function() {
+    if (currentPassword) {
+      HTMLGOUtils.copyToClipboard(currentPassword);
+    }
+  });
+  
+  // 复制链接
+  document.getElementById('copy-url-btn').addEventListener('click', function() {
+    HTMLGOUtils.copyToClipboard(shareUrl.value);
+  });
+  
+  // 在新窗口打开链接
+  document.getElementById('open-link-btn').addEventListener('click', function() {
+    if (shareUrl.value) {
+      window.open(shareUrl.value, '_blank');
+    }
+  });
+  
+  // 初始化
+  updateContentTypeBadge('text');
+});
+</script>
+
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-secondary border-t border-primary mt-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="col-span-1 md:col-span-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="text-2xl">🚀</div>
+              <h3 class="text-lg font-display font-semibold text-primary">HTML-GO</h3>
+            </div>
+            <p class="text-sm text-secondary leading-relaxed max-w-md">
+              专业的HTML内容分享平台，让AI生成的内容轻松分享给世界。简单、快速、安全。
+            </p>
+          </div>
+          
+          <div>
+            <h4 class="text-sm font-semibold text-primary mb-4">快速链接</h4>
+            <ul class="space-y-2">
+              <li><a href="/" class="text-sm text-secondary hover:text-primary transition-colors">首页</a></li>
+              <li><a href="/admin/dashboard" class="text-sm text-secondary hover:text-primary transition-colors">管理后台</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="text-sm font-semibold text-primary mb-4">联系我们</h4>
+            <ul class="space-y-2">
+              <li>
+                <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer" 
+                   class="text-sm text-secondary hover:text-primary transition-colors flex items-center gap-2">
+                  <i class="fab fa-twitter text-xs"></i>
+                  Twitter
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-primary mt-8 pt-8">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-tertiary">© 2025 HTML-GO. All rights reserved.</p>
+            <p class="text-xs text-tertiary">
+              Made with ❤️ by <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer" class="text-brand-600 hover:text-brand-700">向阳乔木</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Toast通知容器 -->
+  <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-2"></div>
+  
+  <!-- 移动端优化 -->
+  <script src="/js/mobile-optimizer.js"></script>
+  
+  <!-- 全局JavaScript -->
+  <script>
+    // 主题切换功能
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    function updateThemeIcon() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        themeIcon.className = 'fas fa-moon text-sm';
+      } else {
+        themeIcon.className = 'fas fa-sun text-sm';
+      }
+    }
+    
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+    }
+    
+    updateThemeIcon();
+    
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // 全局工具函数
+    window.HTMLGOUtils = {
+      showToast(message, type = 'info', duration = 5000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        
+        const iconMap = {
+          success: 'fas fa-check',
+          error: 'fas fa-times',
+          warning: 'fas fa-exclamation-triangle',
+          info: 'fas fa-info-circle'
+        };
+        
+        toast.innerHTML = 
+          '<div class="toast-icon">' +
+            '<i class="' + (iconMap[type] || iconMap.info) + '"></i>' +
+          '</div>' +
+          '<div class="toast-content">' +
+            '<p class="toast-message">' + message + '</p>' +
+          '</div>' +
+          '<button class="toast-close" onclick="this.parentElement.remove()">' +
+            '<i class="fas fa-times text-xs"></i>' +
+          '</button>';
+        
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      },
+      
+      async copyToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          this.showToast('已复制到剪贴板', 'success');
+          return true;
+        } catch (err) {
+          console.error('复制失败:', err);
+          this.showToast('复制失败，请手动复制', 'error');
+          return false;
+        }
+      }
+    };
+  </script>
+</body>
+</html> 

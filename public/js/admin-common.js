@@ -335,8 +335,10 @@ class AdminApp {
      * 格式化日期
      */
     static formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
-        const d = new Date(date);
-        if (isNaN(d)) return '无效日期';
+        // 确保时间戳为数字格式
+        const timestamp = typeof date === 'string' ? parseInt(date) : date;
+        const d = new Date(timestamp);
+        if (isNaN(d.getTime())) return '无效日期';
         
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -508,4 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 全局暴露工具函数
 window.AdminApp = AdminApp;
-window.Pagination = Pagination; 
+window.Pagination = Pagination;
+
+// 全局showNotification函数
+window.showNotification = function(message, type = 'info', duration = 3000) {
+    return AdminApp.showNotification(message, type, duration);
+}; 

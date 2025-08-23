@@ -25,6 +25,22 @@ console.log('环境变量:', {
 const { isAuthenticated, isAuthenticatedOrApiKey } = require('./middleware/auth');
 const { apiKeyAuth, validateApiKeyMiddleware, requirePermissions } = require('./middleware/apiKey');
 
+// 导入性能监控中间件
+const { responseTimeMonitor, getPerformanceStats, getDetailedPerformanceReport, cleanupOldLogs } = require('./middleware/responseTimeMonitor');
+
+// 导入内存优化工具
+const { 
+  getMemoryUsage, 
+  getDetailedMemoryStats, 
+  forceGarbageCollection, 
+  startMemoryMonitoring, 
+  generateMemoryReport, 
+  detectMemoryLeaks 
+} = require('./utils/memoryOptimizer');
+
+// 导入缓存管理系统
+const { cache } = require('./utils/cacheManager');
+
 // 导入配置
 const config = require('./config');
 
@@ -37,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 // 确保在服务器上使用正确的端口
-const PORT = process.env.NODE_ENV === 'production' ? 8888 : config.port;
+const PORT = config.port;
 
 // 将配置添加到应用本地变量中，便于在中间件中访问
 app.locals.config = config;
@@ -102,6 +118,10 @@ app.use(session({
 // 设置视图引擎
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// ===== Phase 3: 性能监控中间件 =====
+app.use(responseTimeMonitor);
+console.log('✅ 性能监控中间件已启用');
 
 // 登录路由
 app.get('/login', (req, res) => {
@@ -839,6 +859,285 @@ app.get('/api/admin/stats/anomaly', isAuthenticated, async (req, res) => {
   }
 });
 
+// ===== Phase 3: 性能监控API端点 =====
+
+// 实时性能统计（管理员接口）
+app.get('/api/admin/performance/stats', isAuthenticated, (req, res) => {
+  try {
+    const stats = getPerformanceStats();
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('获取性能统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取性能统计失败'
+    });
+  }
+});
+
+// 详细性能报告（管理员接口）
+app.get('/api/admin/performance/report', isAuthenticated, async (req, res) => {
+  try {
+    const { hours = 24 } = req.query;
+    const report = await getDetailedPerformanceReport(parseInt(hours));
+    
+    if (!report) {
+      return res.status(500).json({
+        success: false,
+        error: '生成性能报告失败'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (error) {
+    console.error('获取性能报告错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取性能报告失败'
+    });
+  }
+});
+
+// 系统性能状态（公开API）
+app.get('/api/v2/performance/status', (req, res) => {
+  try {
+    const stats = getPerformanceStats();
+    // 只返回基本的性能指标，不暴露敏感信息
+    res.json({
+      success: true,
+      data: {
+        uptime: stats.uptime,
+        averageResponseTime: stats.averageResponseTime,
+        totalRequests: stats.totalRequests,
+        errorRate: stats.errorRate,
+        memoryUsage: {
+          heapUsed: Math.round(stats.memoryUsage.heapUsed / 1024 / 1024), // MB
+          heapTotal: Math.round(stats.memoryUsage.heapTotal / 1024 / 1024) // MB
+        },
+        status: stats.errorRate > 10 ? 'degraded' : stats.averageResponseTime > 2000 ? 'slow' : 'healthy'
+      }
+    });
+  } catch (error) {
+    console.error('获取性能状态错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取性能状态失败'
+    });
+  }
+});
+
+// ===== Phase 3: 内存管理API端点 =====
+
+// 内存使用状态（管理员接口）
+app.get('/api/admin/memory/status', isAuthenticated, (req, res) => {
+  try {
+    const memoryStats = getDetailedMemoryStats();
+    res.json({
+      success: true,
+      data: memoryStats
+    });
+  } catch (error) {
+    console.error('获取内存状态错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取内存状态失败'
+    });
+  }
+});
+
+// 内存使用报告（管理员接口）
+app.get('/api/admin/memory/report', isAuthenticated, (req, res) => {
+  try {
+    const report = generateMemoryReport();
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (error) {
+    console.error('生成内存报告错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '生成内存报告失败'
+    });
+  }
+});
+
+// 强制垃圾回收（管理员接口）
+app.post('/api/admin/memory/gc', isAuthenticated, (req, res) => {
+  try {
+    const gcResult = forceGarbageCollection();
+    res.json({
+      success: true,
+      data: gcResult
+    });
+  } catch (error) {
+    console.error('执行垃圾回收错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '执行垃圾回收失败'
+    });
+  }
+});
+
+// 内存泄漏检测（管理员接口）
+app.get('/api/admin/memory/leak-detection', isAuthenticated, (req, res) => {
+  try {
+    const leakInfo = detectMemoryLeaks();
+    res.json({
+      success: true,
+      data: leakInfo
+    });
+  } catch (error) {
+    console.error('内存泄漏检测错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '内存泄漏检测失败'
+    });
+  }
+});
+
+// 基本内存信息（公开API）
+app.get('/api/v2/memory/status', (req, res) => {
+  try {
+    const usage = getMemoryUsage();
+    res.json({
+      success: true,
+      data: {
+        heapUsed: usage.heapUsed,
+        heapTotal: usage.heapTotal,
+        rss: usage.rss,
+        status: usage.heapUsed > 150 ? 'high' : usage.heapUsed > 100 ? 'medium' : 'normal'
+      }
+    });
+  } catch (error) {
+    console.error('获取内存信息错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取内存信息失败'
+    });
+  }
+});
+
+// ===== Phase 3: 缓存管理API端点 =====
+
+// 缓存统计信息（管理员接口）
+app.get('/api/admin/cache/stats', isAuthenticated, (req, res) => {
+  try {
+    const stats = cache.stats();
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('获取缓存统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取缓存统计失败'
+    });
+  }
+});
+
+// 缓存详细报告（管理员接口）
+app.get('/api/admin/cache/report', isAuthenticated, (req, res) => {
+  try {
+    const report = cache.report();
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (error) {
+    console.error('生成缓存报告错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '生成缓存报告失败'
+    });
+  }
+});
+
+// 清空缓存（管理员接口）
+app.post('/api/admin/cache/clear', isAuthenticated, (req, res) => {
+  try {
+    const { category } = req.body;
+    
+    let clearedCount = 0;
+    if (category) {
+      // 清空特定类别的缓存
+      const allKeys = Array.from(cache.report().summary.items);
+      // 这里需要实现按类别清除的逻辑
+      res.json({
+        success: true,
+        data: {
+          message: `清空 ${category} 类别缓存`,
+          clearedCount: 0 // 临时返回0，实际需要实现
+        }
+      });
+    } else {
+      // 清空所有缓存
+      clearedCount = cache.clear();
+      res.json({
+        success: true,
+        data: {
+          message: '清空所有缓存',
+          clearedCount
+        }
+      });
+    }
+  } catch (error) {
+    console.error('清空缓存错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '清空缓存失败'
+    });
+  }
+});
+
+// 缓存预热（管理员接口）
+app.post('/api/admin/cache/warmup', isAuthenticated, async (req, res) => {
+  try {
+    console.log('🔥 开始缓存预热...');
+    
+    // 预热页面统计数据
+    try {
+      const { getPagesStats } = require('./models/pages');
+      const pagesStats = await getPagesStats();
+      cache.stats.set('pages_stats', pagesStats);
+      console.log('✅ 页面统计数据已预热');
+    } catch (err) {
+      console.warn('预热页面统计失败:', err.message);
+    }
+
+    // 预热API Keys统计
+    try {
+      const { getOverallApiStats } = require('./models/apiKeys');
+      const apiStats = await getOverallApiStats();
+      cache.stats.set('api_overall_stats', apiStats);
+      console.log('✅ API统计数据已预热');
+    } catch (err) {
+      console.warn('预热API统计失败:', err.message);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: '缓存预热完成',
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('缓存预热错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '缓存预热失败'
+    });
+  }
+});
+
 // 健康检查API
 app.get('/api/v2/health', (req, res) => {
   res.json({
@@ -1233,6 +1532,34 @@ initDatabase().then(() => {
         console.log(`${Object.keys(middleware.route.methods)} ${middleware.route.path}`);
       }
     });
+
+    // ===== Phase 3: 启动性能监控定期任务 =====
+    
+    // 立即执行一次清理
+    console.log('🧹 执行性能日志清理...');
+    cleanupOldLogs();
+    
+    // ===== Phase 3: 启动内存监控 =====
+    console.log('🧠 启动内存监控...');
+    startMemoryMonitoring();
+    
+    // 设置定期清理任务（每天凌晨2点执行）
+    const cleanupInterval = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 2 && now.getMinutes() === 0) {
+        console.log('🧹 定期执行性能日志清理...');
+        cleanupOldLogs();
+      }
+    }, 60000); // 每分钟检查一次
+    
+    // 进程退出时清理定时器
+    process.on('SIGINT', () => {
+      console.log('\n🛑 收到终止信号，清理资源...');
+      clearInterval(cleanupInterval);
+      process.exit(0);
+    });
+    
+    console.log('✅ 性能监控定期清理任务已启动');
   });
 
 }).catch(err => {

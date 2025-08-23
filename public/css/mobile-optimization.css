@@ -1,0 +1,795 @@
+/**
+ * 移动端优化
+ * Phase 3: UI/UX优化 - 移动端体验进一步优化
+ */
+
+/* ===== 移动端基础重置 ===== */
+@viewport {
+  width: device-width;
+  zoom: 1.0;
+}
+
+/* 防止iOS Safari缩放 */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* 移动端点击高亮 */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  -webkit-touch-callout: none;
+}
+
+/* ===== 触控目标优化 ===== */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin: 4px;
+}
+
+/* 按钮触控优化 */
+button, .btn, .button, 
+a[role="button"], input[type="submit"], 
+input[type="button"], input[type="reset"] {
+  min-height: 44px;
+  padding: 12px 16px;
+  margin: 4px 0;
+  font-size: 16px; /* 防止iOS缩放 */
+}
+
+/* 输入框触控优化 */
+input, textarea, select {
+  min-height: 44px;
+  padding: 12px 16px;
+  font-size: 16px; /* 防止iOS缩放 */
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #0066cc;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* ===== 响应式布局 ===== */
+@media (max-width: 768px) {
+  /* 容器优化 */
+  .container {
+    padding: 0 16px;
+    max-width: 100%;
+  }
+
+  /* 网格系统移动端优化 */
+  .row {
+    margin: 0 -8px;
+  }
+
+  .col, [class*="col-"] {
+    padding: 0 8px;
+    margin-bottom: 16px;
+  }
+
+  /* 表格移动端优化 */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  .table-mobile {
+    display: block;
+    width: 100%;
+  }
+
+  .table-mobile thead {
+    display: none;
+  }
+
+  .table-mobile tbody,
+  .table-mobile tr,
+  .table-mobile td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-mobile tr {
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .table-mobile td {
+    text-align: left !important;
+    padding: 8px 0;
+    border: none;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .table-mobile td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 45%;
+    font-weight: bold;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  /* 导航移动端优化 */
+  .navbar {
+    padding: 8px 16px;
+  }
+
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-item {
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  .nav-link {
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+
+  /* 卡片移动端优化 */
+  .card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 16px;
+  }
+
+  /* 模态框移动端优化 */
+  .modal {
+    padding: 16px;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 12px 12px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    transform: none;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e1e5e9;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+  }
+
+  .modal-body {
+    padding: 20px;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #e1e5e9;
+    position: sticky;
+    bottom: 0;
+    background: white;
+  }
+
+  /* 表单移动端优化 */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row .col {
+    margin-bottom: 16px;
+  }
+
+  /* 按钮组移动端优化 */
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    width: 100%;
+    margin: 2px 0;
+    border-radius: 8px !important;
+  }
+
+  /* 分页移动端优化 */
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pagination .page-item {
+    margin: 2px;
+  }
+
+  .pagination .page-link {
+    padding: 8px 12px;
+    min-width: 44px;
+  }
+
+  /* 面包屑移动端优化 */
+  .breadcrumb {
+    font-size: 14px;
+    padding: 8px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* 警告框移动端优化 */
+  .alert {
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+/* ===== 滑动手势支持 ===== */
+.swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-x;
+}
+
+.swipe-item {
+  position: relative;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: #dc3545;
+  color: white;
+  padding: 0 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.swipe-item.swiped {
+  transform: translateX(-80px);
+}
+
+.swipe-item.swiped .swipe-actions {
+  transform: translateX(0);
+}
+
+/* ===== 下拉刷新 ===== */
+.pull-to-refresh {
+  position: relative;
+  overflow: hidden;
+}
+
+.pull-indicator {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.pull-indicator.active {
+  top: 20px;
+  background: #0066cc;
+  color: white;
+}
+
+.pull-indicator .spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-top: 2px solid #0066cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== 底部安全区域 ===== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .modal-content {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  .navbar-fixed-bottom {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ===== 虚拟键盘适配 ===== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 80vh;
+  }
+
+  .navbar {
+    display: none;
+  }
+
+  .container {
+    padding-top: 8px;
+  }
+}
+
+/* ===== 移动端导航抽屉 ===== */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-drawer.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background: white;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-drawer.open .drawer-content {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  padding: 20px 16px;
+  border-bottom: 1px solid #e1e5e9;
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.drawer-body {
+  padding: 16px 0;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.2s ease;
+}
+
+.drawer-item:hover,
+.drawer-item.active {
+  background-color: #f8f9fa;
+  color: #0066cc;
+}
+
+.drawer-item i {
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+}
+
+/* ===== 移动端搜索 ===== */
+.mobile-search {
+  position: relative;
+}
+
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 9998;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.search-overlay.open {
+  transform: translateY(0);
+}
+
+.search-header {
+  padding: 16px;
+  border-bottom: 1px solid #e1e5e9;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  font-size: 18px;
+  padding: 8px 0;
+  outline: none;
+}
+
+.search-close {
+  margin-left: 16px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+}
+
+.search-results {
+  padding: 16px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+/* ===== 移动端工具栏 ===== */
+.mobile-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #e1e5e9;
+  display: flex;
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.toolbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  color: #666;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.2s ease;
+  min-height: 60px;
+  justify-content: center;
+}
+
+.toolbar-item.active,
+.toolbar-item:hover {
+  color: #0066cc;
+}
+
+.toolbar-item i {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+/* ===== 触控反馈 ===== */
+.touch-feedback {
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-feedback:active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.touch-feedback::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.touch-feedback:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* ===== 滚动优化 ===== */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ===== 移动端表单优化 ===== */
+.mobile-form {
+  padding: 16px;
+}
+
+.mobile-form .form-group {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.mobile-form .form-label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: #666;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  background: white;
+  padding: 0 4px;
+}
+
+.mobile-form .form-control:focus + .form-label,
+.mobile-form .form-control:not(:placeholder-shown) + .form-label {
+  top: -8px;
+  font-size: 12px;
+  color: #0066cc;
+}
+
+.mobile-form .form-control {
+  padding: 16px;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+}
+
+.mobile-form .form-control:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* ===== 移动端卡片堆叠 ===== */
+.card-stack {
+  position: relative;
+}
+
+.card-stack .card {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.card-stack .card:nth-child(2) {
+  transform: scale(0.96) translateY(-8px);
+  z-index: -1;
+}
+
+.card-stack .card:nth-child(3) {
+  transform: scale(0.92) translateY(-16px);
+  z-index: -2;
+}
+
+/* ===== 移动端手势指示器 ===== */
+.gesture-indicator {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
+/* ===== 移动端优化的数据表格 ===== */
+.mobile-data-table {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-data-table {
+    display: block;
+  }
+
+  .data-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #0066cc;
+  }
+
+  .data-card-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .data-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+  }
+
+  .data-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .data-field-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .data-field-value {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .data-card-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f1f1;
+    display: flex;
+    gap: 8px;
+  }
+
+  .data-card-actions .btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+/* ===== 移动端性能优化 ===== */
+.mobile-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 减少重绘 */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+}
+
+/* 优化滚动性能 */
+.scroll-optimized {
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* ===== 深色模式移动端适配 ===== */
+@media (prefers-color-scheme: dark) {
+  .mobile-drawer .drawer-content {
+    background: #1a1a1a;
+    color: white;
+  }
+
+  .drawer-header {
+    background: #2a2a2a;
+    border-bottom-color: #333;
+  }
+
+  .drawer-item {
+    color: #e1e1e1;
+    border-bottom-color: #333;
+  }
+
+  .drawer-item:hover,
+  .drawer-item.active {
+    background-color: #333;
+    color: #66ccff;
+  }
+
+  .mobile-toolbar {
+    background: #1a1a1a;
+    border-top-color: #333;
+  }
+
+  .toolbar-item {
+    color: #e1e1e1;
+  }
+
+  .toolbar-item.active,
+  .toolbar-item:hover {
+    color: #66ccff;
+  }
+
+  .search-overlay {
+    background: #1a1a1a;
+    color: white;
+  }
+
+  .search-header {
+    border-bottom-color: #333;
+  }
+
+  .search-input {
+    color: white;
+  }
+
+  .search-close {
+    color: #e1e1e1;
+  }
+} 

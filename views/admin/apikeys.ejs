@@ -1,0 +1,804 @@
+<%- include('../layouts/admin', { 
+  title: 'API Key管理 - HTML-GO Admin',
+  currentPath: '/admin/apikeys',
+  currentPage: 'apikeys'
+}) %>
+
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="fas fa-key"></i>
+      API Key管理
+    </h1>
+    <p class="page-description">
+      管理API密钥，控制API访问权限和使用限制
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" onclick="showCreateModal()">
+      <i class="fas fa-plus"></i>
+      创建新Key
+    </button>
+  </div>
+</div>
+
+<!-- 统计概览 -->
+<div class="stats-grid mb-6">
+  <div class="stat-card">
+    <div class="stat-icon bg-blue-100 text-blue-600">
+      <i class="fas fa-key"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="totalKeys">--</div>
+      <div class="stat-label">总计Key数量</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-green-100 text-green-600">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="activeKeys">--</div>
+      <div class="stat-label">活跃Key数量</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-orange-100 text-orange-600">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="totalCalls">--</div>
+      <div class="stat-label">今日调用次数</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-purple-100 text-purple-600">
+      <i class="fas fa-clock"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="avgResponseTime">--</div>
+      <div class="stat-label">平均响应时间</div>
+    </div>
+  </div>
+</div>
+
+<!-- API Key列表 -->
+<div class="data-card">
+  <div class="data-card-header">
+    <h2 class="data-card-title">
+      <i class="fas fa-list"></i>
+      API Key列表
+    </h2>
+    <div class="data-card-actions">
+      <button class="btn btn-sm btn-secondary" onclick="refreshKeyList()">
+        <i class="fas fa-sync-alt"></i>
+        刷新
+      </button>
+    </div>
+  </div>
+  
+  <div class="data-card-content">
+    <div id="loadingSpinner" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      加载中...
+    </div>
+    
+    <div id="keyListContainer" style="display: none;">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>权限</th>
+              <th>使用限制</th>
+              <th>状态</th>
+              <th>最后使用</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="keyListBody">
+            <!-- 数据将通过JavaScript动态加载 -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <i class="fas fa-key empty-icon"></i>
+        <h3>还没有API Key</h3>
+        <p>点击"创建新Key"按钮开始创建您的第一个API Key</p>
+        <button class="btn btn-primary" onclick="showCreateModal()">
+          <i class="fas fa-plus"></i>
+          创建新Key
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 创建API Key模态框 -->
+<div id="createModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-plus"></i>
+        创建新的API Key
+      </h3>
+      <button class="modal-close" onclick="hideCreateModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form id="createKeyForm">
+        <div class="form-group">
+          <label for="keyName" class="form-label required">名称</label>
+          <input type="text" id="keyName" name="name" class="form-input" 
+                 placeholder="例如：前端应用API Key" required>
+          <small class="form-help">给这个API Key起一个容易识别的名称</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="keyDescription" class="form-label">描述</label>
+          <textarea id="keyDescription" name="description" class="form-input" 
+                    rows="3" placeholder="描述这个Key的用途（可选）"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">权限设置</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="permissions" value="read" checked>
+              <span class="checkbox-mark"></span>
+              读取权限 (查看页面、获取列表)
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="permissions" value="write" checked>
+              <span class="checkbox-mark"></span>
+              写入权限 (创建页面、修改内容)
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="maxHourly" class="form-label">每小时限制</label>
+            <input type="number" id="maxHourly" name="maxRequestsPerHour" 
+                   class="form-input" value="1000" min="1" max="10000">
+            <small class="form-help">每小时最大请求次数</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="maxDaily" class="form-label">每日限制</label>
+            <input type="number" id="maxDaily" name="maxRequestsPerDay" 
+                   class="form-input" value="10000" min="1" max="100000">
+            <small class="form-help">每天最大请求次数</small>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="expiresAt" class="form-label">过期时间（可选）</label>
+          <input type="datetime-local" id="expiresAt" name="expiresAt" class="form-input">
+          <small class="form-help">留空表示永不过期</small>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="hideCreateModal()">取消</button>
+      <button type="button" class="btn btn-primary" onclick="createApiKey()">
+        <i class="fas fa-key"></i>
+        创建API Key
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- API Key详情模态框 -->
+<div id="keyDetailModal" class="modal">
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-info-circle"></i>
+        API Key详情
+      </h3>
+      <button class="modal-close" onclick="hideKeyDetailModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div id="keyDetailContent">
+        <!-- 详情内容将通过JavaScript动态加载 -->
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="hideKeyDetailModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- API Key成功创建模态框 -->
+<div id="keySuccessModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title text-green-600">
+        <i class="fas fa-check-circle"></i>
+        API Key创建成功
+      </h3>
+    </div>
+    
+    <div class="modal-body">
+      <div class="alert alert-warning mb-4">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>重要：</strong>请立即复制并保存您的API Key，它只会显示这一次！
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">您的API Key：</label>
+        <div class="api-key-display">
+          <input type="text" id="newApiKey" class="form-input" readonly>
+          <button class="btn btn-primary" onclick="copyApiKey()">
+            <i class="fas fa-copy"></i>
+            复制
+          </button>
+        </div>
+      </div>
+      
+      <div class="usage-example">
+        <h4>使用示例：</h4>
+        <pre><code>curl -H "Authorization: Bearer <span id="exampleKey"></span>" \
+     https://your-domain.com/api/pages/create \
+     -d '{"htmlContent": "&lt;h1&gt;Hello&lt;/h1&gt;"}'</code></pre>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="hideKeySuccessModal()">
+        我已保存
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// API Key管理相关的JavaScript代码
+let apiKeys = [];
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+  loadApiKeys();
+  loadStatistics();
+});
+
+// 加载API Key列表
+async function loadApiKeys() {
+  try {
+    const response = await fetch('/api/admin/apikeys');
+    const data = await response.json();
+    
+    if (data.success) {
+      apiKeys = data.keys;
+      renderKeyList();
+    } else {
+      showNotification('加载API Key列表失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('加载API Key列表错误:', error);
+    showNotification('加载API Key列表失败', 'error');
+  } finally {
+    document.getElementById('loadingSpinner').style.display = 'none';
+    document.getElementById('keyListContainer').style.display = 'block';
+  }
+}
+
+// 渲染API Key列表
+function renderKeyList() {
+  const tbody = document.getElementById('keyListBody');
+  const emptyState = document.getElementById('emptyState');
+  
+  if (apiKeys.length === 0) {
+    tbody.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  
+  emptyState.style.display = 'none';
+  
+  tbody.innerHTML = apiKeys.map(key => `
+    <tr>
+      <td>
+        <div class="key-info">
+          <strong>${escapeHtml(key.name)}</strong>
+          ${key.description ? `<br><small class="text-gray-600">${escapeHtml(key.description)}</small>` : ''}
+        </div>
+      </td>
+      <td>
+        <div class="permission-badges">
+          ${key.permissions.split(',').map(p => 
+            `<span class="badge ${p === 'read' ? 'badge-blue' : 'badge-green'}">${p}</span>`
+          ).join('')}
+        </div>
+      </td>
+      <td>
+        <small>
+          每小时: ${key.max_requests_per_hour}<br>
+          每日: ${key.max_requests_per_day}
+        </small>
+      </td>
+      <td>
+        <span class="status-badge ${key.is_active ? 'status-active' : 'status-inactive'}">
+          ${key.is_active ? '活跃' : '已禁用'}
+        </span>
+        ${key.expires_at && key.expires_at < Date.now() ? 
+          '<br><span class="badge badge-red">已过期</span>' : ''}
+      </td>
+      <td>
+        ${key.last_used_at ? formatDate(key.last_used_at) : '从未使用'}
+      </td>
+      <td>
+        ${formatDate(key.created_at)}
+      </td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn btn-sm btn-info" onclick="showKeyDetail('${key.key_id}')" title="查看详情">
+            <i class="fas fa-info-circle"></i>
+          </button>
+          <button class="btn btn-sm ${key.is_active ? 'btn-warning' : 'btn-success'}" 
+                  onclick="toggleKey('${key.key_id}', ${!key.is_active})" 
+                  title="${key.is_active ? '禁用' : '启用'}">
+            <i class="fas ${key.is_active ? 'fa-pause' : 'fa-play'}"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deleteKey('${key.key_id}')" title="删除">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// 加载统计信息
+async function loadStatistics() {
+  try {
+    const response = await fetch('/api/admin/apikeys/stats');
+    const data = await response.json();
+    
+    if (data.success) {
+      document.getElementById('totalKeys').textContent = data.stats.totalKeys;
+      document.getElementById('activeKeys').textContent = data.stats.activeKeys;
+      document.getElementById('totalCalls').textContent = data.stats.todayCalls;
+      document.getElementById('avgResponseTime').textContent = data.stats.avgResponseTime + 'ms';
+    }
+  } catch (error) {
+    console.error('加载统计信息错误:', error);
+  }
+}
+
+// 显示创建模态框
+function showCreateModal() {
+  document.getElementById('createModal').style.display = 'flex';
+  document.getElementById('keyName').focus();
+}
+
+// 隐藏创建模态框
+function hideCreateModal() {
+  document.getElementById('createModal').style.display = 'none';
+  document.getElementById('createKeyForm').reset();
+}
+
+// 创建API Key
+async function createApiKey() {
+  const form = document.getElementById('createKeyForm');
+  const formData = new FormData(form);
+  
+  // 收集权限
+  const permissions = Array.from(form.querySelectorAll('input[name="permissions"]:checked'))
+    .map(input => input.value);
+  
+  if (permissions.length === 0) {
+    showNotification('请至少选择一个权限', 'warning');
+    return;
+  }
+  
+  const keyData = {
+    name: formData.get('name'),
+    description: formData.get('description'),
+    permissions: permissions,
+    maxRequestsPerHour: parseInt(formData.get('maxRequestsPerHour')),
+    maxRequestsPerDay: parseInt(formData.get('maxRequestsPerDay')),
+    expiresAt: formData.get('expiresAt') ? new Date(formData.get('expiresAt')).getTime() : null
+  };
+  
+  try {
+    const response = await fetch('/api/admin/apikeys', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(keyData)
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      hideCreateModal();
+      showKeySuccess(data.apiKey);
+      loadApiKeys();
+      loadStatistics();
+    } else {
+      showNotification('创建API Key失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('创建API Key错误:', error);
+    showNotification('创建API Key失败', 'error');
+  }
+}
+
+// 显示API Key创建成功模态框
+function showKeySuccess(apiKey) {
+  document.getElementById('newApiKey').value = apiKey;
+  document.getElementById('exampleKey').textContent = apiKey;
+  document.getElementById('keySuccessModal').style.display = 'flex';
+}
+
+// 隐藏API Key成功模态框
+function hideKeySuccessModal() {
+  document.getElementById('keySuccessModal').style.display = 'none';
+}
+
+// 复制API Key
+function copyApiKey() {
+  const input = document.getElementById('newApiKey');
+  input.select();
+  document.execCommand('copy');
+  showNotification('API Key已复制到剪贴板', 'success');
+}
+
+// 刷新Key列表
+function refreshKeyList() {
+  document.getElementById('loadingSpinner').style.display = 'block';
+  document.getElementById('keyListContainer').style.display = 'none';
+  loadApiKeys();
+  loadStatistics();
+}
+
+// 显示Key详情
+async function showKeyDetail(keyId) {
+  try {
+    const response = await fetch(`/api/admin/apikeys/${keyId}/stats`);
+    const data = await response.json();
+    
+    if (data.success) {
+      const key = apiKeys.find(k => k.key_id === keyId);
+      const stats = data.stats;
+      
+      document.getElementById('keyDetailContent').innerHTML = `
+        <div class="key-detail">
+          <div class="detail-section">
+            <h4>基本信息</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>名称:</label>
+                <span>${escapeHtml(key.name)}</span>
+              </div>
+              <div class="detail-item">
+                <label>描述:</label>
+                <span>${key.description || '无'}</span>
+              </div>
+              <div class="detail-item">
+                <label>权限:</label>
+                <span>${key.permissions.split(',').join(', ')}</span>
+              </div>
+              <div class="detail-item">
+                <label>状态:</label>
+                <span class="status-badge ${key.is_active ? 'status-active' : 'status-inactive'}">
+                  ${key.is_active ? '活跃' : '已禁用'}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h4>使用限制</h4>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>每小时限制:</label>
+                <span>${key.max_requests_per_hour} 次</span>
+              </div>
+              <div class="detail-item">
+                <label>每日限制:</label>
+                <span>${key.max_requests_per_day} 次</span>
+              </div>
+              <div class="detail-item">
+                <label>过期时间:</label>
+                <span>${key.expires_at ? formatDate(key.expires_at) : '永不过期'}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h4>使用统计 (最近7天)</h4>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value">${stats.totalCalls}</div>
+                <div class="stat-label">总调用次数</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${stats.successCalls}</div>
+                <div class="stat-label">成功调用</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${stats.errorCalls}</div>
+                <div class="stat-label">失败调用</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${stats.avgResponseTime}ms</div>
+                <div class="stat-label">平均响应时间</div>
+              </div>
+            </div>
+          </div>
+          
+          ${stats.topEndpoints.length > 0 ? `
+          <div class="detail-section">
+            <h4>最常用端点</h4>
+            <div class="endpoint-list">
+              ${stats.topEndpoints.map(ep => `
+                <div class="endpoint-item">
+                  <span class="endpoint-path">${ep.endpoint}</span>
+                  <span class="endpoint-count">${ep.count} 次</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      `;
+      
+      document.getElementById('keyDetailModal').style.display = 'flex';
+    } else {
+      showNotification('获取Key详情失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('获取Key详情错误:', error);
+    showNotification('获取Key详情失败', 'error');
+  }
+}
+
+// 隐藏Key详情模态框
+function hideKeyDetailModal() {
+  document.getElementById('keyDetailModal').style.display = 'none';
+}
+
+// 切换Key状态
+async function toggleKey(keyId, isActive) {
+  try {
+    const response = await fetch(`/api/admin/apikeys/${keyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ isActive })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification(`API Key已${isActive ? '启用' : '禁用'}`, 'success');
+      loadApiKeys();
+      loadStatistics();
+    } else {
+      showNotification('操作失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('切换Key状态错误:', error);
+    showNotification('操作失败', 'error');
+  }
+}
+
+// 删除Key
+async function deleteKey(keyId) {
+  const key = apiKeys.find(k => k.key_id === keyId);
+  
+  if (!confirm(`确定要删除API Key "${key.name}" 吗？此操作无法撤销。`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/admin/apikeys/${keyId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification('API Key已删除', 'success');
+      loadApiKeys();
+      loadStatistics();
+    } else {
+      showNotification('删除失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('删除Key错误:', error);
+    showNotification('删除失败', 'error');
+  }
+}
+
+// 工具函数
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatDate(timestamp) {
+  const date = new Date(parseInt(timestamp));
+  return date.toLocaleString('zh-CN');
+}
+</script>
+
+<style>
+/* API Key管理页面专用样式 */
+.api-key-display {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.api-key-display .form-input {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.permission-badges {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-green { background: #d1fae5; color: #065f46; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-active { background: #d1fae5; color: #065f46; }
+.status-inactive { background: #fee2e2; color: #991b1b; }
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.usage-example {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+}
+
+.usage-example h4 {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+}
+
+.usage-example pre {
+  margin: 0;
+  padding: 0.75rem;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+
+.key-detail .detail-section {
+  margin-bottom: 2rem;
+}
+
+.key-detail .detail-section h4 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-item label {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.endpoint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.endpoint-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 0.25rem;
+}
+
+.endpoint-path {
+  font-family: monospace;
+  color: #374151;
+}
+
+.endpoint-count {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin: 0;
+}
+
+.modal-large {
+  max-width: 800px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+</style> 

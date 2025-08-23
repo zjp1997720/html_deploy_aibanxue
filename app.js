@@ -22,7 +22,7 @@ console.log('环境变量:', {
 });
 
 // 导入认证中间件
-const { isAuthenticated } = require('./middleware/auth');
+const { isAuthenticated, isAuthenticatedOrApiKey } = require('./middleware/auth');
 
 // 导入配置
 const config = require('./config');
@@ -173,10 +173,10 @@ app.get('/logout', (req, res) => {
 // 导入路由处理函数
 const { createPage, getPageById, getRecentPages, getAllPages } = require('./models/pages');
 
-// 创建页面的 API 需要认证
-app.post('/api/pages/create', isAuthenticated, async (req, res) => {
+// 创建页面的 API 需要认证（支持Web会话、旧版API Token、新版API Key）
+app.post('/api/pages/create', isAuthenticatedOrApiKey, async (req, res) => {
   try {
-    const { htmlContent, isProtected, codeType } = req.body; // 接收 codeType
+    const { htmlContent, isProtected, codeType, name } = req.body; // 接收 codeType 和 name
 
     if (!htmlContent) {
       return res.status(400).json({ success: false, error: '请提供HTML内容' });
@@ -184,7 +184,7 @@ app.post('/api/pages/create', isAuthenticated, async (req, res) => {
 
     const isProtectedBool = isProtected === true || isProtected === 1 || isProtected === '1' || String(isProtected).toLowerCase() === 'true';
 
-    const result = await createPage(htmlContent, isProtectedBool, codeType);
+    const result = await createPage(htmlContent, isProtectedBool, codeType, name);
     const url = `${req.protocol}://${req.get('host')}/view/${result.urlId}`;
 
     // 返回适配 Coze 插件的格式
@@ -299,32 +299,12 @@ app.get('/admin/pages', isAuthenticated, (req, res) => {
   `);
 });
 
-// 临时路由 - API Key管理 (将在下一阶段完整实现)
+// API Key管理页面
 app.get('/admin/apikeys', isAuthenticated, (req, res) => {
-  res.status(200).send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>API Key管理 - HTML-GO Admin</title>
-      <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; }
-        .container { max-width: 800px; margin: 0 auto; text-align: center; }
-        .icon { font-size: 4rem; margin-bottom: 1rem; }
-        .title { color: #1e40af; margin-bottom: 1rem; }
-        .btn { padding: 0.5rem 1rem; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">🔑</div>
-        <h1 class="title">API Key管理功能开发中</h1>
-        <p>此功能将在Phase 2中实现，敬请期待！</p>
-        <p>计划功能：生成Key、权限控制、使用统计等</p>
-        <a href="/admin/dashboard" class="btn">返回概览</a>
-      </div>
-    </body>
-    </html>
-  `);
+  res.render('admin/apikeys', {
+    title: 'API Key管理 - HTML-GO Admin',
+    currentPath: '/admin/apikeys'
+  });
 });
 
 // 临时路由 - 系统设置 (将在下一阶段完整实现)
@@ -353,6 +333,196 @@ app.get('/admin/settings', isAuthenticated, (req, res) => {
     </body>
     </html>
   `);
+});
+
+// ================================
+// API Key管理 API 端点
+// ================================
+
+// 导入API Key相关模型
+const { 
+  createApiKey, 
+  getAllApiKeys, 
+  getApiKeyById, 
+  deleteApiKey, 
+  toggleApiKey, 
+  getApiKeyStats 
+} = require('./models/apiKeys');
+
+// 获取所有API Keys列表
+app.get('/api/admin/apikeys', isAuthenticated, async (req, res) => {
+  try {
+    const keys = await getAllApiKeys();
+    res.json({
+      success: true,
+      keys: keys
+    });
+  } catch (error) {
+    console.error('获取API Keys列表错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取API Keys列表失败'
+    });
+  }
+});
+
+// 创建新的API Key
+app.post('/api/admin/apikeys', isAuthenticated, async (req, res) => {
+  try {
+    const { 
+      name, 
+      description, 
+      permissions, 
+      maxRequestsPerHour, 
+      maxRequestsPerDay, 
+      expiresAt 
+    } = req.body;
+
+    if (!name || !permissions || permissions.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '请提供API Key名称和权限'
+      });
+    }
+
+    const result = await createApiKey(
+      name,
+      description,
+      permissions,
+      maxRequestsPerHour,
+      maxRequestsPerDay,
+      expiresAt
+    );
+
+    res.json({
+      success: true,
+      message: 'API Key创建成功',
+      keyId: result.keyId,
+      apiKey: result.apiKey // 只在创建时返回明文key
+    });
+
+  } catch (error) {
+    console.error('创建API Key错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '创建API Key失败'
+    });
+  }
+});
+
+// 更新API Key状态
+app.put('/api/admin/apikeys/:keyId', isAuthenticated, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    const { isActive } = req.body;
+
+    const result = await toggleApiKey(keyId, isActive);
+    
+    if (result) {
+      res.json({
+        success: true,
+        message: `API Key已${isActive ? '启用' : '禁用'}`
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'API Key不存在'
+      });
+    }
+
+  } catch (error) {
+    console.error('更新API Key状态错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '更新API Key状态失败'
+    });
+  }
+});
+
+// 删除API Key
+app.delete('/api/admin/apikeys/:keyId', isAuthenticated, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+
+    const result = await deleteApiKey(keyId);
+    
+    if (result) {
+      res.json({
+        success: true,
+        message: 'API Key已删除'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'API Key不存在'
+      });
+    }
+
+  } catch (error) {
+    console.error('删除API Key错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '删除API Key失败'
+    });
+  }
+});
+
+// 获取API Key使用统计
+app.get('/api/admin/apikeys/:keyId/stats', isAuthenticated, async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    const days = parseInt(req.query.days) || 7;
+
+    const stats = await getApiKeyStats(keyId, days);
+    
+    res.json({
+      success: true,
+      stats: stats
+    });
+
+  } catch (error) {
+    console.error('获取API Key统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取API Key统计失败'
+    });
+  }
+});
+
+// 获取API Keys总体统计
+app.get('/api/admin/apikeys/stats', isAuthenticated, async (req, res) => {
+  try {
+    const keys = await getAllApiKeys();
+    
+    // 计算总体统计
+    const totalKeys = keys.length;
+    const activeKeys = keys.filter(k => k.is_active === 1).length;
+    
+    // 获取今天的调用统计（这里简化处理，实际应该查询使用日志）
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    // 简化的统计，实际应该查询api_usage_logs表
+    const todayCalls = 0; // 需要实现具体的查询逻辑
+    const avgResponseTime = 0; // 需要实现具体的查询逻辑
+    
+    res.json({
+      success: true,
+      stats: {
+        totalKeys,
+        activeKeys,
+        todayCalls,
+        avgResponseTime
+      }
+    });
+
+  } catch (error) {
+    console.error('获取API Keys总体统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取统计失败'
+    });
+  }
 });
 
 // 导入代码类型检测和内容渲染工具

@@ -21,9 +21,10 @@ function generateRandomPassword() {
  * @param {string} htmlContent HTML内容
  * @param {boolean} isProtected 是否启用密码保护
  * @param {string} codeType 代码类型（html, markdown, svg, mermaid）
+ * @param {string} name 页面名称（可选）
  * @returns {Promise<Object>} 返回生成的URL ID和密码
  */
-async function createPage(htmlContent, isProtected = false, codeType = 'html') {
+async function createPage(htmlContent, isProtected = false, codeType = 'html', name = null) {
   try {
     // 生成时间戳
     const timestamp = new Date().getTime().toString();
@@ -39,8 +40,8 @@ async function createPage(htmlContent, isProtected = false, codeType = 'html') {
     // 保存到数据库
     // isProtected决定是否需要密码才能访问
     await run(
-      'INSERT INTO pages (id, html_content, created_at, password, is_protected, code_type) VALUES (?, ?, ?, ?, ?, ?)',
-      [urlId, htmlContent, Date.now(), password, isProtected ? 1 : 0, codeType]
+      'INSERT INTO pages (id, html_content, created_at, password, is_protected, code_type, name) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [urlId, htmlContent, Date.now(), password, isProtected ? 1 : 0, codeType, name]
     );
     
     return { urlId, password };
@@ -90,7 +91,7 @@ async function getAllPages() {
   try {
     // 选择需要的字段，并按创建时间降序排列
     return await query(
-      'SELECT id, html_content, created_at, password, is_protected, code_type FROM pages ORDER BY created_at DESC'
+      'SELECT id, html_content, created_at, password, is_protected, code_type, name FROM pages ORDER BY created_at DESC'
     );
   } catch (error) {
     console.error('获取所有页面错误:', error);

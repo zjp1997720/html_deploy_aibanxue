@@ -23,6 +23,7 @@ console.log('环境变量:', {
 
 // 导入认证中间件
 const { isAuthenticated, isAuthenticatedOrApiKey } = require('./middleware/auth');
+const { apiKeyAuth, validateApiKeyMiddleware, requirePermissions } = require('./middleware/apiKey');
 
 // 导入配置
 const config = require('./config');
@@ -171,7 +172,7 @@ app.get('/logout', (req, res) => {
 // 将 API 路由分为两部分：需要认证的和不需要认证的
 
 // 导入路由处理函数
-const { createPage, getPageById, getRecentPages, getAllPages } = require('./models/pages');
+const { createPage, getPageById, getRecentPages, getAllPages, getPagesList, getPagesStats, batchDeletePages, batchUpdateProtection, updatePage, deletePage } = require('./models/pages');
 
 // 创建页面的 API 需要认证（支持Web会话、旧版API Token、新版API Key）
 app.post('/api/pages/create', isAuthenticatedOrApiKey, async (req, res) => {
@@ -271,32 +272,390 @@ app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
   }
 });
 
-// 临时路由 - 页面管理 (将在下一阶段完整实现)
+// 页面管理页面
 app.get('/admin/pages', isAuthenticated, (req, res) => {
-  res.status(200).send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>页面管理 - HTML-GO Admin</title>
-      <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; }
-        .container { max-width: 800px; margin: 0 auto; text-align: center; }
-        .icon { font-size: 4rem; margin-bottom: 1rem; }
-        .title { color: #1e40af; margin-bottom: 1rem; }
-        .btn { padding: 0.5rem 1rem; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">🚧</div>
-        <h1 class="title">页面管理功能开发中</h1>
-        <p>此功能将在Phase 2中实现，敬请期待！</p>
-        <p>计划功能：搜索、筛选、批量操作、编辑等</p>
-        <a href="/admin/dashboard" class="btn">返回概览</a>
-      </div>
-    </body>
-    </html>
-  `);
+  res.render('admin/pages', {
+    title: '页面管理 - HTML-GO Admin',
+    currentPath: '/admin/pages'
+  });
+});
+
+// ================================
+// 页面管理 API 端点（旧版，用于管理后台）
+// ================================
+
+// 获取页面列表（支持分页、搜索、筛选）
+app.get('/api/admin/pages', isAuthenticated, async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search = '',
+      codeType = '',
+      isProtected = null,
+      sortBy = 'created_at',
+      sortOrder = 'DESC'
+    } = req.query;
+
+    // 转换参数类型
+    const options = {
+      page: parseInt(page) || 1,
+      limit: Math.min(parseInt(limit) || 20, 100), // 限制最大每页100条
+      search: String(search || ''),
+      codeType: String(codeType || ''),
+      isProtected: isProtected === 'true' ? true : isProtected === 'false' ? false : null,
+      sortBy: String(sortBy || 'created_at'),
+      sortOrder: String(sortOrder || 'DESC')
+    };
+
+    const result = await getPagesList(options);
+    
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    console.error('获取页面列表错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取页面列表失败'
+    });
+  }
+});
+
+// 获取页面统计信息
+app.get('/api/admin/pages/stats', isAuthenticated, async (req, res) => {
+  try {
+    const stats = await getPagesStats();
+    res.json({
+      success: true,
+      stats
+    });
+  } catch (error) {
+    console.error('获取页面统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取页面统计失败'
+    });
+  }
+});
+
+// 更新页面信息
+app.put('/api/admin/pages/:pageId', isAuthenticated, async (req, res) => {
+  try {
+    const { pageId } = req.params;
+    const { name, htmlContent, isProtected, password, codeType } = req.body;
+
+    // 构建更新对象
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (htmlContent !== undefined) updates.html_content = htmlContent;
+    if (isProtected !== undefined) updates.is_protected = isProtected ? 1 : 0;
+    if (password !== undefined) updates.password = password;
+    if (codeType !== undefined) updates.code_type = codeType;
+
+    const success = await updatePage(pageId, updates);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: '页面更新成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: '页面不存在'
+      });
+    }
+  } catch (error) {
+    console.error('更新页面错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '更新页面失败'
+    });
+  }
+});
+
+// 删除单个页面
+app.delete('/api/admin/pages/:pageId', isAuthenticated, async (req, res) => {
+  try {
+    const { pageId } = req.params;
+    
+    const success = await deletePage(pageId);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: '页面删除成功'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: '页面不存在'
+      });
+    }
+  } catch (error) {
+    console.error('删除页面错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '删除页面失败'
+    });
+  }
+});
+
+// 批量删除页面
+app.post('/api/admin/pages/batch/delete', isAuthenticated, async (req, res) => {
+  try {
+    const { pageIds } = req.body;
+    
+    if (!Array.isArray(pageIds) || pageIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '请选择要删除的页面'
+      });
+    }
+
+    const deletedCount = await batchDeletePages(pageIds);
+    
+    res.json({
+      success: true,
+      message: `成功删除 ${deletedCount} 个页面`,
+      deletedCount
+    });
+  } catch (error) {
+    console.error('批量删除页面错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '批量删除失败'
+    });
+  }
+});
+
+// 批量更新页面保护状态
+app.post('/api/admin/pages/batch/protection', isAuthenticated, async (req, res) => {
+  try {
+    const { pageIds, isProtected } = req.body;
+    
+    if (!Array.isArray(pageIds) || pageIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '请选择要操作的页面'
+      });
+    }
+
+    const updatedCount = await batchUpdateProtection(pageIds, isProtected);
+    
+    res.json({
+      success: true,
+      message: `成功${isProtected ? '启用' : '取消'}保护 ${updatedCount} 个页面`,
+      updatedCount
+    });
+  } catch (error) {
+    console.error('批量更新保护状态错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '批量更新失败'
+    });
+  }
+});
+
+// 使用新的API Key中间件的创建页面API
+app.post('/api/v2/pages/create', apiKeyAuth(['write']), async (req, res) => {
+  try {
+    const { htmlContent, isProtected, codeType, name } = req.body;
+
+    if (!htmlContent) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '请提供HTML内容',
+        code: 'MISSING_CONTENT'
+      });
+    }
+
+    const isProtectedBool = isProtected === true || isProtected === 1 || isProtected === '1' || String(isProtected).toLowerCase() === 'true';
+
+    const result = await createPage(htmlContent, isProtectedBool, codeType, name);
+    const url = `${req.protocol}://${req.get('host')}/view/${result.urlId}`;
+
+    res.json({
+      success: true,
+      data: {
+        id: result.urlId,
+        url: url,
+        password: result.password,
+        isProtected: isProtectedBool,
+        name: name || null,
+        codeType: codeType || 'html'
+      }
+    });
+  } catch (error) {
+    console.error('创建页面API错误:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: '服务器错误',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// 获取页面信息API（使用新中间件）
+app.get('/api/v2/pages/:id', apiKeyAuth(['read']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const page = await getPageById(id);
+
+    if (!page) {
+      return res.status(404).json({
+        success: false,
+        error: '页面不存在',
+        code: 'PAGE_NOT_FOUND'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: page.id,
+        name: page.name,
+        codeType: page.code_type,
+        isProtected: page.is_protected === 1,
+        contentSize: page.html_content ? page.html_content.length : 0,
+        createdAt: page.created_at
+      }
+    });
+  } catch (error) {
+    console.error('获取页面API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器错误',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// 获取页面列表API（使用新中间件）
+app.get('/api/v2/pages', apiKeyAuth(['read']), async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search = '',
+      codeType = '',
+      isProtected = null
+    } = req.query;
+
+    const options = {
+      page: parseInt(page) || 1,
+      limit: Math.min(parseInt(limit) || 20, 100),
+      search: String(search || ''),
+      codeType: String(codeType || ''),
+      isProtected: isProtected === 'true' ? true : isProtected === 'false' ? false : null
+    };
+
+    const result = await getPagesList(options);
+    
+    // 过滤敏感信息
+    const filteredPages = result.pages.map(page => ({
+      id: page.id,
+      name: page.name,
+      codeType: page.code_type,
+      isProtected: page.is_protected === 1,
+      contentSize: page.content_size,
+      createdAt: page.created_at
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        pages: filteredPages,
+        pagination: result.pagination
+      }
+    });
+  } catch (error) {
+    console.error('获取页面列表API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器错误',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// 更新页面API（使用新中间件）
+app.put('/api/v2/pages/:id', apiKeyAuth(['write']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, htmlContent, isProtected, password, codeType } = req.body;
+
+    // 构建更新对象
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (htmlContent !== undefined) updates.html_content = htmlContent;
+    if (isProtected !== undefined) updates.is_protected = isProtected ? 1 : 0;
+    if (password !== undefined) updates.password = password;
+    if (codeType !== undefined) updates.code_type = codeType;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '没有提供要更新的字段',
+        code: 'NO_UPDATE_FIELDS'
+      });
+    }
+
+    const success = await updatePage(id, updates);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: '页面更新成功',
+        data: { id }
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: '页面不存在',
+        code: 'PAGE_NOT_FOUND'
+      });
+    }
+  } catch (error) {
+    console.error('更新页面API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器错误',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// 删除页面API（使用新中间件）
+app.delete('/api/v2/pages/:id', apiKeyAuth(['write']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const success = await deletePage(id);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: '页面删除成功',
+        data: { id }
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: '页面不存在',
+        code: 'PAGE_NOT_FOUND'
+      });
+    }
+  } catch (error) {
+    console.error('删除页面API错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器错误',
+      code: 'INTERNAL_ERROR'
+    });
+  }
 });
 
 // API Key管理页面
@@ -336,6 +695,165 @@ app.get('/admin/settings', isAuthenticated, (req, res) => {
 });
 
 // ================================
+// 增强的统计和监控API
+// ================================
+
+// 系统总体统计API
+app.get('/api/v2/stats/system', apiKeyAuth(['read']), async (req, res) => {
+  try {
+    const pagesStats = await getPagesStats();
+    
+    res.json({
+      success: true,
+      data: {
+        pages: pagesStats,
+        system: {
+          uptime: process.uptime(),
+          memoryUsage: process.memoryUsage(),
+          nodeVersion: process.version,
+          platform: process.platform
+        }
+      }
+    });
+  } catch (error) {
+    console.error('获取系统统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取统计失败',
+      code: 'STATS_ERROR'
+    });
+  }
+});
+
+// API Key使用统计API（增强版）
+app.get('/api/v2/stats/apikey/:keyId', apiKeyAuth(['read']), async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    const { days = 7 } = req.query;
+    
+    // 只允许查询自己的API Key统计，除非有管理权限
+    if (req.apiKeyInfo.keyId !== keyId) {
+      return res.status(403).json({
+        success: false,
+        error: '只能查询自己的API Key统计',
+        code: 'ACCESS_DENIED'
+      });
+    }
+    
+    const { getApiKeyStats } = require('./models/apiKeys');
+    const stats = await getApiKeyStats(keyId, parseInt(days));
+    
+    res.json({
+      success: true,
+      data: {
+        keyId,
+        period: `${days} days`,
+        ...stats
+      }
+    });
+  } catch (error) {
+    console.error('获取API Key统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取统计失败',
+      code: 'STATS_ERROR'
+    });
+  }
+});
+
+// 详细API Key统计API
+app.get('/api/v2/stats/apikey/:keyId/detailed', apiKeyAuth(['read']), async (req, res) => {
+  try {
+    const { keyId } = req.params;
+    const { days = 7 } = req.query;
+    
+    // 只允许查询自己的API Key统计
+    if (req.apiKeyInfo.keyId !== keyId) {
+      return res.status(403).json({
+        success: false,
+        error: '只能查询自己的API Key统计',
+        code: 'ACCESS_DENIED'
+      });
+    }
+    
+    const stats = await getDetailedApiKeyStats(keyId, parseInt(days));
+    
+    res.json({
+      success: true,
+      data: {
+        keyId,
+        period: `${days} days`,
+        ...stats
+      }
+    });
+  } catch (error) {
+    console.error('获取详细API Key统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取统计失败',
+      code: 'STATS_ERROR'
+    });
+  }
+});
+
+// 总体API统计（管理员接口）
+app.get('/api/admin/stats/api/overall', isAuthenticated, async (req, res) => {
+  try {
+    const { days = 7 } = req.query;
+    
+    const stats = await getOverallApiStats(parseInt(days));
+    
+    res.json({
+      success: true,
+      data: {
+        period: `${days} days`,
+        ...stats
+      }
+    });
+  } catch (error) {
+    console.error('获取总体API统计错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取统计失败'
+    });
+  }
+});
+
+// 异常检测报告（管理员接口）
+app.get('/api/admin/stats/anomaly', isAuthenticated, async (req, res) => {
+  try {
+    const { hours = 24 } = req.query;
+    
+    const report = await getAnomalyReport(parseInt(hours));
+    
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (error) {
+    console.error('获取异常检测报告错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取异常报告失败'
+    });
+  }
+});
+
+// 健康检查API
+app.get('/api/v2/health', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      version: '2.0.0',
+      environment: process.env.NODE_ENV || 'development'
+    }
+  });
+});
+
+// ================================
 // API Key管理 API 端点
 // ================================
 
@@ -346,7 +864,10 @@ const {
   getApiKeyById, 
   deleteApiKey, 
   toggleApiKey, 
-  getApiKeyStats 
+  getApiKeyStats,
+  getDetailedApiKeyStats,
+  getOverallApiStats,
+  getAnomalyReport
 } = require('./models/apiKeys');
 
 // 获取所有API Keys列表

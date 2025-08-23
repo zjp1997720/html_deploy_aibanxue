@@ -1,0 +1,1110 @@
+<%- include('../layouts/admin', { 
+  title: '页面管理 - HTML-GO Admin',
+  currentPath: '/admin/pages',
+  currentPage: 'pages'
+}) %>
+
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="fas fa-file-alt"></i>
+      页面管理
+    </h1>
+    <p class="page-description">
+      管理所有已创建的页面，支持搜索、筛选、编辑和批量操作
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" onclick="window.open('/', '_blank')">
+      <i class="fas fa-plus"></i>
+      创建新页面
+    </button>
+  </div>
+</div>
+
+<!-- 统计概览 -->
+<div class="stats-grid mb-6">
+  <div class="stat-card">
+    <div class="stat-icon bg-blue-100 text-blue-600">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="totalPages">--</div>
+      <div class="stat-label">总页面数</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-green-100 text-green-600">
+      <i class="fas fa-globe"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="publicPages">--</div>
+      <div class="stat-label">公开页面</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-orange-100 text-orange-600">
+      <i class="fas fa-lock"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="protectedPages">--</div>
+      <div class="stat-label">受保护页面</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon bg-purple-100 text-purple-600">
+      <i class="fas fa-calendar-day"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value" id="todayPages">--</div>
+      <div class="stat-label">今日新增</div>
+    </div>
+  </div>
+</div>
+
+<!-- 搜索和筛选 -->
+<div class="filter-section">
+  <div class="filter-card">
+    <div class="filter-header">
+      <h3>搜索和筛选</h3>
+      <button class="btn btn-sm btn-secondary" onclick="resetFilters()">
+        <i class="fas fa-undo"></i>
+        重置
+      </button>
+    </div>
+    
+    <div class="filter-content">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">搜索关键词</label>
+          <input type="text" id="searchInput" class="form-input" 
+                 placeholder="搜索页面名称或内容..." onchange="applyFilters()">
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">内容类型</label>
+          <select id="codeTypeFilter" class="form-select" onchange="applyFilters()">
+            <option value="">全部类型</option>
+            <option value="html">HTML</option>
+            <option value="markdown">Markdown</option>
+            <option value="svg">SVG</option>
+            <option value="mermaid">Mermaid</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">保护状态</label>
+          <select id="protectionFilter" class="form-select" onchange="applyFilters()">
+            <option value="">全部状态</option>
+            <option value="false">公开</option>
+            <option value="true">受保护</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">排序方式</label>
+          <select id="sortFilter" class="form-select" onchange="applyFilters()">
+            <option value="created_at,DESC">创建时间（最新）</option>
+            <option value="created_at,ASC">创建时间（最早）</option>
+            <option value="name,ASC">名称（A-Z）</option>
+            <option value="name,DESC">名称（Z-A）</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 页面列表 -->
+<div class="data-card">
+  <div class="data-card-header">
+    <h2 class="data-card-title">
+      <i class="fas fa-list"></i>
+      页面列表
+      <span id="pageCount" class="page-count"></span>
+    </h2>
+    <div class="data-card-actions">
+      <div class="batch-actions" id="batchActions" style="display: none;">
+        <button class="btn btn-sm btn-danger" onclick="batchDelete()">
+          <i class="fas fa-trash"></i>
+          批量删除
+        </button>
+        <button class="btn btn-sm btn-warning" onclick="batchProtect(true)">
+          <i class="fas fa-lock"></i>
+          设为保护
+        </button>
+        <button class="btn btn-sm btn-success" onclick="batchProtect(false)">
+          <i class="fas fa-unlock"></i>
+          取消保护
+        </button>
+        <span class="selected-count" id="selectedCount">已选择 0 项</span>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="refreshPageList()">
+        <i class="fas fa-sync-alt"></i>
+        刷新
+      </button>
+    </div>
+  </div>
+  
+  <div class="data-card-content">
+    <div id="loadingSpinner" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      加载中...
+    </div>
+    
+    <div id="pageListContainer" style="display: none;">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+              </th>
+              <th>页面信息</th>
+              <th>类型</th>
+              <th>状态</th>
+              <th>内容大小</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="pageListBody">
+            <!-- 数据将通过JavaScript动态加载 -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- 分页组件 -->
+      <div id="paginationContainer" class="pagination-container">
+        <!-- 分页将通过JavaScript动态生成 -->
+      </div>
+      
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <i class="fas fa-file-alt empty-icon"></i>
+        <h3>没有找到页面</h3>
+        <p>尝试调整搜索条件或创建新的页面</p>
+        <button class="btn btn-primary" onclick="window.open('/', '_blank')">
+          <i class="fas fa-plus"></i>
+          创建新页面
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 页面编辑模态框 -->
+<div id="editModal" class="modal">
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-edit"></i>
+        编辑页面
+      </h3>
+      <button class="modal-close" onclick="hideEditModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form id="editPageForm">
+        <input type="hidden" id="editPageId" name="pageId">
+        
+        <div class="form-group">
+          <label for="editPageName" class="form-label">页面名称</label>
+          <input type="text" id="editPageName" name="name" class="form-input" 
+                 placeholder="给页面起一个名称（可选）">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editCodeType" class="form-label">内容类型</label>
+            <select id="editCodeType" name="codeType" class="form-select">
+              <option value="html">HTML</option>
+              <option value="markdown">Markdown</option>
+              <option value="svg">SVG</option>
+              <option value="mermaid">Mermaid</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">保护设置</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" id="editIsProtected" name="isProtected">
+                <span class="checkbox-mark"></span>
+                启用密码保护
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group" id="editPasswordGroup" style="display: none;">
+          <label for="editPassword" class="form-label">访问密码</label>
+          <input type="text" id="editPassword" name="password" class="form-input" 
+                 placeholder="5位数字密码" maxlength="5">
+        </div>
+        
+        <div class="form-group">
+          <label for="editHtmlContent" class="form-label">页面内容</label>
+          <textarea id="editHtmlContent" name="htmlContent" class="form-textarea" 
+                    rows="15" placeholder="在这里输入或粘贴内容..."></textarea>
+          <small class="form-help">
+            内容大小: <span id="contentSize">0</span> 字符
+          </small>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="hideEditModal()">取消</button>
+      <button type="button" class="btn btn-primary" onclick="savePageChanges()">
+        <i class="fas fa-save"></i>
+        保存更改
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 页面预览模态框 -->
+<div id="previewModal" class="modal">
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-eye"></i>
+        页面预览
+      </h3>
+      <button class="modal-close" onclick="hidePreviewModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="preview-toolbar">
+        <button class="btn btn-sm btn-primary" id="openPageBtn" onclick="openPageInNewTab()">
+          <i class="fas fa-external-link-alt"></i>
+          在新窗口打开
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="copyPageLink()">
+          <i class="fas fa-copy"></i>
+          复制链接
+        </button>
+      </div>
+      <div class="preview-container">
+        <iframe id="previewFrame" class="preview-frame"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 页面管理相关的JavaScript代码
+let currentPages = [];
+let currentPagination = {};
+let currentFilters = {
+  page: 1,
+  limit: 20,
+  search: '',
+  codeType: '',
+  isProtected: null,
+  sortBy: 'created_at',
+  sortOrder: 'DESC'
+};
+let selectedPages = new Set();
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+  loadPagesStats();
+  loadPagesList();
+  initEventListeners();
+});
+
+// 初始化事件监听
+function initEventListeners() {
+  // 搜索输入框防抖
+  let searchTimeout;
+  document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      applyFilters();
+    }, 500);
+  });
+
+  // 编辑页面表单中的内容大小计算
+  document.getElementById('editHtmlContent').addEventListener('input', function() {
+    document.getElementById('contentSize').textContent = this.value.length;
+  });
+
+  // 保护状态复选框变化
+  document.getElementById('editIsProtected').addEventListener('change', function() {
+    const passwordGroup = document.getElementById('editPasswordGroup');
+    passwordGroup.style.display = this.checked ? 'block' : 'none';
+  });
+}
+
+// 加载页面统计信息
+async function loadPagesStats() {
+  try {
+    const response = await fetch('/api/admin/pages/stats');
+    const data = await response.json();
+    
+    if (data.success) {
+      const stats = data.stats;
+      document.getElementById('totalPages').textContent = stats.total;
+      document.getElementById('publicPages').textContent = stats.public;
+      document.getElementById('protectedPages').textContent = stats.protected;
+      document.getElementById('todayPages').textContent = stats.today;
+    }
+  } catch (error) {
+    console.error('加载页面统计错误:', error);
+  }
+}
+
+// 加载页面列表
+async function loadPagesList() {
+  try {
+    const params = new URLSearchParams(currentFilters);
+    const response = await fetch(`/api/admin/pages?${params}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      currentPages = data.pages;
+      currentPagination = data.pagination;
+      renderPagesList();
+      renderPagination();
+      updatePageCount();
+    } else {
+      showNotification('加载页面列表失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('加载页面列表错误:', error);
+    showNotification('加载页面列表失败', 'error');
+  } finally {
+    document.getElementById('loadingSpinner').style.display = 'none';
+    document.getElementById('pageListContainer').style.display = 'block';
+  }
+}
+
+// 渲染页面列表
+function renderPagesList() {
+  const tbody = document.getElementById('pageListBody');
+  const emptyState = document.getElementById('emptyState');
+  
+  if (currentPages.length === 0) {
+    tbody.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  
+  emptyState.style.display = 'none';
+  
+  tbody.innerHTML = currentPages.map(page => `
+    <tr>
+      <td>
+        <input type="checkbox" class="page-checkbox" value="${page.id}" 
+               onchange="togglePageSelection('${page.id}')">
+      </td>
+      <td>
+        <div class="page-info">
+          <div class="page-name">
+            <strong>${escapeHtml(page.name || `HTML-${page.id}`)}</strong>
+            <button class="btn-link" onclick="copyPageLink('${page.id}')" title="复制链接">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="page-id">ID: ${page.id}</div>
+          ${page.name ? `<div class="page-content-preview">${escapeHtml(page.html_content.substring(0, 100))}...</div>` : ''}
+        </div>
+      </td>
+      <td>
+        <span class="type-badge type-${page.code_type}">${page.code_type.toUpperCase()}</span>
+      </td>
+      <td>
+        <span class="status-badge ${page.is_protected ? 'status-protected' : 'status-public'}">
+          <i class="fas ${page.is_protected ? 'fa-lock' : 'fa-globe'}"></i>
+          ${page.is_protected ? '受保护' : '公开'}
+        </span>
+      </td>
+      <td>
+        ${formatFileSize(page.content_size)}
+      </td>
+      <td>
+        ${formatDate(page.created_at)}
+      </td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn btn-sm btn-info" onclick="previewPage('${page.id}')" title="预览">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="editPage('${page.id}')" title="编辑">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deletePage('${page.id}')" title="删除">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// 渲染分页组件
+function renderPagination() {
+  const container = document.getElementById('paginationContainer');
+  const pagination = currentPagination;
+  
+  if (pagination.total <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  let paginationHtml = '<div class="pagination">';
+  
+  // 上一页
+  if (pagination.hasPrev) {
+    paginationHtml += `<button class="page-btn" onclick="goToPage(${pagination.current - 1})">
+      <i class="fas fa-chevron-left"></i> 上一页
+    </button>`;
+  }
+  
+  // 页码按钮
+  const startPage = Math.max(1, pagination.current - 2);
+  const endPage = Math.min(pagination.total, pagination.current + 2);
+  
+  if (startPage > 1) {
+    paginationHtml += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+    if (startPage > 2) {
+      paginationHtml += '<span class="page-ellipsis">...</span>';
+    }
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    paginationHtml += `<button class="page-btn ${i === pagination.current ? 'active' : ''}" 
+                       onclick="goToPage(${i})">${i}</button>`;
+  }
+  
+  if (endPage < pagination.total) {
+    if (endPage < pagination.total - 1) {
+      paginationHtml += '<span class="page-ellipsis">...</span>';
+    }
+    paginationHtml += `<button class="page-btn" onclick="goToPage(${pagination.total})">${pagination.total}</button>`;
+  }
+  
+  // 下一页
+  if (pagination.hasNext) {
+    paginationHtml += `<button class="page-btn" onclick="goToPage(${pagination.current + 1})">
+      下一页 <i class="fas fa-chevron-right"></i>
+    </button>`;
+  }
+  
+  paginationHtml += '</div>';
+  
+  // 分页信息
+  paginationHtml += `<div class="pagination-info">
+    显示第 ${(pagination.current - 1) * pagination.limit + 1} - 
+    ${Math.min(pagination.current * pagination.limit, pagination.totalRecords)} 项，
+    共 ${pagination.totalRecords} 项
+  </div>`;
+  
+  container.innerHTML = paginationHtml;
+}
+
+// 更新页面计数
+function updatePageCount() {
+  const countElement = document.getElementById('pageCount');
+  if (currentPagination.totalRecords > 0) {
+    countElement.textContent = `(${currentPagination.totalRecords})`;
+  } else {
+    countElement.textContent = '';
+  }
+}
+
+// 应用筛选条件
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.trim();
+  const codeType = document.getElementById('codeTypeFilter').value;
+  const isProtected = document.getElementById('protectionFilter').value;
+  const [sortBy, sortOrder] = document.getElementById('sortFilter').value.split(',');
+  
+  currentFilters = {
+    ...currentFilters,
+    page: 1, // 重置到第一页
+    search,
+    codeType,
+    isProtected: isProtected === '' ? null : isProtected,
+    sortBy,
+    sortOrder
+  };
+  
+  selectedPages.clear();
+  updateBatchActions();
+  loadPagesList();
+}
+
+// 重置筛选条件
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('codeTypeFilter').value = '';
+  document.getElementById('protectionFilter').value = '';
+  document.getElementById('sortFilter').value = 'created_at,DESC';
+  
+  currentFilters = {
+    page: 1,
+    limit: 20,
+    search: '',
+    codeType: '',
+    isProtected: null,
+    sortBy: 'created_at',
+    sortOrder: 'DESC'
+  };
+  
+  selectedPages.clear();
+  updateBatchActions();
+  loadPagesList();
+}
+
+// 跳转到指定页面
+function goToPage(page) {
+  currentFilters.page = page;
+  loadPagesList();
+}
+
+// 刷新页面列表
+function refreshPageList() {
+  document.getElementById('loadingSpinner').style.display = 'block';
+  document.getElementById('pageListContainer').style.display = 'none';
+  loadPagesStats();
+  loadPagesList();
+}
+
+// 切换页面选择
+function togglePageSelection(pageId) {
+  const checkbox = document.querySelector(`input[value="${pageId}"]`);
+  if (checkbox.checked) {
+    selectedPages.add(pageId);
+  } else {
+    selectedPages.delete(pageId);
+  }
+  updateBatchActions();
+}
+
+// 全选/取消全选
+function toggleSelectAll() {
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+  
+  pageCheckboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+    if (selectAllCheckbox.checked) {
+      selectedPages.add(checkbox.value);
+    } else {
+      selectedPages.delete(checkbox.value);
+    }
+  });
+  
+  updateBatchActions();
+}
+
+// 更新批量操作按钮
+function updateBatchActions() {
+  const batchActions = document.getElementById('batchActions');
+  const selectedCount = document.getElementById('selectedCount');
+  
+  if (selectedPages.size > 0) {
+    batchActions.style.display = 'flex';
+    selectedCount.textContent = `已选择 ${selectedPages.size} 项`;
+  } else {
+    batchActions.style.display = 'none';
+  }
+}
+
+// 预览页面
+function previewPage(pageId) {
+  const page = currentPages.find(p => p.id === pageId);
+  if (!page) return;
+  
+  const modal = document.getElementById('previewModal');
+  const frame = document.getElementById('previewFrame');
+  const openBtn = document.getElementById('openPageBtn');
+  
+  const url = `/view/${pageId}`;
+  frame.src = url;
+  openBtn.onclick = () => window.open(url, '_blank');
+  
+  modal.style.display = 'flex';
+}
+
+// 隐藏预览模态框
+function hidePreviewModal() {
+  document.getElementById('previewModal').style.display = 'none';
+  document.getElementById('previewFrame').src = '';
+}
+
+// 编辑页面
+function editPage(pageId) {
+  const page = currentPages.find(p => p.id === pageId);
+  if (!page) return;
+  
+  // 填充表单
+  document.getElementById('editPageId').value = page.id;
+  document.getElementById('editPageName').value = page.name || '';
+  document.getElementById('editCodeType').value = page.code_type || 'html';
+  document.getElementById('editIsProtected').checked = page.is_protected === 1;
+  document.getElementById('editPassword').value = page.password || '';
+  document.getElementById('editHtmlContent').value = page.html_content || '';
+  
+  // 显示/隐藏密码字段
+  const passwordGroup = document.getElementById('editPasswordGroup');
+  passwordGroup.style.display = page.is_protected === 1 ? 'block' : 'none';
+  
+  // 更新内容大小
+  document.getElementById('contentSize').textContent = (page.html_content || '').length;
+  
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+// 隐藏编辑模态框
+function hideEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+  document.getElementById('editPageForm').reset();
+}
+
+// 保存页面更改
+async function savePageChanges() {
+  const form = document.getElementById('editPageForm');
+  const formData = new FormData(form);
+  
+  const pageId = formData.get('pageId');
+  const updates = {
+    name: formData.get('name'),
+    codeType: formData.get('codeType'),
+    isProtected: document.getElementById('editIsProtected').checked,
+    password: formData.get('password'),
+    htmlContent: formData.get('htmlContent')
+  };
+  
+  try {
+    const response = await fetch(`/api/admin/pages/${pageId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification('页面更新成功', 'success');
+      hideEditModal();
+      refreshPageList();
+    } else {
+      showNotification('更新失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('保存页面更改错误:', error);
+    showNotification('保存失败', 'error');
+  }
+}
+
+// 删除单个页面
+async function deletePage(pageId) {
+  const page = currentPages.find(p => p.id === pageId);
+  const pageName = page ? (page.name || `HTML-${page.id}`) : pageId;
+  
+  if (!confirm(`确定要删除页面"${pageName}"吗？此操作无法撤销。`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/admin/pages/${pageId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification('页面删除成功', 'success');
+      refreshPageList();
+    } else {
+      showNotification('删除失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('删除页面错误:', error);
+    showNotification('删除失败', 'error');
+  }
+}
+
+// 批量删除页面
+async function batchDelete() {
+  if (selectedPages.size === 0) {
+    showNotification('请选择要删除的页面', 'warning');
+    return;
+  }
+  
+  if (!confirm(`确定要删除选中的 ${selectedPages.size} 个页面吗？此操作无法撤销。`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/admin/pages/batch/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        pageIds: Array.from(selectedPages)
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification(data.message, 'success');
+      selectedPages.clear();
+      updateBatchActions();
+      refreshPageList();
+    } else {
+      showNotification('批量删除失败: ' + data.error, 'error');
+    }
+  } catch (error) {
+    console.error('批量删除错误:', error);
+    showNotification('批量删除失败', 'error');
+  }
+}
+
+// 批量设置保护状态
+async function batchProtect(isProtected) {
+  if (selectedPages.size === 0) {
+    showNotification('请选择要操作的页面', 'warning');
+    return;
+  }
+  
+  const action = isProtected ? '设为保护' : '取消保护';
+  if (!confirm(`确定要${action}选中的 ${selectedPages.size} 个页面吗？`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/admin/pages/batch/protection', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        pageIds: Array.from(selectedPages),
+        isProtected
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification(data.message, 'success');
+      selectedPages.clear();
+      updateBatchActions();
+      refreshPageList();
+    } else {
+      showNotification(`批量${action}失败: ` + data.error, 'error');
+    }
+  } catch (error) {
+    console.error(`批量${action}错误:`, error);
+    showNotification(`批量${action}失败`, 'error');
+  }
+}
+
+// 复制页面链接
+function copyPageLink(pageId) {
+  const url = `${window.location.origin}/view/${pageId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showNotification('链接已复制到剪贴板', 'success');
+  }).catch(() => {
+    // 降级方案
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    showNotification('链接已复制到剪贴板', 'success');
+  });
+}
+
+// 在新标签页打开页面
+let currentPreviewPageId = null;
+function openPageInNewTab() {
+  if (currentPreviewPageId) {
+    window.open(`/view/${currentPreviewPageId}`, '_blank');
+  }
+}
+
+// 工具函数
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatDate(timestamp) {
+  const date = new Date(parseInt(timestamp));
+  return date.toLocaleString('zh-CN');
+}
+
+function formatFileSize(size) {
+  if (size < 1024) return size + ' B';
+  if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+  return (size / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// 模态框点击外部关闭
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal')) {
+    e.target.style.display = 'none';
+  }
+});
+</script>
+
+<style>
+/* 页面管理专用样式 */
+.filter-section {
+  margin-bottom: 2rem;
+}
+
+.filter-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  background: #f8fafc;
+}
+
+.filter-header h3 {
+  margin: 0;
+  color: var(--admin-dark);
+  font-size: 1rem;
+}
+
+.filter-content {
+  padding: 1.5rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-weight: 500;
+  color: var(--admin-secondary);
+  font-size: 0.875rem;
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.page-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-id {
+  font-size: 0.75rem;
+  color: var(--admin-secondary);
+  font-family: monospace;
+}
+
+.page-content-preview {
+  font-size: 0.75rem;
+  color: #6b7280;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.type-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.type-html { background: #dbeafe; color: #1e40af; }
+.type-markdown { background: #d1fae5; color: #065f46; }
+.type-svg { background: #fef3c7; color: #92400e; }
+.type-mermaid { background: #e0e7ff; color: #5b21b6; }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-public { background: #d1fae5; color: #065f46; }
+.status-protected { background: #fef3c7; color: #92400e; }
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+.selected-count {
+  font-size: 0.875rem;
+  color: var(--admin-secondary);
+  margin-left: 0.5rem;
+}
+
+.pagination-container {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.page-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--admin-border);
+  background: white;
+  color: var(--admin-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--admin-transition);
+  font-size: 0.875rem;
+}
+
+.page-btn:hover {
+  background: var(--admin-light);
+  border-color: var(--admin-primary);
+}
+
+.page-btn.active {
+  background: var(--admin-primary);
+  color: white;
+  border-color: var(--admin-primary);
+}
+
+.page-ellipsis {
+  padding: 0.5rem;
+  color: var(--admin-secondary);
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: var(--admin-secondary);
+}
+
+.preview-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.preview-container {
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: white;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 600px;
+  border: none;
+  background: white;
+}
+
+.page-count {
+  color: var(--admin-secondary);
+  font-weight: normal;
+  font-size: 0.875rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--admin-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: var(--admin-transition);
+}
+
+.btn-link:hover {
+  color: var(--admin-primary);
+  background: var(--admin-light);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 300px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .batch-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .page-info {
+    min-width: 200px;
+  }
+}</style> 

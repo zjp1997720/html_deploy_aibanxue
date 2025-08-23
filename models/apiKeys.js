@@ -384,6 +384,264 @@ async function getApiKeyStats(keyId, days = 7) {
   }
 }
 
+/**
+ * 获取API Key的详细使用统计（增强版）
+ * @param {string} keyId - API Key ID
+ * @param {number} days - 查询天数
+ * @returns {Promise<Object>} 返回详细统计
+ */
+async function getDetailedApiKeyStats(keyId, days = 7) {
+  try {
+    const daysBefore = Date.now() - (days * 24 * 60 * 60 * 1000);
+    
+    // 基础统计
+    const basicStats = await getApiKeyStats(keyId, days);
+    
+    // 按天统计调用次数
+    const dailyStats = await query(`
+      SELECT 
+        DATE(datetime(created_at/1000, 'unixepoch')) as date,
+        COUNT(*) as calls,
+        SUM(CASE WHEN status_code >= 200 AND status_code < 300 THEN 1 ELSE 0 END) as success_calls,
+        AVG(response_time) as avg_response_time
+      FROM api_usage_logs 
+      WHERE key_id = ? AND created_at > ?
+      GROUP BY DATE(datetime(created_at/1000, 'unixepoch'))
+      ORDER BY date DESC
+    `, [keyId, daysBefore]);
+    
+    // 按HTTP方法统计
+    const methodStats = await query(`
+      SELECT 
+        method,
+        COUNT(*) as count
+      FROM api_usage_logs 
+      WHERE key_id = ? AND created_at > ?
+      GROUP BY method
+      ORDER BY count DESC
+    `, [keyId, daysBefore]);
+    
+    // 按状态码统计
+    const statusStats = await query(`
+      SELECT 
+        status_code,
+        COUNT(*) as count
+      FROM api_usage_logs 
+      WHERE key_id = ? AND created_at > ?
+      GROUP BY status_code
+      ORDER BY count DESC
+    `, [keyId, daysBefore]);
+    
+    // 最近的错误
+    const recentErrors = await query(`
+      SELECT 
+        endpoint,
+        method,
+        status_code,
+        error_message,
+        created_at
+      FROM api_usage_logs 
+      WHERE key_id = ? AND created_at > ? AND status_code >= 400
+      ORDER BY created_at DESC
+      LIMIT 10
+    `, [keyId, daysBefore]);
+    
+    // 响应时间分布
+    const responseTimeStats = await get(`
+      SELECT 
+        MIN(response_time) as min_time,
+        MAX(response_time) as max_time,
+        AVG(response_time) as avg_time,
+        COUNT(CASE WHEN response_time < 100 THEN 1 END) as under_100ms,
+        COUNT(CASE WHEN response_time BETWEEN 100 AND 500 THEN 1 END) as between_100_500ms,
+        COUNT(CASE WHEN response_time > 500 THEN 1 END) as over_500ms
+      FROM api_usage_logs 
+      WHERE key_id = ? AND created_at > ? AND response_time IS NOT NULL
+    `, [keyId, daysBefore]);
+    
+    return {
+      ...basicStats,
+      dailyStats: dailyStats || [],
+      methodStats: methodStats || [],
+      statusStats: statusStats || [],
+      recentErrors: recentErrors || [],
+      responseTimeDistribution: responseTimeStats || {}
+    };
+  } catch (error) {
+    console.error('获取详细API Key统计错误:', error);
+    throw error;
+  }
+}
+
+/**
+ * 获取所有API Key的总体统计
+ * @param {number} days - 查询天数
+ * @returns {Promise<Object>} 返回总体统计
+ */
+async function getOverallApiStats(days = 7) {
+  try {
+    const daysBefore = Date.now() - (days * 24 * 60 * 60 * 1000);
+    
+    // 活跃API Key数量
+    const activeKeys = await get(`
+      SELECT COUNT(DISTINCT key_id) as count
+      FROM api_usage_logs 
+      WHERE created_at > ?
+    `, [daysBefore]);
+    
+    // 总调用次数
+    const totalCalls = await get(`
+      SELECT COUNT(*) as count 
+      FROM api_usage_logs 
+      WHERE created_at > ?
+    `, [daysBefore]);
+    
+    // 成功率
+    const successRate = await get(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status_code >= 200 AND status_code < 300 THEN 1 ELSE 0 END) as success
+      FROM api_usage_logs 
+      WHERE created_at > ?
+    `, [daysBefore]);
+    
+    // 平均响应时间
+    const avgResponseTime = await get(`
+      SELECT AVG(response_time) as avg_time 
+      FROM api_usage_logs 
+      WHERE created_at > ? AND response_time IS NOT NULL
+    `, [daysBefore]);
+    
+    // 最热门的端点
+    const topEndpoints = await query(`
+      SELECT 
+        endpoint,
+        COUNT(*) as calls,
+        COUNT(DISTINCT key_id) as unique_keys
+      FROM api_usage_logs 
+      WHERE created_at > ?
+      GROUP BY endpoint 
+      ORDER BY calls DESC 
+      LIMIT 10
+    `, [daysBefore]);
+    
+    // 每小时调用统计
+    const hourlyStats = await query(`
+      SELECT 
+        strftime('%H', datetime(created_at/1000, 'unixepoch')) as hour,
+        COUNT(*) as calls
+      FROM api_usage_logs 
+      WHERE created_at > ?
+      GROUP BY hour
+      ORDER BY hour
+    `, [daysBefore]);
+    
+    // 错误统计
+    const errorStats = await query(`
+      SELECT 
+        status_code,
+        COUNT(*) as count,
+        COUNT(DISTINCT key_id) as affected_keys
+      FROM api_usage_logs 
+      WHERE created_at > ? AND status_code >= 400
+      GROUP BY status_code
+      ORDER BY count DESC
+    `, [daysBefore]);
+    
+    return {
+      activeKeys: activeKeys.count || 0,
+      totalCalls: totalCalls.count || 0,
+      successRate: successRate.total > 0 ? (successRate.success / successRate.total * 100).toFixed(2) : 0,
+      avgResponseTime: Math.round(avgResponseTime.avg_time || 0),
+      topEndpoints: topEndpoints || [],
+      hourlyDistribution: hourlyStats || [],
+      errorBreakdown: errorStats || []
+    };
+  } catch (error) {
+    console.error('获取总体API统计错误:', error);
+    throw error;
+  }
+}
+
+/**
+ * 获取异常检测报告
+ * @param {number} hours - 检测最近几小时
+ * @returns {Promise<Object>} 返回异常报告
+ */
+async function getAnomalyReport(hours = 24) {
+  try {
+    const hoursBefore = Date.now() - (hours * 60 * 60 * 1000);
+    
+    // 高错误率的API Key
+    const highErrorRateKeys = await query(`
+      SELECT 
+        key_id,
+        COUNT(*) as total_calls,
+        SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) as error_calls,
+        ROUND(SUM(CASE WHEN status_code >= 400 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as error_rate
+      FROM api_usage_logs 
+      WHERE created_at > ?
+      GROUP BY key_id
+      HAVING error_rate > 10 AND total_calls > 10
+      ORDER BY error_rate DESC
+      LIMIT 10
+    `, [hoursBefore]);
+    
+    // 高频调用的API Key
+    const highVolumeKeys = await query(`
+      SELECT 
+        key_id,
+        COUNT(*) as calls,
+        ROUND(COUNT(*) * 1.0 / ?, 2) as calls_per_hour
+      FROM api_usage_logs 
+      WHERE created_at > ?
+      GROUP BY key_id
+      HAVING calls > 1000
+      ORDER BY calls DESC
+      LIMIT 10
+    `, [hours, hoursBefore]);
+    
+    // 响应时间异常的端点
+    const slowEndpoints = await query(`
+      SELECT 
+        endpoint,
+        COUNT(*) as calls,
+        AVG(response_time) as avg_response_time,
+        MAX(response_time) as max_response_time
+      FROM api_usage_logs 
+      WHERE created_at > ? AND response_time IS NOT NULL
+      GROUP BY endpoint
+      HAVING avg_response_time > 1000
+      ORDER BY avg_response_time DESC
+      LIMIT 10
+    `, [hoursBefore]);
+    
+    // 最近的404错误
+    const notFoundErrors = await query(`
+      SELECT 
+        endpoint,
+        COUNT(*) as count,
+        COUNT(DISTINCT key_id) as affected_keys
+      FROM api_usage_logs 
+      WHERE created_at > ? AND status_code = 404
+      GROUP BY endpoint
+      ORDER BY count DESC
+      LIMIT 10
+    `, [hoursBefore]);
+    
+    return {
+      timeRange: `${hours} hours`,
+      highErrorRateKeys: highErrorRateKeys || [],
+      highVolumeKeys: highVolumeKeys || [],
+      slowEndpoints: slowEndpoints || [],
+      notFoundErrors: notFoundErrors || []
+    };
+  } catch (error) {
+    console.error('获取异常检测报告错误:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   createApiKey,
   validateApiKey,
@@ -394,5 +652,8 @@ module.exports = {
   getApiKeyById,
   deleteApiKey,
   toggleApiKey,
-  getApiKeyStats
+  getApiKeyStats,
+  getDetailedApiKeyStats,
+  getOverallApiStats,
+  getAnomalyReport
 }; 

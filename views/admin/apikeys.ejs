@@ -14,6 +14,9 @@ const breadcrumb = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> - HTML-GO 管理后台</title>
+    <!-- 设计系统与组件库样式（统一视觉与8px网格） -->
+    <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="icon" href="/icon/web/favicon.ico">
@@ -82,10 +85,10 @@ const breadcrumb = [
         <main class="main-content">
             <!-- 面包屑导航 -->
             <div class="breadcrumb-container">
-                <nav class="breadcrumb">
-                    <a href="/admin/dashboard" class="breadcrumb-item">管理后台</a>
-                    <span class="breadcrumb-separator">/</span>
-                    <span class="breadcrumb-item current">API Key管理</span>
+                <nav class="breadcrumb" aria-label="面包屑">
+                    <a href="/admin/dashboard" class="breadcrumb-link">管理后台</a>
+                    <span class="breadcrumb-separator" aria-hidden="true">/</span>
+                    <span class="breadcrumb-current" aria-current="page">API Key管理</span>
                 </nav>
             </div>
 
@@ -109,52 +112,60 @@ const breadcrumb = [
   </div>
 </div>
 
-<!-- 统计概览 -->
-<div class="stats-grid mb-6">
-  <div class="stat-card">
-    <div class="stat-icon bg-blue-100 text-blue-600">
-      <i class="fas fa-key"></i>
+<!-- 统计概览 - 设计师重构版本 -->
+<div class="stats-overview mb-6">
+  <div class="stats-container card" role="status" aria-live="polite">
+    <div class="stat-item">
+      <div class="stat-icon bg-blue-gradient">
+        <i class="fas fa-key"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="totalKeys">--</span>
+        <span class="stat-label">总计Key数量</span>
+      </div>
     </div>
-    <div class="stat-content">
-      <div class="stat-value" id="totalKeys">--</div>
-      <div class="stat-label">总计Key数量</div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon bg-green-gradient">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="activeKeys">--</span>
+        <span class="stat-label">活跃Key数量</span>
+      </div>
     </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon bg-green-100 text-green-600">
-      <i class="fas fa-check-circle"></i>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon bg-orange-gradient">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="todayCalls">--</span>
+        <span class="stat-label">今日调用次数</span>
+      </div>
     </div>
-    <div class="stat-content">
-      <div class="stat-value" id="activeKeys">--</div>
-      <div class="stat-label">活跃Key数量</div>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon bg-orange-100 text-orange-600">
-      <i class="fas fa-chart-line"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-value" id="totalCalls">--</div>
-      <div class="stat-label">今日调用次数</div>
-    </div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="stat-icon bg-purple-100 text-purple-600">
-      <i class="fas fa-clock"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-value" id="avgResponseTime">--</div>
-      <div class="stat-label">平均响应时间</div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon bg-purple-gradient">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value" id="avgResponseTime">--</span>
+        <span class="stat-label">平均响应时间</span>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- API Key列表 -->
-<div class="data-card">
-  <div class="data-card-header">
+<div class="data-card card">
+  <div class="data-card-header card-header">
     <h2 class="data-card-title">
       <i class="fas fa-list"></i>
       API Key列表
@@ -167,15 +178,15 @@ const breadcrumb = [
     </div>
   </div>
   
-  <div class="data-card-content">
+  <div class="data-card-content card-body">
     <div id="loadingSpinner" class="loading-spinner">
       <i class="fas fa-spinner fa-spin"></i>
       加载中...
     </div>
     
     <div id="keyListContainer" style="display: none;">
-      <div class="table-responsive">
-        <table class="data-table">
+      <div class="table-responsive table-container">
+        <table class="data-table" role="table" aria-label="API Key 列表">
           <thead>
             <tr>
               <th>名称</th>
@@ -206,89 +217,177 @@ const breadcrumb = [
   </div>
 </div>
 
-<!-- 创建API Key模态框 -->
-<div id="createModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">
-        <i class="fas fa-plus"></i>
-        创建新的API Key
-      </h3>
-      <button class="modal-close" onclick="hideCreateModal()">
+<!-- 创建API Key模态框 - 重构版本 -->
+<div id="createModal" class="modal modal-enhanced" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
+  <div class="modal-content modal-optimized">
+    <div class="modal-header modal-header-enhanced">
+      <div class="modal-title-section">
+        <div class="modal-icon">
+          <i class="fas fa-key"></i>
+        </div>
+        <div class="modal-title-content">
+          <h3 class="modal-title" id="createModalTitle">创建新的API Key</h3>
+          <p class="modal-subtitle">配置API访问权限和使用限制</p>
+        </div>
+      </div>
+      <button class="modal-close modal-close-enhanced" onclick="hideCreateModal()" aria-label="关闭对话框">
         <i class="fas fa-times"></i>
       </button>
     </div>
     
-    <div class="modal-body">
-      <form id="createKeyForm">
-        <div class="form-group">
-          <label for="keyName" class="form-label required">名称</label>
-          <input type="text" id="keyName" name="name" class="form-input" 
-                 placeholder="例如：前端应用API Key" required>
-          <small class="form-help">给这个API Key起一个容易识别的名称</small>
-        </div>
-        
-        <div class="form-group">
-          <label for="keyDescription" class="form-label">描述</label>
-          <textarea id="keyDescription" name="description" class="form-input" 
-                    rows="3" placeholder="描述这个Key的用途（可选）"></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">权限设置</label>
-          <div class="checkbox-group">
-            <label class="checkbox-item">
-              <input type="checkbox" name="permissions" value="read" checked>
-              <span class="checkbox-mark"></span>
-              读取权限 (查看页面、获取列表)
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" name="permissions" value="write" checked>
-              <span class="checkbox-mark"></span>
-              写入权限 (创建页面、修改内容)
-            </label>
+    <div class="modal-body modal-body-enhanced">
+      <form id="createKeyForm" class="form-enhanced">
+        <!-- 基本信息区域 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h4 class="section-title">
+              <i class="fas fa-info-circle"></i>
+              基本信息
+            </h4>
+          </div>
+          <div class="section-content">
+            <div class="form-group form-group-enhanced">
+              <label for="keyName" class="form-label form-label-required">
+                <span class="label-text">名称</span>
+                <span class="label-required">*</span>
+              </label>
+              <input type="text" id="keyName" name="name" class="form-input form-input-enhanced" 
+                     placeholder="例如：前端应用API Key" required>
+              <div class="form-feedback" id="keyNameFeedback"></div>
+              <small class="form-help">给这个API Key起一个容易识别的名称</small>
+            </div>
+            
+            <div class="form-group form-group-enhanced">
+              <label for="keyDescription" class="form-label">
+                <span class="label-text">描述</span>
+              </label>
+              <textarea id="keyDescription" name="description" class="form-input form-textarea-enhanced" 
+                        rows="2" placeholder="描述这个Key的用途（可选）"></textarea>
+              <small class="form-help">详细说明这个API Key的使用场景</small>
+            </div>
           </div>
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="maxHourly" class="form-label">每小时限制</label>
-            <input type="number" id="maxHourly" name="maxRequestsPerHour" 
-                   class="form-input" value="1000" min="1" max="10000">
-            <small class="form-help">每小时最大请求次数</small>
+
+        <!-- 权限设置区域 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h4 class="section-title">
+              <i class="fas fa-shield-alt"></i>
+              权限设置
+            </h4>
           </div>
-          
-          <div class="form-group">
-            <label for="maxDaily" class="form-label">每日限制</label>
-            <input type="number" id="maxDaily" name="maxRequestsPerDay" 
-                   class="form-input" value="10000" min="1" max="100000">
-            <small class="form-help">每天最大请求次数</small>
+          <div class="section-content">
+            <div class="permission-grid">
+              <div class="permission-card permission-card-read">
+                <div class="permission-header">
+                  <div class="permission-icon">
+                    <i class="fas fa-eye"></i>
+                  </div>
+                  <div class="permission-info">
+                    <h5 class="permission-title">读取权限</h5>
+                    <p class="permission-desc">查看页面、获取列表</p>
+                  </div>
+                </div>
+                <div class="permission-toggle">
+                  <label class="toggle-switch">
+                    <input type="checkbox" name="permissions" value="read" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="permission-card permission-card-write">
+                <div class="permission-header">
+                  <div class="permission-icon">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                  <div class="permission-info">
+                    <h5 class="permission-title">写入权限</h5>
+                    <p class="permission-desc">创建页面、修改内容</p>
+                  </div>
+                </div>
+                <div class="permission-toggle">
+                  <label class="toggle-switch">
+                    <input type="checkbox" name="permissions" value="write" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div class="form-group">
-          <label for="expiresAt" class="form-label">过期时间（可选）</label>
-          <input type="datetime-local" id="expiresAt" name="expiresAt" class="form-input">
-          <small class="form-help">留空表示永不过期</small>
+
+        <!-- 使用限制区域 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h4 class="section-title">
+              <i class="fas fa-tachometer-alt"></i>
+              使用限制
+            </h4>
+          </div>
+          <div class="section-content">
+            <div class="limit-grid">
+              <div class="limit-item">
+                <label for="maxHourly" class="form-label">
+                  <span class="label-text">每小时限制</span>
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="maxHourly" name="maxRequestsPerHour" 
+                         class="form-input form-input-enhanced" value="1000" min="1" max="10000">
+                  <span class="input-unit">次/小时</span>
+                </div>
+                <div class="form-feedback" id="maxHourlyFeedback"></div>
+              </div>
+              
+              <div class="limit-item">
+                <label for="maxDaily" class="form-label">
+                  <span class="label-text">每日限制</span>
+                </label>
+                <div class="input-with-unit">
+                  <input type="number" id="maxDaily" name="maxRequestsPerDay" 
+                         class="form-input form-input-enhanced" value="10000" min="1" max="100000">
+                  <span class="input-unit">次/天</span>
+                </div>
+                <div class="form-feedback" id="maxDailyFeedback"></div>
+              </div>
+            </div>
+            
+            <div class="form-group form-group-enhanced">
+              <label for="expiresAt" class="form-label">
+                <span class="label-text">过期时间</span>
+              </label>
+              <input type="datetime-local" id="expiresAt" name="expiresAt" class="form-input form-input-enhanced">
+              <small class="form-help">留空表示永不过期</small>
+            </div>
+          </div>
         </div>
       </form>
     </div>
     
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="hideCreateModal()">取消</button>
-      <button type="button" class="btn btn-primary" onclick="createApiKey()">
-        <i class="fas fa-key"></i>
-        创建API Key
+    <div class="modal-footer modal-footer-enhanced">
+      <button type="button" class="btn btn-secondary btn-enhanced" onclick="hideCreateModal()">
+        <i class="fas fa-times"></i>
+        取消
+      </button>
+      <button type="button" class="btn btn-primary btn-enhanced btn-loading-capable" onclick="createApiKey()" id="createKeyBtn">
+        <span class="btn-content">
+          <i class="fas fa-key"></i>
+          创建API Key
+        </span>
+        <span class="btn-loading" style="display: none;">
+          <i class="fas fa-spinner fa-spin"></i>
+          创建中...
+        </span>
       </button>
     </div>
   </div>
 </div>
 
 <!-- API Key详情模态框 -->
-<div id="keyDetailModal" class="modal">
+<div id="keyDetailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="keyDetailModalTitle">
   <div class="modal-content modal-large">
     <div class="modal-header">
-      <h3 class="modal-title">
+      <h3 class="modal-title" id="keyDetailModalTitle">
         <i class="fas fa-info-circle"></i>
         API Key详情
       </h3>
@@ -310,10 +409,10 @@ const breadcrumb = [
 </div>
 
 <!-- API Key成功创建模态框 -->
-<div id="keySuccessModal" class="modal">
+<div id="keySuccessModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="keySuccessModalTitle">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 class="modal-title text-green-600">
+      <h3 class="modal-title text-green-600" id="keySuccessModalTitle">
         <i class="fas fa-check-circle"></i>
         API Key创建成功
       </h3>
@@ -478,10 +577,140 @@ function hideCreateModal() {
   document.getElementById('createKeyForm').reset();
 }
 
-// 创建API Key
+// 页面加载完成后初始化增强功能
+document.addEventListener('DOMContentLoaded', function() {
+  loadApiKeys();
+  loadStatistics();
+  initFormValidation();
+  initFormEnhancements();
+});
+
+// 初始化表单验证
+function initFormValidation() {
+  const nameInput = document.getElementById('keyName');
+  const maxHourlyInput = document.getElementById('maxHourly');
+  const maxDailyInput = document.getElementById('maxDaily');
+  
+  // 名称实时验证
+  nameInput.addEventListener('input', function() {
+    validateKeyName(this.value);
+  });
+  
+  // 限制数值验证
+  maxHourlyInput.addEventListener('input', function() {
+    validateLimit(this, 'maxHourlyFeedback', 1, 10000);
+  });
+  
+  maxDailyInput.addEventListener('input', function() {
+    validateLimit(this, 'maxDailyFeedback', 1, 100000);
+    validateDailyVsHourly();
+  });
+}
+
+// 初始化表单增强功能
+function initFormEnhancements() {
+  // 权限卡片点击切换
+  document.querySelectorAll('.permission-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (e.target.type !== 'checkbox') {
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+  
+  // 权限切换动画
+  document.querySelectorAll('input[name="permissions"]').forEach(input => {
+    input.addEventListener('change', function() {
+      const card = this.closest('.permission-card');
+      if (this.checked) {
+        card.classList.add('permission-active');
+      } else {
+        card.classList.remove('permission-active');
+      }
+    });
+  });
+}
+
+// 验证API Key名称
+function validateKeyName(name) {
+  const feedback = document.getElementById('keyNameFeedback');
+  
+  if (!name.trim()) {
+    showFieldFeedback(feedback, '', '');
+    return false;
+  }
+  
+  if (name.length < 3) {
+    showFieldFeedback(feedback, '名称至少需要3个字符', 'error');
+    return false;
+  }
+  
+  if (name.length > 50) {
+    showFieldFeedback(feedback, '名称不能超过50个字符', 'error');
+    return false;
+  }
+  
+  showFieldFeedback(feedback, '名称格式正确', 'success');
+  return true;
+}
+
+// 验证限制数值
+function validateLimit(input, feedbackId, min, max) {
+  const feedback = document.getElementById(feedbackId);
+  const value = parseInt(input.value);
+  
+  if (isNaN(value) || value < min) {
+    showFieldFeedback(feedback, `最小值为 ${min}`, 'error');
+    return false;
+  }
+  
+  if (value > max) {
+    showFieldFeedback(feedback, `最大值为 ${max}`, 'error');
+    return false;
+  }
+  
+  showFieldFeedback(feedback, '数值有效', 'success');
+  return true;
+}
+
+// 验证每日限制是否大于每小时限制
+function validateDailyVsHourly() {
+  const hourly = parseInt(document.getElementById('maxHourly').value);
+  const daily = parseInt(document.getElementById('maxDaily').value);
+  const feedback = document.getElementById('maxDailyFeedback');
+  
+  if (!isNaN(hourly) && !isNaN(daily) && daily < hourly) {
+    showFieldFeedback(feedback, '每日限制应大于每小时限制', 'error');
+    return false;
+  }
+  
+  return true;
+}
+
+// 显示字段反馈
+function showFieldFeedback(element, message, type) {
+  element.textContent = message;
+  element.className = `form-feedback ${type}`;
+}
+
+// 创建API Key - 增强版本
 async function createApiKey() {
   const form = document.getElementById('createKeyForm');
   const formData = new FormData(form);
+  const createBtn = document.getElementById('createKeyBtn');
+  
+  // 表单验证
+  const nameValid = validateKeyName(formData.get('name'));
+  const hourlyValid = validateLimit(document.getElementById('maxHourly'), 'maxHourlyFeedback', 1, 10000);
+  const dailyValid = validateLimit(document.getElementById('maxDaily'), 'maxDailyFeedback', 1, 100000);
+  const dailyVsHourlyValid = validateDailyVsHourly();
+  
+  if (!nameValid || !hourlyValid || !dailyValid || !dailyVsHourlyValid) {
+    showNotification('请修正表单中的错误', 'error');
+    return;
+  }
   
   // 收集权限
   const permissions = Array.from(form.querySelectorAll('input[name="permissions"]:checked'))
@@ -491,6 +720,9 @@ async function createApiKey() {
     showNotification('请至少选择一个权限', 'warning');
     return;
   }
+  
+  // 显示加载状态
+  showButtonLoading(createBtn, true);
   
   const keyData = {
     name: formData.get('name'),
@@ -517,13 +749,75 @@ async function createApiKey() {
       showKeySuccess(data.apiKey);
       loadApiKeys();
       loadStatistics();
+      showNotification('API Key创建成功', 'success');
     } else {
       showNotification('创建API Key失败: ' + data.error, 'error');
     }
   } catch (error) {
     console.error('创建API Key错误:', error);
     showNotification('创建API Key失败', 'error');
+  } finally {
+    showButtonLoading(createBtn, false);
   }
+}
+
+// 按钮加载状态控制
+function showButtonLoading(button, isLoading) {
+  const content = button.querySelector('.btn-content');
+  const loading = button.querySelector('.btn-loading');
+  
+  if (isLoading) {
+    content.style.display = 'none';
+    loading.style.display = 'flex';
+    button.disabled = true;
+  } else {
+    content.style.display = 'flex';
+    loading.style.display = 'none';
+    button.disabled = false;
+  }
+}
+
+// 显示创建模态框 - 增强版本
+function showCreateModal() {
+  const modal = document.getElementById('createModal');
+  const form = document.getElementById('createKeyForm');
+  
+  // 重置表单
+  form.reset();
+  
+  // 清除所有反馈
+  document.querySelectorAll('.form-feedback').forEach(feedback => {
+    feedback.textContent = '';
+    feedback.className = 'form-feedback';
+  });
+  
+  // 重置权限卡片状态
+  document.querySelectorAll('.permission-card').forEach(card => {
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    if (checkbox.checked) {
+      card.classList.add('permission-active');
+    } else {
+      card.classList.remove('permission-active');
+    }
+  });
+  
+  // 显示模态框
+  modal.style.display = 'flex';
+  
+  // 聚焦到名称输入框
+  setTimeout(() => {
+    document.getElementById('keyName').focus();
+  }, 300);
+}
+
+// 隐藏创建模态框 - 增强版本
+function hideCreateModal() {
+  const modal = document.getElementById('createModal');
+  modal.style.display = 'none';
+  
+  // 重置按钮状态
+  const createBtn = document.getElementById('createKeyBtn');
+  showButtonLoading(createBtn, false);
 }
 
 // 显示API Key创建成功模态框
@@ -729,7 +1023,629 @@ function formatDate(timestamp) {
 </script>
 
 <style>
-/* API Key管理页面专用样式 */
+/* ===== 统计概览横向布局 - 设计师重构版本 ===== */
+.stats-overview {
+  margin-bottom: 32px;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.stats-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+}
+
+.stats-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 25px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.stat-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+}
+
+.bg-green-gradient {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+}
+
+.bg-orange-gradient {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3);
+}
+
+.bg-purple-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.3);
+}
+
+.stat-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.stat-divider {
+  display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .stats-container {
+    padding: 20px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .stat-info {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-container {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 20px;
+  }
+  
+  .stat-item {
+    justify-content: center;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+  }
+  
+  .stat-label {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ===== API Key管理专用样式 ===== */
+.api-key-card {
+  transition: all 0.2s ease;
+  border: 1px solid var(--admin-border);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px; /* 内部圆角比外部小4px，完美贴合，消除白色小角 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* 精确的背景色定义，确保视觉一致性 */
+.bg-blue-100 { 
+  background-color: #dbeafe;
+  border-radius: 8px; /* 与stat-icon保持一致 */
+}
+.text-blue-600 { color: #2563eb; }
+
+.bg-green-100 { 
+  background-color: #dcfce7;
+  border-radius: 8px;
+}
+.text-green-600 { color: #16a34a; }
+
+.bg-orange-100 { 
+  background-color: #fed7aa;
+  border-radius: 8px;
+}
+.text-orange-600 { color: #ea580c; }
+
+.bg-purple-100 { 
+  background-color: #f3e8ff;
+  border-radius: 8px;
+}
+.text-purple-600 { color: #9333ea; }
+
+/* API Key管理页面专用样式 - 设计师重构版本 */
+
+/* ===== 模态对话框增强样式 ===== */
+.modal-enhanced {
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-optimized {
+  max-width: 640px;
+  width: 90vw;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== 模态框头部增强 ===== */
+.modal-header-enhanced {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+}
+
+.modal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.modal-title-content h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.modal-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.modal-close-enhanced {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close-enhanced:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* ===== 模态框主体增强 ===== */
+.modal-body-enhanced {
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-enhanced {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 表单区域分组 ===== */
+.form-section {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.section-header {
+  background: #f8fafc;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title i {
+  color: #667eea;
+  font-size: 14px;
+}
+
+.section-content {
+  padding: 24px;
+}
+
+/* ===== 表单组件增强 ===== */
+.form-group-enhanced {
+  margin-bottom: 16px;
+}
+
+.form-group-enhanced:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-label-required .label-required {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.form-input-enhanced {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.form-input-enhanced:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-input-enhanced:hover {
+  border-color: #cbd5e1;
+}
+
+.form-textarea-enhanced {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* ===== 实时反馈系统 ===== */
+.form-feedback {
+  margin-top: 4px;
+  font-size: 12px;
+  min-height: 16px;
+  transition: all 0.2s ease;
+}
+
+.form-feedback.success {
+  color: #059669;
+}
+
+.form-feedback.error {
+  color: #ef4444;
+}
+
+.form-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* ===== 权限设置卡片 ===== */
+.permission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.permission-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.permission-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.permission-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+}
+
+.permission-card:hover::before {
+  transform: scaleX(1);
+}
+
+.permission-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.permission-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.permission-info {
+  flex: 1;
+}
+
+.permission-title {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.permission-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.permission-toggle {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== 切换开关组件 ===== */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .toggle-slider {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* ===== 使用限制网格 ===== */
+.limit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.limit-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-unit {
+  position: absolute;
+  right: 16px;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.input-with-unit .form-input-enhanced {
+  padding-right: 80px;
+}
+
+/* ===== 按钮增强 ===== */
+.modal-footer-enhanced {
+  background: #f8fafc;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-enhanced {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-enhanced:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-enhanced:active {
+  transform: translateY(0);
+}
+
+.btn-loading-capable {
+  min-width: 140px;
+}
+
+.btn-content,
+.btn-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ===== 原有样式保持 ===== */
 .api-key-display {
   display: flex;
   gap: 0.5rem;
@@ -848,36 +1764,58 @@ function formatDate(timestamp) {
   color: #6b7280;
 }
 
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-item input[type="checkbox"] {
-  margin: 0;
-}
-
 .modal-large {
   max-width: 800px;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
+/* ===== 响应式设计 ===== */
 @media (max-width: 768px) {
-  .form-row {
+  .modal-optimized {
+    width: 95vw;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+  
+  .modal-header-enhanced {
+    padding: 20px;
+  }
+  
+  .modal-title-section {
+    gap: 12px;
+  }
+  
+  .modal-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .modal-title-content h3 {
+    font-size: 18px;
+  }
+  
+  .section-content {
+    padding: 20px;
+  }
+  
+  .permission-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .limit-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .modal-footer-enhanced {
+    padding: 16px 20px;
+    flex-direction: column-reverse;
+  }
+  
+  .btn-enhanced {
+    width: 100%;
+    justify-content: center;
   }
   
   .detail-grid {
@@ -886,6 +1824,23 @@ function formatDate(timestamp) {
   
   .action-buttons {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-optimized {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .section-content {
+    padding: 16px;
+  }
+  
+  .modal-header-enhanced {
+    padding: 16px;
   }
 }
 </style>

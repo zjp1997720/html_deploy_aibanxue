@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>HTML-GO 管理后台</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="/icon/web/favicon.ico">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <!-- 顶部导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <span class="brand-icon">🚀</span>
+                    <span class="brand-text">HTML-GO Admin</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span class="toggle-icon">☰</span>
+                </button>
+            </div>
+            <div class="nav-right">
+                <div class="nav-user">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name">管理员</span>
+                    <div class="user-dropdown">
+                        <a href="/admin/settings" class="dropdown-item">⚙️ 设置</a>
+                        <a href="/logout" class="dropdown-item logout">🚪 退出登录</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 侧边导航栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/admin/dashboard" class="nav-link <%= currentPath === '/admin/dashboard' ? 'active' : '' %>" data-page="dashboard">
+                            <span class="nav-icon">📊</span>
+                            <span class="nav-text">概览</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/pages" class="nav-link <%= currentPath === '/admin/pages' ? 'active' : '' %>" data-page="pages">
+                            <span class="nav-icon">📄</span>
+                            <span class="nav-text">页面管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/apikeys" class="nav-link <%= currentPath === '/admin/apikeys' ? 'active' : '' %>" data-page="apikeys">
+                            <span class="nav-icon">🔑</span>
+                            <span class="nav-text">API Key管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/settings" class="nav-link <%= currentPath === '/admin/settings' ? 'active' : '' %>" data-page="settings">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-text">系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- 快捷操作 -->
+                <div class="sidebar-footer">
+                    <div class="quick-actions">
+                        <a href="/" class="quick-link" target="_blank" title="查看前台">🌐 前台</a>
+                        <a href="/admin/pages/new" class="quick-link" title="创建页面">➕ 新建</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content" id="mainContent">
+            <!-- 面包屑导航 -->
+            <div class="breadcrumb-container">
+                <nav class="breadcrumb">
+                    <% if (typeof breadcrumb !== 'undefined' && breadcrumb && breadcrumb.length > 0) { %>
+                        <% breadcrumb.forEach((item, index) => { %>
+                            <% if (index > 0) { %>
+                                <span class="breadcrumb-separator">/</span>
+                            <% } %>
+                            <% if (item.url && index < breadcrumb.length - 1) { %>
+                                <a href="<%= item.url %>" class="breadcrumb-link"><%= item.title %></a>
+                            <% } else { %>
+                                <span class="breadcrumb-current"><%= item.title %></span>
+                            <% } %>
+                        <% }) %>
+                    <% } else { %>
+                        <span class="breadcrumb-current">管理后台</span>
+                    <% } %>
+                </nav>
+            </div>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <%- body %>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端遮罩 -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <script src="/js/admin-common.js"></script>
+    <% if (typeof pageScript !== 'undefined') { %>
+        <script src="/js/<%= pageScript %>"></script>
+    <% } %>
+</body>
+</html> 

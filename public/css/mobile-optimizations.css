@@ -1,0 +1,492 @@
+/**
+ * HTML-GO 移动端优化
+ * 专门针对移动设备的体验优化
+ */
+
+/* =========================
+   移动端基础优化
+   ========================= */
+
+/* 触摸友好的按钮尺寸 */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 44px; /* 符合iOS/Android触摸标准 */
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .btn-sm {
+    min-height: 40px;
+    padding: var(--space-2) var(--space-3);
+  }
+  
+  .btn-lg {
+    min-height: 48px;
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+/* 移动端导航优化 */
+@media (max-width: 768px) {
+  /* 顶部导航栏 */
+  header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  /* 为固定导航栏添加页面顶部边距 */
+  main {
+    padding-top: 80px;
+  }
+  
+  /* 移动端Logo调整 */
+  .logo-text {
+    font-size: var(--text-base);
+  }
+  
+  /* 隐藏桌面端导航 */
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+/* =========================
+   移动端表格优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 横向滚动表格容器 */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-primary);
+  }
+  
+  .admin-table {
+    min-width: 600px; /* 最小宽度确保表格内容可读 */
+    border: none;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: var(--space-3) var(--space-4);
+    white-space: nowrap;
+  }
+  
+  /* 移动端表格卡片化 */
+  .mobile-card-table {
+    display: block;
+  }
+  
+  .mobile-card-table thead {
+    display: none;
+  }
+  
+  .mobile-card-table tbody {
+    display: block;
+  }
+  
+  .mobile-card-table tr {
+    display: block;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .mobile-card-table td {
+    display: block;
+    border: none;
+    padding: var(--space-2) 0;
+    position: relative;
+    padding-left: 120px;
+  }
+  
+  .mobile-card-table td::before {
+    content: attr(data-label) ": ";
+    position: absolute;
+    left: 0;
+    width: 110px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-tertiary);
+    font-size: var(--text-sm);
+  }
+}
+
+/* =========================
+   移动端卡片优化
+   ========================= */
+
+@media (max-width: 768px) {
+  .card {
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+  }
+  
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: var(--space-4);
+  }
+  
+  .card-title {
+    font-size: var(--text-lg);
+  }
+  
+  /* 统计卡片移动端布局 */
+  .stat-card {
+    padding: var(--space-4);
+  }
+  
+  .stat-card-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+  }
+}
+
+/* =========================
+   移动端表单优化
+   ========================= */
+
+@media (max-width: 768px) {
+  .form-input,
+  .form-textarea {
+    font-size: 16px; /* 防止iOS自动缩放 */
+    border-radius: var(--radius-md);
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  /* 表单按钮组 */
+  .form-actions {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =========================
+   移动端Toast通知优化
+   ========================= */
+
+@media (max-width: 768px) {
+  .toast {
+    right: var(--space-4);
+    left: var(--space-4);
+    max-width: none;
+    top: var(--space-20); /* 避免被固定导航遮挡 */
+  }
+  
+  .toast-title {
+    font-size: var(--text-sm);
+  }
+  
+  .toast-message {
+    font-size: var(--text-sm);
+  }
+}
+
+/* =========================
+   移动端侧边栏优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 侧边栏动画优化 */
+  .mobile-sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  
+  /* 遮罩层优化 */
+  .mobile-overlay {
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+  }
+  
+  /* 侧边栏内容优化 */
+  .mobile-nav-link {
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    border-radius: var(--radius-md);
+  }
+  
+  .mobile-nav-link i {
+    width: 24px;
+    text-align: center;
+  }
+}
+
+/* =========================
+   移动端网格系统优化
+   ========================= */
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .col-span-2,
+  .col-span-3,
+  .col-span-4,
+  .col-span-6,
+  .col-span-12 {
+    grid-column: span 1 / span 1;
+  }
+  
+  /* 强制单列布局 */
+  .mobile-single-col {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================
+   移动端文字优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 标题层级调整 */
+  .text-5xl { font-size: var(--text-3xl); }
+  .text-4xl { font-size: var(--text-2xl); }
+  .text-3xl { font-size: var(--text-xl); }
+  .text-2xl { font-size: var(--text-lg); }
+  
+  /* 行高优化 */
+  h1, h2, h3 {
+    line-height: var(--line-height-tight);
+  }
+  
+  p {
+    line-height: var(--line-height-relaxed);
+  }
+  
+  /* 长文本处理 */
+  .mobile-text-wrap {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* =========================
+   移动端间距优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 页面边距调整 */
+  .container {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+  
+  /* 区域间距调整 */
+  .section-spacing {
+    padding: var(--space-8) 0;
+  }
+  
+  .mb-8 { margin-bottom: var(--space-6); }
+  .mb-12 { margin-bottom: var(--space-8); }
+  .mb-16 { margin-bottom: var(--space-10); }
+  .mb-20 { margin-bottom: var(--space-12); }
+  
+  .py-20 { padding: var(--space-12) 0; }
+  .py-16 { padding: var(--space-10) 0; }
+  .py-12 { padding: var(--space-8) 0; }
+}
+
+/* =========================
+   移动端交互优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 触摸反馈 */
+  .btn:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .card:active {
+    transform: scale(0.995);
+    transition: transform 0.1s ease;
+  }
+  
+  /* 长按选择禁用 */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* 滚动优化 */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* =========================
+   移动端性能优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 硬件加速优化 */
+  .hw-accelerate {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* 滚动性能优化 */
+  .scroll-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0);
+  }
+  
+  /* 动画性能优化 */
+  .animate-mobile {
+    will-change: transform, opacity;
+  }
+  
+  .animate-mobile.finished {
+    will-change: auto;
+  }
+}
+
+/* =========================
+   移动端可访问性优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 焦点指示器增强 */
+  .focus-visible:focus-visible {
+    outline: 3px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+  
+  /* 最小触摸目标 */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 屏幕阅读器优化 */
+  .sr-only-mobile {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* =========================
+   PWA支持优化
+   ========================= */
+
+@media (max-width: 768px) {
+  /* 全屏应用样式 */
+  .pwa-fullscreen {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* 状态栏适配 */
+  .status-bar-safe {
+    padding-top: calc(var(--space-4) + env(safe-area-inset-top));
+  }
+}
+
+/* =========================
+   暗黑模式移动端优化
+   ========================= */
+
+@media (max-width: 768px) {
+  [data-theme="dark"] {
+    /* 移动端暗黑模式对比度增强 */
+    --text-primary: var(--neutral-50);
+    --text-secondary: var(--neutral-200);
+    --bg-primary: var(--neutral-950);
+    --bg-secondary: var(--neutral-900);
+  }
+  
+  [data-theme="dark"] .mobile-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* =========================
+   横屏模式优化
+   ========================= */
+
+@media (max-width: 768px) and (orientation: landscape) {
+  /* 横屏时优化导航栏高度 */
+  header {
+    height: 56px;
+  }
+  
+  main {
+    padding-top: 72px;
+  }
+  
+  /* 横屏时调整间距 */
+  .py-20 { padding: var(--space-8) 0; }
+  .py-16 { padding: var(--space-6) 0; }
+  
+  /* 横屏时优化表单 */
+  .form-group {
+    margin-bottom: var(--space-3);
+  }
+}
+
+/* =========================
+   超小屏幕优化 (< 375px)
+   ========================= */
+
+@media (max-width: 374px) {
+  .container {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+  
+  .btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+  
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: var(--space-3);
+  }
+  
+  .stat-card {
+    padding: var(--space-3);
+  }
+  
+  .text-2xl { font-size: var(--text-lg); }
+  .text-xl { font-size: var(--text-base); }
+} 

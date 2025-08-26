@@ -1,0 +1,1 @@
+{"title":"无边框Tab组件重构","features":["移除tab边框样式","保持tab切换功能","现代化UI设计","响应式布局"],"tech":{"Web":{"arch":"EJS模板","component":"现有CSS框架"}},"design":"在现有EJS模板基础上，移除tab按钮的边框样式，保持简洁的现代化设计风格","plan":{"分析现有EJS模板结构":"done","定位需要修改的tab按钮":"done","移除btn-outline类实现无边框效果":"done","验证修改效果":"done"}}

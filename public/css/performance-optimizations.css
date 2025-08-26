@@ -1,0 +1,362 @@
+/**
+ * HTML-GO 性能优化CSS
+ * 包含关键渲染路径优化和资源加载优化
+ */
+
+/* =========================
+   关键CSS - 首屏必要样式
+   ========================= */
+
+/* 基础重置 - 防止样式闪烁 */
+*,::before,::after{box-sizing:border-box;border:0 solid var(--border-primary)}*{margin:0;padding:0}html{line-height:1.5;-webkit-text-size-adjust:100%;font-feature-settings:normal;font-variation-settings:normal}body{margin:0;line-height:inherit;font-family:var(--font-family-body);color:var(--text-primary);background-color:var(--bg-primary);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* 关键布局样式 */
+.min-h-screen{min-height:100vh}
+.bg-primary{background-color:var(--bg-primary)}
+.bg-secondary{background-color:var(--bg-secondary)}
+.bg-elevated{background-color:var(--bg-elevated)}
+.flex{display:flex}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.h-16{height:4rem}
+.px-4{padding-left:1rem;padding-right:1rem}
+.py-8{padding-top:2rem;padding-bottom:2rem}
+.text-primary{color:var(--text-primary)}
+.text-secondary{color:var(--text-secondary)}
+.font-display{font-family:var(--font-family-display)}
+.font-semibold{font-weight:600}
+.text-lg{font-size:1.125rem}
+.text-xl{font-size:1.25rem}
+.text-2xl{font-size:1.5rem}
+
+/* 导航关键样式 */
+.sticky{position:sticky}
+.top-0{top:0}
+.z-40{z-index:40}
+.z-50{z-index:50}
+.border-b{border-bottom-width:1px}
+.border-primary{border-color:var(--border-primary)}
+.shadow-sm{box-shadow:var(--shadow-sm)}
+
+/* 按钮关键样式 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.5rem 1rem;font-weight:500;text-decoration:none;border:1px solid transparent;border-radius:0.5rem;cursor:pointer;transition:all 0.2s ease}
+.btn-primary{color:#fff;background-color:var(--brand-600);border-color:var(--brand-600)}
+.btn-ghost{color:var(--text-primary);background-color:transparent}
+
+/* =========================
+   资源加载优化
+   ========================= */
+
+/* 图片优化 */
+img {
+  max-width: 100%;
+  height: auto;
+  loading: lazy;
+  decoding: async;
+}
+
+/* 关键图片预加载 */
+.hero-image,
+.logo-image {
+  loading: eager;
+  decoding: sync;
+}
+
+/* WebP支持检测 */
+.webp-support img[data-webp] {
+  content: attr(data-webp);
+}
+
+/* =========================
+   字体加载优化
+   ========================= */
+
+/* 字体显示优化 */
+@font-face {
+  font-family: 'Inter';
+  font-display: swap;
+  /* 确保文本立即显示，即使字体还在加载 */
+}
+
+@font-face {
+  font-family: 'Inter Display';
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-display: swap;
+}
+
+/* 字体回退优化 */
+.font-display {
+  font-family: 'Inter Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.font-body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* =========================
+   CSS加载优化
+   ========================= */
+
+/* 关键CSS以上的样式防止FOUC */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-primary);
+  border-top: 3px solid var(--brand-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* =========================
+   渐进式增强
+   ========================= */
+
+/* 基础功能样式（无JavaScript时也能工作） */
+.no-js .mobile-sidebar {
+  transform: translateX(0);
+  position: static;
+  width: auto;
+}
+
+.no-js .mobile-overlay {
+  display: none;
+}
+
+.no-js .btn-loading::after {
+  display: none;
+}
+
+/* JavaScript增强后的样式 */
+.js .enhanced-features {
+  display: block;
+}
+
+/* =========================
+   GPU加速优化
+   ========================= */
+
+/* 动画元素硬件加速 */
+.animate-element,
+.btn,
+.card,
+.toast,
+.mobile-sidebar {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 滚动优化 */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+.scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translate3d(0, 0, 0);
+}
+
+/* =========================
+   网络优化
+   ========================= */
+
+/* 慢网络适配 */
+@media (prefers-reduced-data: reduce) {
+  /* 在慢网络或省流量模式下隐藏非关键图片 */
+  .non-critical-image {
+    display: none;
+  }
+  
+  /* 简化动画 */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* 减少阴影和渐变 */
+  .card {
+    box-shadow: none;
+    border: 1px solid var(--border-primary);
+  }
+}
+
+/* =========================
+   打印优化
+   ========================= */
+
+@media print {
+  /* 打印时优化 */
+  .no-print,
+  .btn,
+  .mobile-sidebar,
+  .mobile-overlay,
+  .toast {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+  
+  .print-no-break {
+    page-break-inside: avoid;
+  }
+  
+  /* 确保文本颜色在打印时可读 */
+  body {
+    color: #000 !important;
+    background: #fff !important;
+  }
+  
+  .card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* =========================
+   可访问性优化
+   ========================= */
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .loading-spinner {
+    animation: none;
+    border-top-color: var(--brand-600);
+  }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  :root {
+    --border-primary: #000;
+    --text-primary: #000;
+    --text-secondary: #333;
+    --bg-primary: #fff;
+    --bg-secondary: #f5f5f5;
+  }
+  
+  [data-theme="dark"] {
+    --border-primary: #fff;
+    --text-primary: #fff;
+    --text-secondary: #ccc;
+    --bg-primary: #000;
+    --bg-secondary: #111;
+  }
+}
+
+/* =========================
+   响应式图片
+   ========================= */
+
+/* 响应式图片容器 */
+.responsive-image {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.responsive-image img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+/* 图片懒加载占位符 */
+.image-placeholder {
+  background: linear-gradient(90deg, var(--neutral-200) 25%, var(--neutral-100) 37%, var(--neutral-200) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: -100% 50%; }
+}
+
+/* =========================
+   缓存优化提示
+   ========================= */
+
+/* 
+  资源缓存策略：
+  1. CSS/JS 文件：长期缓存（版本控制）
+  2. 图片：中期缓存
+  3. HTML：短期缓存或无缓存
+  4. 字体：长期缓存
+  
+  使用 Service Worker 进行离线缓存
+  使用 CDN 进行静态资源分发
+*/
+
+/* =========================
+   性能监控
+   ========================= */
+
+/* 关键渲染路径标记 */
+.perf-mark {
+  /* 用于性能测量的标记元素 */
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* =========================
+   压缩优化
+   ========================= */
+
+/* 
+  CSS压缩建议：
+  1. 移除注释
+  2. 移除空格和换行
+  3. 压缩颜色值
+  4. 合并相同规则
+  5. 移除未使用的CSS
+  
+  启用 Gzip/Brotli 压缩
+  使用 PostCSS 进行自动优化
+*/ 

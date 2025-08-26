@@ -1,0 +1,102 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp",
+        "--headless",
+        "--isolated",
+        "--browser",
+        "chromium"
+      ],
+      "env": {
+        "PWDEBUG": "0"
+      }
+    },
+    "thinking": {
+      "timeout": 60,
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "firecrawl-mcp": {
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-fb517db9678943239b91549db907c503"
+      }
+    },
+    "playwright-mcp": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@microsoft/playwright-mcp",
+        "--key",
+        "c1138375-5aab-4d27-aaba-8f331226b6bc",
+        "--profile",
+        "slow-toad-MYeV8S"
+      ]
+    },
+    "exa": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "exa",
+        "--key",
+        "c1138375-5aab-4d27-aaba-8f331226b6bc",
+        "--profile",
+        "slow-toad-MYeV8S"
+      ]
+    },
+    "context7-mcp": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@upstash/context7-mcp",
+        "--key",
+        "c1138375-5aab-4d27-aaba-8f331226b6bc",
+        "--profile",
+        "slow-toad-MYeV8S"
+      ]
+    },
+    "mcp-server-chart": {
+      "disabled": true,
+      "timeout": 60,
+      "type": "sse",
+      "url": "https://mcp.api-inference.modelscope.net/a21f65d920e345/sse"
+    }
+  }
+}

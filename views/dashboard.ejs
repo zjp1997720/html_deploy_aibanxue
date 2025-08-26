@@ -1,62 +1,464 @@
-<%- include('partials/header', { title }) %>
+<% 
+// 设置页面数据
+const currentPath = '/admin/dashboard';
+const title = '概览';
+const breadcrumb = [
+    { title: '管理后台', url: '/admin/dashboard' },
+    { title: '概览' }
+];
+%>
 
-<style>
-  .dashboard-container { max-width: 1200px; margin: 2rem auto; padding: 2rem; }
-  .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
-  .dashboard-table th, .dashboard-table td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; }
-  .dashboard-table th { background-color: rgba(var(--primary-rgb), 0.1); font-family: 'Orbitron', sans-serif; }
-  .dashboard-table a { color: var(--primary); text-decoration: none; }
-  .dashboard-table a:hover { text-decoration: underline; }
-  .status-protected { color: #f43f5e; font-weight: bold; }
-  .status-public { color: #10b981; }
-</style>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - HTML-GO 管理后台</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="icon" href="/icon/web/favicon.ico">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <!-- 顶部导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <span class="brand-icon">🚀</span>
+                    <span class="brand-text">HTML-GO Admin</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span class="toggle-icon">☰</span>
+                </button>
+            </div>
+            <div class="nav-right">
+                <div class="nav-user">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name">管理员</span>
+                    <div class="user-dropdown">
+                        <a href="/admin/settings" class="dropdown-item">⚙️ 设置</a>
+                        <a href="/logout" class="dropdown-item logout">🚪 退出登录</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-<div class="main-container">
-  <header class="app-header">
-    <div class="title-container">
-      <h1 class="cyber-title"><span>A</span><span>D</span><span>M</span><span>I</span><span>N</span></h1>
+        <!-- 侧边导航栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/admin/dashboard" class="nav-link <%= currentPath === '/admin/dashboard' ? 'active' : '' %>" data-page="dashboard">
+                            <span class="nav-icon">📊</span>
+                            <span class="nav-text">概览</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/pages" class="nav-link <%= currentPath === '/admin/pages' ? 'active' : '' %>" data-page="pages">
+                            <span class="nav-icon">📄</span>
+                            <span class="nav-text">页面管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/apikeys" class="nav-link <%= currentPath === '/admin/apikeys' ? 'active' : '' %>" data-page="apikeys">
+                            <span class="nav-icon">🔑</span>
+                            <span class="nav-text">API Key管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/settings" class="nav-link <%= currentPath === '/admin/settings' ? 'active' : '' %>" data-page="settings">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-text">系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- 快捷操作 -->
+                <div class="sidebar-footer">
+                    <div class="quick-actions">
+                        <a href="/" class="quick-link" target="_blank" title="查看前台">🌐 前台</a>
+                        <a href="/admin/pages/new" class="quick-link" title="创建页面">➕ 新建</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content" id="mainContent">
+            <!-- 面包屑导航 -->
+            <div class="breadcrumb-container">
+                <nav class="breadcrumb">
+                    <% if (typeof breadcrumb !== 'undefined' && breadcrumb && breadcrumb.length > 0) { %>
+                        <% breadcrumb.forEach((item, index) => { %>
+                            <% if (index > 0) { %>
+                                <span class="breadcrumb-separator">/</span>
+                            <% } %>
+                            <% if (item.url && index < breadcrumb.length - 1) { %>
+                                <a href="<%= item.url %>" class="breadcrumb-link"><%= item.title %></a>
+                            <% } else { %>
+                                <span class="breadcrumb-current"><%= item.title %></span>
+                            <% } %>
+                        <% }) %>
+                    <% } else { %>
+                        <span class="breadcrumb-current">管理后台</span>
+                    <% } %>
+                </nav>
+            </div>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h1>📊 概览</h1>
+                    <p>系统运行状态和数据统计</p>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-content">
+                            <h3>总页面数</h3>
+                            <div class="stat-value"><%= pages.length %></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🔒</div>
+                        <div class="stat-content">
+                            <h3>受保护页面</h3>
+                            <div class="stat-value"><%= pages.filter(p => p.is_protected).length %></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🌐</div>
+                        <div class="stat-content">
+                            <h3>公开页面</h3>
+                            <div class="stat-value"><%= pages.filter(p => !p.is_protected).length %></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <h3>今日访问</h3>
+                            <div class="stat-value">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷操作 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>快捷操作</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions-grid">
+                            <a href="/admin/pages" class="action-btn">
+                                <span class="action-icon">📄</span>
+                                <span class="action-text">管理页面</span>
+                            </a>
+                            <a href="/admin/apikeys" class="action-btn">
+                                <span class="action-icon">🔑</span>
+                                <span class="action-text">API Keys</span>
+                            </a>
+                            <a href="/" class="action-btn" target="_blank">
+                                <span class="action-icon">🌐</span>
+                                <span class="action-text">查看前台</span>
+                            </a>
+                            <a href="/admin/settings" class="action-btn">
+                                <span class="action-icon">⚙️</span>
+                                <span class="action-text">系统设置</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近页面 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>最近创建的页面</h3>
+                        <a href="/admin/pages" class="btn btn-sm btn-primary">查看全部</a>
+                    </div>
+                    <div class="card-body">
+                        <% if (pages.length > 0) { %>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>页面 ID</th>
+                                            <th>名称</th>
+                                            <th>类型</th>
+                                            <th>创建时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% pages.slice(0, 10).forEach(function(page) { %>
+                                            <tr>
+                                                <td>
+                                                    <code class="page-id"><%= page.id %></code>
+                                                </td>
+                                                <td>
+                                                    <a href="/view/<%= page.id %>" target="_blank" class="page-link">
+                                                        <%= page.name || 'HTML-' + page.id %>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge badge-<%= page.code_type %>">
+                                                        <%= page.code_type.toUpperCase() %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <time class="time-ago" datetime="<%= page.created_at %>">
+                                                        <%= formatDate(page.created_at) %>
+                                                    </time>
+                                                </td>
+                                                <td>
+                                                    <% if (page.is_protected) { %>
+                                                        <span class="status-badge status-protected">🔒 受保护</span>
+                                                    <% } else { %>
+                                                        <span class="status-badge status-public">🌐 公开</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <a href="/view/<%= page.id %>" target="_blank" class="btn btn-sm btn-secondary" title="查看页面">👁️</a>
+                                                        <button onclick="copyPageUrl('<%= page.id %>')" class="btn btn-sm btn-info" title="复制链接">📋</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="empty-state">
+                                <div class="empty-icon">📄</div>
+                                <h3>还没有页面</h3>
+                                <p>创建第一个页面开始使用吧！</p>
+                                <a href="/" class="btn btn-primary">创建页面</a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <p class="app-description">已部署页面列表</p>
-  </header>
 
-  <div class="card dashboard-container">
-    <table class="dashboard-table">
-      <thead>
-        <tr>
-          <th>页面 ID</th>
-          <th>代码类型</th>
-          <th>创建时间</th>
-          <th>状态</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (pages.length > 0) { %>
-          <% pages.forEach(function(page) { %>
-            <tr>
-              <td><a href="/view/<%= page.id %>" target="_blank"><%= page.id %></a></td>
-              <td><%= page.code_type.toUpperCase() %></td>
-              <td><%= formatDate(page.created_at) %></td>
-              <td>
-                <% if (page.is_protected) { %>
-                  <span class="status-protected">加密</span>
-                <% } else { %>
-                  <span class="status-public">公开</span>
-                <% } %>
-              </td>
-            </tr>
-          <% }); %>
-        <% } else { %>
-          <tr>
-            <td colspan="4" style="text-align: center;">暂无已部署的页面</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
+    <!-- 移动端遮罩 -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
 
-  <footer class="app-footer">
-    <p class="footer-text">@2025 <a href="https://x.com/vista8" target="_blank" rel="noopener noreferrer">向阳乔木</a></p>
-  </footer>
-</div>
+    <!-- 页面专用样式 -->
+    <style>
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-<%- include('partials/footer') %>
+        .stat-card {
+            background: white;
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--admin-shadow);
+            transition: var(--admin-transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--admin-shadow-lg);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .stat-content h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.875rem;
+            color: var(--admin-secondary);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--admin-primary);
+        }
+
+        /* 快捷操作网格 */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            background: var(--admin-light);
+            border: 1px solid var(--admin-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--admin-dark);
+            transition: var(--admin-transition);
+        }
+
+        .action-btn:hover {
+            background: var(--admin-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+        }
+
+        .action-text {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* 卡片头部样式增强 */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--admin-dark);
+        }
+
+        /* 表格增强 */
+        .page-id {
+            background: var(--admin-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .page-link {
+            color: var(--admin-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .page-link:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .badge-html { background: #fef3c7; color: #92400e; }
+        .badge-markdown { background: #dbeafe; color: #1e40af; }
+        .badge-svg { background: #ecfdf5; color: #065f46; }
+        .badge-mermaid { background: #fce7f3; color: #be185d; }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-protected {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .status-public {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .time-ago {
+            color: var(--admin-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--admin-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--admin-dark);
+        }
+
+        .empty-state p {
+            margin: 0 0 1.5rem 0;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <script src="/js/admin-common.js"></script>
+    <script>
+        // 复制页面URL功能
+        function copyPageUrl(pageId) {
+            const url = `${window.location.origin}/view/${pageId}`;
+            AdminApp.copyToClipboard(url);
+        }
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 更新时间显示
+            document.querySelectorAll('.time-ago').forEach(el => {
+                const timestamp = parseInt(el.getAttribute('datetime'));
+                const date = new Date(timestamp);
+                el.textContent = AdminApp.formatDate(date, 'MM-DD HH:mm');
+            });
+        });
+    </script>
+</body>
+</html>

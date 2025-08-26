@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - HTML-GO</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="HTML-GO 登录页面">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- Favicons -->
+  <link rel="icon" href="/icon/web/favicon.ico">
+  <link rel="apple-touch-icon" href="/icon/web/apple-touch-icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  <link rel="stylesheet" href="/css/mobile-optimizations.css">
+  
+  <!-- Theme Script -->
+  <script>
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</head>
+<body>
+  <div id="app" class="min-h-screen bg-secondary">
+    <!-- 登录页面容器 -->
+    <main class="min-h-screen flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md">
+        <!-- Logo和标题 -->
+        <div class="text-center mb-8">
+          <div class="flex items-center justify-center gap-3 mb-4">
+            <div class="text-3xl">🚀</div>
+            <h1 class="text-2xl font-display font-bold text-primary">HTML-GO</h1>
+          </div>
+          <p class="text-secondary">分享AI生成内容的最佳方式</p>
+        </div>
+        
+        <!-- 登录卡片 -->
+        <div class="card">
+          <div class="card-header text-center">
+            <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-lock text-xl"></i>
+            </div>
+            <h2 class="card-title">访问验证</h2>
+            <p class="card-description">请输入访问密码以继续</p>
+          </div>
+          
+          <div class="card-body">
+            <!-- 错误信息 -->
+            <% if (typeof error !== 'undefined' && error) { %>
+              <div class="mb-6 p-4 bg-error-50 border border-error-200 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-exclamation-triangle text-error-600"></i>
+                  <span class="text-sm font-medium text-error-800"><%= error %></span>
+                </div>
+              </div>
+            <% } %>
+            
+            <!-- 登录表单 -->
+            <form action="/login" method="post" class="space-y-6">
+              <div class="form-group">
+                <label for="password" class="form-label form-label-required">
+                  <i class="fas fa-key mr-2"></i>
+                  访问密码
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-input w-full"
+                  placeholder="请输入密码"
+                  required
+                  autocomplete="current-password"
+                  autofocus
+                >
+                <p class="form-help">请联系管理员获取访问密码</p>
+              </div>
+              
+              <button type="submit" class="btn btn-primary w-full btn-lg">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                登录
+              </button>
+            </form>
+          </div>
+          
+          <div class="card-footer">
+            <div class="flex items-center justify-between text-sm">
+              <button 
+                id="theme-toggle" 
+                class="btn btn-ghost btn-sm tooltip"
+                data-tooltip="切换主题"
+                type="button"
+              >
+                <i class="fas fa-sun" id="theme-icon"></i>
+                <span class="ml-2">切换主题</span>
+              </button>
+              <span class="text-tertiary">安全登录</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 页脚信息 -->
+        <div class="text-center mt-8">
+          <p class="text-xs text-tertiary">
+            © 2025 HTML-GO. 专业的内容分享平台
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Toast容器 -->
+  <div id="toast-container" class="fixed top-6 right-6 z-50 space-y-2"></div>
+  
+  <!-- 移动端优化 -->
+  <script src="/js/mobile-optimizer.js"></script>
+  
+  <!-- 页面脚本 -->
+  <script>
+    // 主题切换
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    function updateThemeIcon() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      themeIcon.className = currentTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+    
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+    }
+    
+    updateThemeIcon();
+    themeToggle?.addEventListener('click', toggleTheme);
+    
+    // 表单增强
+    const form = document.querySelector('form');
+    const submitBtn = form?.querySelector('button[type="submit"]');
+    const passwordInput = document.getElementById('password');
+    
+    // 表单提交处理
+    form?.addEventListener('submit', function(e) {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>验证中...';
+        submitBtn.classList.add('btn-loading');
+      }
+    });
+    
+    // 密码输入优化
+    passwordInput?.addEventListener('input', function() {
+      // 清除之前的错误状态
+      this.classList.remove('form-input-error');
+      const errorMsg = document.querySelector('.bg-error-50');
+      if (errorMsg) {
+        errorMsg.style.opacity = '0.5';
+      }
+    });
+    
+    // 回车键提交
+    passwordInput?.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        form?.dispatchEvent(new Event('submit'));
+      }
+    });
+    
+    // 自动聚焦密码输入框
+    window.addEventListener('load', () => {
+      passwordInput?.focus();
+    });
+    
+    // 页面加载动画
+    document.addEventListener('DOMContentLoaded', () => {
+      const card = document.querySelector('.card');
+      if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100);
+      }
+    });
+  </script>
+  
+  <!-- 页面特定样式 -->
+  <style>
+    /* 登录页面特定样式 */
+    .login-card-animation {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 聚焦状态增强 */
+    .form-input:focus {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* 按钮加载状态 */
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+    }
+    
+    /* 移动端优化 */
+    @media (max-width: 640px) {
+      .card-header,
+      .card-body,
+      .card-footer {
+        padding: var(--space-5);
+      }
+      
+      .btn-lg {
+        height: 48px;
+        font-size: var(--text-base);
+      }
+    }
+    
+    /* 暗黑模式优化 */
+    [data-theme="dark"] .bg-error-50 {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+    
+    [data-theme="dark"] .text-error-800 {
+      color: #fca5a5;
+    }
+  </style>
+</body>
+</html> 

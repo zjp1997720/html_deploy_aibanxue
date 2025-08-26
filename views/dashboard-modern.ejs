@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>概览 - HTML-GO 管理后台</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="HTML-GO 管理后台">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- Favicons -->
+  <link rel="icon" href="/icon/web/favicon.ico">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  <link rel="stylesheet" href="/css/mobile-optimizations.css">
+  
+  <!-- Theme Script -->
+  <script>
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</head>
+<body>
+  <div id="app" class="min-h-screen bg-secondary">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-40 bg-elevated border-b border-primary shadow-sm">
+      <div class="px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- 左侧：Logo和导航 -->
+          <div class="flex items-center gap-8">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+              <div class="text-2xl">🚀</div>
+              <h1 class="text-lg font-display font-semibold text-primary">
+                HTML-GO <span class="text-sm text-tertiary font-normal">Admin</span>
+              </h1>
+            </div>
+            
+            <!-- 移动端菜单按钮 -->
+            <button 
+              id="mobile-menu-btn"
+              class="md:hidden btn btn-ghost btn-sm btn-icon"
+              aria-label="打开菜单"
+            >
+              <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- 桌面端导航 -->
+            <nav class="hidden md:flex items-center gap-1">
+              <a href="/admin/dashboard" class="nav-link active">
+                <i class="fas fa-chart-line mr-2"></i>
+                概览
+              </a>
+              <a href="/admin/pages" class="nav-link">
+                <i class="fas fa-file-alt mr-2"></i>
+                页面管理
+              </a>
+              <a href="/admin/apikeys" class="nav-link">
+                <i class="fas fa-key mr-2"></i>
+                API Keys
+              </a>
+            </nav>
+          </div>
+          
+          <!-- 右侧：工具栏 -->
+          <div class="flex items-center gap-3">
+            <!-- 快捷操作 -->
+            <a 
+              href="/" 
+              target="_blank"
+              class="hidden sm:flex btn btn-ghost btn-sm tooltip"
+              data-tooltip="查看前台"
+            >
+              <i class="fas fa-external-link-alt mr-2"></i>
+              前台
+            </a>
+            
+            <!-- 主题切换 -->
+            <button 
+              id="theme-toggle" 
+              class="btn btn-ghost btn-sm btn-icon tooltip"
+              data-tooltip="切换主题"
+            >
+              <i class="fas fa-sun" id="theme-icon"></i>
+            </button>
+            
+            <!-- 分隔线 -->
+            <div class="w-px h-6 bg-border-primary"></div>
+            
+            <!-- 用户菜单 -->
+            <div class="relative" id="user-menu">
+              <button 
+                class="flex items-center gap-2 p-2 rounded-lg hover:bg-surface-hover transition-colors"
+                id="user-menu-btn"
+              >
+                <div class="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  A
+                </div>
+                <span class="hidden sm:block text-sm font-medium text-primary">管理员</span>
+                <i class="fas fa-chevron-down text-xs text-tertiary"></i>
+              </button>
+              
+              <!-- 下拉菜单 -->
+              <div 
+                id="user-dropdown"
+                class="absolute right-0 top-full mt-1 w-48 bg-elevated border border-primary rounded-lg shadow-lg hidden z-50"
+              >
+                <div class="p-2">
+                  <a href="/admin/settings" class="dropdown-item">
+                    <i class="fas fa-cog mr-2"></i>
+                    系统设置
+                  </a>
+                  <div class="divider my-2"></div>
+                  <a href="/logout" class="dropdown-item text-error-600">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    退出登录
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- 移动端侧边栏遮罩 -->
+    <div 
+      id="mobile-overlay"
+      class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden hidden"
+    ></div>
+    
+    <!-- 移动端侧边栏 -->
+    <aside 
+      id="mobile-sidebar"
+      class="fixed left-0 top-16 bottom-0 w-64 bg-elevated border-r border-primary transform -translate-x-full transition-transform z-40 md:hidden"
+    >
+      <nav class="p-4 space-y-2">
+        <a href="/admin/dashboard" class="mobile-nav-link active">
+          <i class="fas fa-chart-line mr-3"></i>
+          概览
+        </a>
+        <a href="/admin/pages" class="mobile-nav-link">
+          <i class="fas fa-file-alt mr-3"></i>
+          页面管理
+        </a>
+        <a href="/admin/apikeys" class="mobile-nav-link">
+          <i class="fas fa-key mr-3"></i>
+          API Keys
+        </a>
+        <div class="divider my-4"></div>
+        <a href="/" target="_blank" class="mobile-nav-link">
+          <i class="fas fa-external-link-alt mr-3"></i>
+          查看前台
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- 主内容区域 -->
+    <main class="px-4 sm:px-6 lg:px-8 py-8">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-display font-semibold text-primary mb-2">
+          <i class="fas fa-chart-line mr-3 text-brand-600"></i>
+          系统概览
+        </h2>
+        <p class="text-secondary">查看系统运行状态和关键指标</p>
+      </div>
+      
+      <!-- 统计卡片网格 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- 总页面数 -->
+        <div class="stat-card">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-tertiary mb-1">总页面数</p>
+              <p class="text-2xl font-bold text-primary"><%= pages.length %></p>
+            </div>
+            <div class="stat-card-icon bg-brand-100 text-brand-600">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 受保护页面 -->
+        <div class="stat-card">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-tertiary mb-1">受保护页面</p>
+              <p class="text-2xl font-bold text-primary"><%= pages.filter(p => p.is_protected).length %></p>
+            </div>
+            <div class="stat-card-icon bg-warning-50 text-warning-600">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 公开页面 -->
+        <div class="stat-card">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-tertiary mb-1">公开页面</p>
+              <p class="text-2xl font-bold text-primary"><%= pages.filter(p => !p.is_protected).length %></p>
+            </div>
+            <div class="stat-card-icon bg-success-50 text-success-600">
+              <i class="fas fa-globe"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 今日创建 -->
+        <div class="stat-card">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-tertiary mb-1">今日创建</p>
+              <p class="text-2xl font-bold text-primary">-</p>
+            </div>
+            <div class="stat-card-icon bg-error-50 text-error-600">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 内容区域 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- 最近页面 -->
+        <div class="lg:col-span-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">最近创建的页面</h3>
+              <a href="/admin/pages" class="btn btn-outline btn-sm">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                查看全部
+              </a>
+            </div>
+            <div class="card-body p-0">
+              <% if (pages.length > 0) { %>
+                <div class="overflow-x-auto">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>页面信息</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% pages.slice(0, 5).forEach(function(page) { %>
+                        <tr>
+                          <td>
+                            <div class="flex items-center gap-3">
+                              <div class="w-10 h-10 bg-brand-100 text-brand-600 rounded-lg flex items-center justify-center text-sm font-medium">
+                                <i class="fas fa-file-alt"></i>
+                              </div>
+                              <div>
+                                <p class="font-medium text-primary truncate max-w-48">
+                                  <%= page.name || 'HTML-' + page.id %>
+                                </p>
+                                <p class="text-xs text-tertiary font-mono">
+                                  ID: <%= page.id %>
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge badge-<%= page.code_type === 'html' ? 'primary' : page.code_type === 'markdown' ? 'secondary' : 'success' %>">
+                              <%= page.code_type.toUpperCase() %>
+                            </span>
+                          </td>
+                          <td>
+                            <% if (page.is_protected) { %>
+                              <span class="inline-flex items-center gap-1 px-2 py-1 bg-warning-50 text-warning-700 text-xs font-medium rounded-md">
+                                <i class="fas fa-lock text-xs"></i>
+                                受保护
+                              </span>
+                            <% } else { %>
+                              <span class="inline-flex items-center gap-1 px-2 py-1 bg-success-50 text-success-700 text-xs font-medium rounded-md">
+                                <i class="fas fa-globe text-xs"></i>
+                                公开
+                              </span>
+                            <% } %>
+                          </td>
+                          <td>
+                            <time class="text-sm text-secondary" datetime="<%= page.created_at %>">
+                              <%= formatDate(page.created_at) %>
+                            </time>
+                          </td>
+                          <td>
+                            <div class="flex items-center gap-1">
+                              <a 
+                                href="/view/<%= page.id %>" 
+                                target="_blank" 
+                                class="btn btn-ghost btn-sm btn-icon tooltip"
+                                data-tooltip="查看页面"
+                              >
+                                <i class="fas fa-eye"></i>
+                              </a>
+                              <button 
+                                onclick="copyPageUrl('<%= page.id %>')" 
+                                class="btn btn-ghost btn-sm btn-icon tooltip"
+                                data-tooltip="复制链接"
+                              >
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } else { %>
+                <div class="flex flex-col items-center justify-center py-12">
+                  <div class="w-16 h-16 bg-neutral-100 text-neutral-400 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-file-alt text-2xl"></i>
+                  </div>
+                  <h3 class="text-lg font-medium text-primary mb-2">还没有页面</h3>
+                  <p class="text-secondary text-center mb-6">创建第一个页面开始使用吧！</p>
+                  <a href="/" class="btn btn-primary">
+                    <i class="fas fa-plus mr-2"></i>
+                    创建页面
+                  </a>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 快捷操作 -->
+        <div class="space-y-6">
+          <!-- 快捷操作卡片 -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">快捷操作</h3>
+            </div>
+            <div class="card-body">
+              <div class="space-y-3">
+                <a href="/" target="_blank" class="btn btn-outline w-full justify-start">
+                  <i class="fas fa-plus mr-3 text-brand-600"></i>
+                  <div class="text-left">
+                    <div class="font-medium">创建页面</div>
+                    <div class="text-xs text-tertiary">快速创建新的分享页面</div>
+                  </div>
+                </a>
+                
+                <a href="/admin/pages" class="btn btn-outline w-full justify-start">
+                  <i class="fas fa-file-alt mr-3 text-success-600"></i>
+                  <div class="text-left">
+                    <div class="font-medium">管理页面</div>
+                    <div class="text-xs text-tertiary">查看和管理所有页面</div>
+                  </div>
+                </a>
+                
+                <a href="/admin/apikeys" class="btn btn-outline w-full justify-start">
+                  <i class="fas fa-key mr-3 text-warning-600"></i>
+                  <div class="text-left">
+                    <div class="font-medium">API 管理</div>
+                    <div class="text-xs text-tertiary">管理API密钥和权限</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 系统状态 -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">系统状态</h3>
+            </div>
+            <div class="card-body">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-success-500 rounded-full"></div>
+                    <span class="text-sm font-medium">服务状态</span>
+                  </div>
+                  <span class="text-sm text-success-600 font-medium">运行中</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-success-500 rounded-full"></div>
+                    <span class="text-sm font-medium">数据库</span>
+                  </div>
+                  <span class="text-sm text-success-600 font-medium">正常</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-warning-500 rounded-full"></div>
+                    <span class="text-sm font-medium">存储空间</span>
+                  </div>
+                  <span class="text-sm text-warning-600 font-medium">良好</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Toast容器 -->
+  <div id="toast-container" class="fixed top-20 right-6 z-50 space-y-2"></div>
+  
+  <!-- 通用样式 -->
+  <style>
+    /* 导航链接样式 */
+    .nav-link {
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: var(--duration-200) var(--easing-standard);
+      transition-property: color, background-color;
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+      background-color: var(--surface-hover);
+    }
+    
+    .nav-link.active {
+      background-color: var(--brand-600);
+      color: var(--neutral-0);
+    }
+    
+    .nav-link.active:hover {
+      background-color: var(--brand-700);
+    }
+    
+    /* 移动端导航链接 */
+    .mobile-nav-link {
+      display: block;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: var(--duration-200) var(--easing-standard);
+      transition-property: color, background-color;
+    }
+    
+    .mobile-nav-link:hover {
+      color: var(--text-primary);
+      background-color: var(--surface-hover);
+    }
+    
+    .mobile-nav-link.active {
+      background-color: var(--brand-600);
+      color: var(--neutral-0);
+    }
+    
+    /* 下拉菜单项 */
+    .dropdown-item {
+      display: block;
+      padding: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: var(--duration-200) var(--easing-standard);
+      transition-property: color, background-color;
+    }
+    
+    .dropdown-item:hover {
+      color: var(--text-primary);
+      background-color: var(--surface-hover);
+    }
+    
+    /* 表格样式增强 */
+    .admin-table {
+      width: 100%;
+      background-color: var(--bg-elevated);
+      border-collapse: collapse;
+    }
+    
+    .admin-table th {
+      padding: var(--space-4) var(--space-6);
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+    
+    .admin-table td {
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+    
+    .admin-table tbody tr:hover {
+      background-color: var(--surface-hover);
+    }
+    
+    .admin-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      transition: box-shadow var(--duration-200) var(--easing-standard);
+    }
+    
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .stat-card-icon {
+      width: var(--space-12);
+      height: var(--space-12);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xl);
+    }
+  </style>
+  
+  <!-- 移动端优化 -->
+  <script src="/js/mobile-optimizer.js"></script>
+  
+  <!-- 全局JavaScript -->
+  <script>
+    // 主题切换
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    function updateThemeIcon() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      themeIcon.className = currentTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+    
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+    }
+    
+    updateThemeIcon();
+    themeToggle?.addEventListener('click', toggleTheme);
+    
+    // 用户菜单
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userDropdown = document.getElementById('user-dropdown');
+    
+    userMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('hidden');
+    });
+    
+    document.addEventListener('click', () => {
+      userDropdown?.classList.add('hidden');
+    });
+    
+    // 移动端菜单
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileSidebar = document.getElementById('mobile-sidebar');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    
+    function toggleMobileMenu() {
+      const isOpen = !mobileSidebar.classList.contains('-translate-x-full');
+      
+      if (isOpen) {
+        mobileSidebar.classList.add('-translate-x-full');
+        mobileOverlay.classList.add('hidden');
+      } else {
+        mobileSidebar.classList.remove('-translate-x-full');
+        mobileOverlay.classList.remove('hidden');
+      }
+    }
+    
+    mobileMenuBtn?.addEventListener('click', toggleMobileMenu);
+    mobileOverlay?.addEventListener('click', toggleMobileMenu);
+    
+    // 全局工具函数
+    window.AdminUtils = {
+      showToast(message, type = 'info', duration = 5000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        
+        const iconMap = {
+          success: 'fas fa-check',
+          error: 'fas fa-times',
+          warning: 'fas fa-exclamation-triangle',
+          info: 'fas fa-info-circle'
+        };
+        
+        toast.innerHTML = 
+          '<div class="toast-icon">' +
+            '<i class="' + (iconMap[type] || iconMap.info) + '"></i>' +
+          '</div>' +
+          '<div class="toast-content">' +
+            '<p class="toast-message">' + message + '</p>' +
+          '</div>' +
+          '<button class="toast-close" onclick="this.parentElement.remove()">' +
+            '<i class="fas fa-times text-xs"></i>' +
+          '</button>';
+        
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      },
+      
+      async copyToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          this.showToast('已复制到剪贴板', 'success');
+          return true;
+        } catch (err) {
+          this.showToast('复制失败', 'error');
+          return false;
+        }
+      }
+    };
+    
+    // 页面特定功能
+    function copyPageUrl(pageId) {
+      const url = window.location.origin + '/view/' + pageId;
+      AdminUtils.copyToClipboard(url);
+    }
+  </script>
+</body>
+</html> 

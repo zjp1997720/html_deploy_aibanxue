@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -57,13 +57,31 @@ jobs:
       - name: Copy files to server via sshpass+scp
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no release.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/release.tar.gz
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no version.json $SERVER_USER@$SERVER_HOST:/tmp/version.json
+          echo "==> Copying release.tar.gz to server"
+          sshpass -p "$SERVER_PASSWORD" scp \
+            -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o TCPKeepAlive=yes \
+            release.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/release.tar.gz
+          echo "==> Copying version.json to server"
+          sshpass -p "$SERVER_PASSWORD" scp \
+            -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o TCPKeepAlive=yes \
+            version.json $SERVER_USER@$SERVER_HOST:/tmp/version.json
 
       - name: Remote deploy via SSH (PM2)
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
-          set -e
+          sshpass -p "$SERVER_PASSWORD" ssh \
+            -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o TCPKeepAlive=yes \
+            $SERVER_USER@$SERVER_HOST << 'EOF'
+          set -Eeuo pipefail
+          echo "==> Connected to server, starting deploy script"
           WORKDIR="/root/html_deploy_aibanxue"
           mkdir -p "$WORKDIR"
           cd "$WORKDIR"
@@ -99,9 +117,12 @@ jobs:
             echo "✅ Restored .env file"
           fi
 
+          echo "==> Node version on server: $(node -v || echo 'node not found')"
+
           # 安装/更新依赖
           if command -v npm >/dev/null 2>&1; then
-            npm ci --omit=dev || npm install --production
+            echo "==> Installing production dependencies"
+            npm ci --omit=dev --no-audit --no-fund || npm install --omit=dev --no-audit --no-fund
           else
             echo "❌ npm not found"
             exit 1
@@ -109,7 +130,14 @@ jobs:
           echo "✅ Updated dependencies"
 
           # 使用PM2进行零停机重启
+          echo "==> Reloading PM2 process: html-go"
           pm2 reload html-go || pm2 restart html-go
+          PM2_EXIT=$?
+          if [ "$PM2_EXIT" -ne 0 ]; then
+            echo "❌ PM2 reload/restart failed with code $PM2_EXIT"
+            pm2 logs html-go --lines 80 || true
+            exit $PM2_EXIT
+          fi
           echo "✅ Reloaded PM2 service"
 
           # 清理临时文件
@@ -118,7 +146,12 @@ jobs:
 
       - name: Verify service health
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
+          sshpass -p "$SERVER_PASSWORD" ssh \
+            -o StrictHostKeyChecking=no \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o TCPKeepAlive=yes \
+            $SERVER_USER@$SERVER_HOST << 'EOF'
           set -euo pipefail
           echo '=== PM2 Status ==='
           pm2 status html-go || { echo 'PM2 status failed'; exit 1; }

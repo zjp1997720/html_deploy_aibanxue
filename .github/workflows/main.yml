@@ -45,15 +45,13 @@ jobs:
           SHORT_SHA=$(git rev-parse --short HEAD)
           BUILD_TIME=$(date -u +%FT%TZ)
           BRANCH_NAME=${GITHUB_REF_NAME:-unknown}
-          cat > version.json <<VERS
-          {
-            "commit": "${GITHUB_SHA}",
-            "shortCommit": "${SHORT_SHA}",
-            "branch": "${BRANCH_NAME}",
-            "buildTime": "${BUILD_TIME}",
-            "runner": "github-actions"
-          }
-VERS
+          printf '%s\n' '{' \
+            "  \"commit\": \"${GITHUB_SHA}\"," \
+            "  \"shortCommit\": \"${SHORT_SHA}\"," \
+            "  \"branch\": \"${BRANCH_NAME}\"," \
+            "  \"buildTime\": \"${BUILD_TIME}\"," \
+            "  \"runner\": \"github-actions\"" \
+            '}' > version.json
           cat version.json
 
       - name: Copy files to server via sshpass+scp

@@ -82,10 +82,25 @@ jobs:
 
       - name: Verify service health
         run: |
-          sleep 3
-          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
+          set -euo pipefail
           echo '=== PM2 Status ==='
-          pm2 status html-go
-          echo '=== Service Health Check ==='
-          curl -fsS http://127.0.0.1:8888/ || echo 'Health check failed - service may still be starting'
-          echo '=== Deployment Complete ==='" 
+          pm2 status html-go || { echo 'PM2 status failed'; exit 1; }
+          echo '=== Waiting for app readiness on 127.0.0.1:8888 ==='
+          READY=0
+          for i in {1..30}; do
+            if curl -fsS -m 3 http://127.0.0.1:8888/ -o /dev/null; then
+              echo "✅ App is ready (attempt $i)"
+              READY=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$READY" -ne 1 ]; then
+            echo '❌ Health check failed after 30 attempts'
+            echo '=== Recent PM2 Logs ==='
+            pm2 logs html-go --lines 80 || true
+            exit 1
+          fi
+          echo '=== Deployment Complete ==='
+          EOF

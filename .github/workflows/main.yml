@@ -39,10 +39,28 @@ jobs:
           git archive --format=tar.gz -o release.tar.gz HEAD
           ls -lh release.tar.gz
 
+      - name: Generate version file
+        run: |
+          set -e
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BUILD_TIME=$(date -u +%FT%TZ)
+          BRANCH_NAME=${GITHUB_REF_NAME:-unknown}
+          cat > version.json <<VERS
+          {
+            "commit": "${GITHUB_SHA}",
+            "shortCommit": "${SHORT_SHA}",
+            "branch": "${BRANCH_NAME}",
+            "buildTime": "${BUILD_TIME}",
+            "runner": "github-actions"
+          }
+VERS
+          cat version.json
+
       - name: Copy files to server via sshpass+scp
         run: |
           sudo apt-get update && sudo apt-get install -y sshpass
           sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no release.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/release.tar.gz
+          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no version.json $SERVER_USER@$SERVER_HOST:/tmp/version.json
 
       - name: Remote deploy via SSH (PM2)
         run: |
@@ -51,31 +69,51 @@ jobs:
           WORKDIR="/root/html_deploy_aibanxue"
           mkdir -p "$WORKDIR"
           cd "$WORKDIR"
-          
+
           # 备份当前.env文件
           if [ -f .env ]; then
             cp .env .env.backup
             echo "✅ Backed up .env file"
           fi
-          
+
+          # 在解压前清理旧代码，保留关键目录（避免旧文件残留导致未更新）
+          echo "🧹 Cleaning old code (preserving .env, db, sessions, node_modules)"
+          find "$WORKDIR" -mindepth 1 -maxdepth 1 \
+            -not -name '.env' \
+            -not -name 'db' \
+            -not -name 'sessions' \
+            -not -name 'node_modules' \
+            -exec rm -rf {} +
+
           # 解压新代码（git archive仅包含受管文件，.env不会被覆盖）
           tar -xzf /tmp/release.tar.gz -C "$WORKDIR"
           echo "✅ Extracted new code"
-          
+
+          # 写入版本文件（用于 /version 接口与缓存控制）
+          if [ -f /tmp/version.json ]; then
+            mv /tmp/version.json "$WORKDIR/version.json"
+            echo "✅ Installed version.json"
+          fi
+
           # 恢复.env文件
           if [ -f .env.backup ]; then
             mv .env.backup .env
             echo "✅ Restored .env file"
           fi
-          
+
           # 安装/更新依赖
-          npm install --production
+          if command -v npm >/dev/null 2>&1; then
+            npm ci --omit=dev || npm install --production
+          else
+            echo "❌ npm not found"
+            exit 1
+          fi
           echo "✅ Updated dependencies"
-          
+
           # 使用PM2进行零停机重启
           pm2 reload html-go || pm2 restart html-go
           echo "✅ Reloaded PM2 service"
-          
+
           # 清理临时文件
           rm -f /tmp/release.tar.gz .env.backup
           EOF

@@ -21,6 +21,17 @@ console.log('环境变量:', {
   AUTH_PASSWORD: process.env.AUTH_PASSWORD
 });
 
+// 版本信息（由 CI 在部署时写入 version.json）
+let versionInfo = { commit: process.env.GIT_COMMIT || 'unknown', buildTime: process.env.BUILD_TIME || null, branch: process.env.GIT_BRANCH || null };
+try {
+  const vPath = path.join(__dirname, 'version.json');
+  if (fs.existsSync(vPath)) {
+    versionInfo = JSON.parse(fs.readFileSync(vPath, 'utf8'));
+  }
+} catch (e) {
+  console.warn('读取 version.json 失败，将使用默认版本信息');
+}
+
 // 导入认证中间件
 const { isAuthenticated, isAuthenticatedOrApiKey } = require('./middleware/auth');
 const { apiKeyAuth, validateApiKeyMiddleware, requirePermissions } = require('./middleware/apiKey');
@@ -66,6 +77,11 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限�
 app.use(cookieParser()); // 解析 Cookie
 app.use('/static', express.static(path.join(__dirname, 'public'))); // 静态文件
 app.use(express.static(path.join(__dirname, 'public'))); // 兼容旧路径 /css /js /icon
+
+// 版本查询接口
+app.get('/version', (req, res) => {
+  res.json({ success: true, data: versionInfo });
+});
 
 // 创建会话目录
 const sessionDir = path.join(__dirname, 'sessions');

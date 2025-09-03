@@ -3,7 +3,11 @@
 # 设置环境变量
 export NODE_ENV=production
 export AUTH_ENABLED=true
-export AUTH_PASSWORD=qq778899
+
+# 从.env文件读取密码（如果存在）
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
 
 # 创建会话目录并设置权限
 mkdir -p sessions

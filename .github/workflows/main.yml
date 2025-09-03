@@ -12,7 +12,7 @@ jobs:
     env:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
-      SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       WORKDIR: /root/html_deploy_aibanxue
 
     steps:
@@ -56,123 +56,110 @@ jobs:
             '}' > version.json
           cat version.json
 
-      - name: Copy files to server via sshpass+scp
-        run: |
-          sudo apt-get update && sudo apt-get install -y sshpass
-          echo "==> Copying release.tar.gz to server"
-          sshpass -p "$SERVER_PASSWORD" scp \
-            -o StrictHostKeyChecking=no \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o TCPKeepAlive=yes \
-            release.tar.gz $SERVER_USER@$SERVER_HOST:/tmp/release.tar.gz
-          echo "==> Copying version.json to server"
-          sshpass -p "$SERVER_PASSWORD" scp \
-            -o StrictHostKeyChecking=no \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o TCPKeepAlive=yes \
-            version.json $SERVER_USER@$SERVER_HOST:/tmp/version.json
+      - name: Copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          source: "release.tar.gz,version.json"
+          target: "/tmp/"
 
-      - name: Remote deploy via SSH (PM2)
-        run: |
-          sshpass -p "$SERVER_PASSWORD" ssh \
-            -o StrictHostKeyChecking=no \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o TCPKeepAlive=yes \
-            $SERVER_USER@$SERVER_HOST << 'EOF'
-          set -Eeuo pipefail
-          echo "==> Connected to server, starting deploy script"
-          WORKDIR="/root/html_deploy_aibanxue"
-          mkdir -p "$WORKDIR"
-          cd "$WORKDIR"
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            set -Eeuo pipefail
+            echo "==> Connected to server, starting deploy script"
+            WORKDIR="/root/html_deploy_aibanxue"
+            mkdir -p "$WORKDIR"
+            cd "$WORKDIR"
 
-          # 备份当前.env文件
-          if [ -f .env ]; then
-            cp .env .env.backup
-            echo "✅ Backed up .env file"
-          fi
+            # 备份当前.env文件
+            if [ -f .env ]; then
+              cp .env .env.backup
+              echo "✅ Backed up .env file"
+            fi
 
-          # 在解压前清理旧代码，保留关键目录（避免旧文件残留导致未更新）
-          echo "🧹 Cleaning old code (preserving .env, db, sessions, node_modules)"
-          find "$WORKDIR" -mindepth 1 -maxdepth 1 \
-            -not -name '.env' \
-            -not -name 'db' \
-            -not -name 'sessions' \
-            -not -name 'node_modules' \
-            -exec rm -rf {} +
+            # 在解压前清理旧代码，保留关键目录（避免旧文件残留导致未更新）
+            echo "🧹 Cleaning old code (preserving .env, db, sessions, node_modules)"
+            find "$WORKDIR" -mindepth 1 -maxdepth 1 \
+              -not -name '.env' \
+              -not -name 'db' \
+              -not -name 'sessions' \
+              -not -name 'node_modules' \
+              -exec rm -rf {} +
 
-          # 解压新代码（git archive仅包含受管文件，.env不会被覆盖）
-          tar -xzf /tmp/release.tar.gz -C "$WORKDIR"
-          echo "✅ Extracted new code"
+            # 解压新代码（git archive仅包含受管文件，.env不会被覆盖）
+            tar -xzf /tmp/release.tar.gz -C "$WORKDIR"
+            echo "✅ Extracted new code"
 
-          # 写入版本文件（用于 /version 接口与缓存控制）
-          if [ -f /tmp/version.json ]; then
-            mv /tmp/version.json "$WORKDIR/version.json"
-            echo "✅ Installed version.json"
-          fi
+            # 写入版本文件（用于 /version 接口与缓存控制）
+            if [ -f /tmp/version.json ]; then
+              mv /tmp/version.json "$WORKDIR/version.json"
+              echo "✅ Installed version.json"
+            fi
 
-          # 恢复.env文件
-          if [ -f .env.backup ]; then
-            mv .env.backup .env
-            echo "✅ Restored .env file"
-          fi
+            # 恢复.env文件
+            if [ -f .env.backup ]; then
+              mv .env.backup .env
+              echo "✅ Restored .env file"
+            fi
 
-          echo "==> Node version on server: $(node -v || echo 'node not found')"
+            echo "==> Node version on server: $(node -v || echo 'node not found')"
 
-          # 安装/更新依赖（跳过 puppeteer 下载）
-          if command -v npm >/dev/null 2>&1; then
-            echo "==> Installing production dependencies"
-            export PUPPETEER_SKIP_DOWNLOAD=1
-            npm ci --omit=dev --no-audit --no-fund || npm install --omit=dev --no-audit --no-fund
-          else
-            echo "❌ npm not found"
-            exit 1
-          fi
-          echo "✅ Updated dependencies"
+            # 安装/更新依赖（跳过 puppeteer 下载）
+            if command -v npm >/dev/null 2>&1; then
+              echo "==> Installing production dependencies"
+              export PUPPETEER_SKIP_DOWNLOAD=1
+              npm ci --omit=dev --no-audit --no-fund || npm install --omit=dev --no-audit --no-fund
+            else
+              echo "❌ npm not found"
+              exit 1
+            fi
+            echo "✅ Updated dependencies"
 
-          # 使用PM2进行零停机重启
-          echo "==> Reloading PM2 process: html-go"
-          pm2 reload html-go || pm2 restart html-go
-          PM2_EXIT=$?
-          if [ "$PM2_EXIT" -ne 0 ]; then
-            echo "❌ PM2 reload/restart failed with code $PM2_EXIT"
-            pm2 logs html-go --lines 80 || true
-            exit $PM2_EXIT
-          fi
-          echo "✅ Reloaded PM2 service"
+            # 使用PM2进行零停机重启
+            echo "==> Reloading PM2 process: html-go"
+            pm2 reload html-go || pm2 restart html-go
+            PM2_EXIT=$?
+            if [ "$PM2_EXIT" -ne 0 ]; then
+              echo "❌ PM2 reload/restart failed with code $PM2_EXIT"
+              pm2 logs html-go --lines 80 || true
+              exit $PM2_EXIT
+            fi
+            echo "✅ Reloaded PM2 service"
 
-          # 清理临时文件
-          rm -f /tmp/release.tar.gz .env.backup
-          EOF
+            # 清理临时文件
+            rm -f /tmp/release.tar.gz /tmp/version.json .env.backup
 
       - name: Verify service health
-        run: |
-          sshpass -p "$SERVER_PASSWORD" ssh \
-            -o StrictHostKeyChecking=no \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o TCPKeepAlive=yes \
-            $SERVER_USER@$SERVER_HOST << 'EOF'
-          set -euo pipefail
-          echo '=== PM2 Status ==='
-          pm2 status html-go || { echo 'PM2 status failed'; exit 1; }
-          echo '=== Waiting for app readiness on 127.0.0.1:8888 ==='
-          READY=0
-          for i in {1..30}; do
-            if curl -fsS -m 3 http://127.0.0.1:8888/ -o /dev/null; then
-              echo "✅ App is ready (attempt $i)"
-              READY=1
-              break
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            echo '=== PM2 Status ==='
+            pm2 status html-go || { echo 'PM2 status failed'; exit 1; }
+            echo '=== Waiting for app readiness on 127.0.0.1:8888 ==='
+            READY=0
+            for i in {1..30}; do
+              if curl -fsS -m 3 http://127.0.0.1:8888/ -o /dev/null; then
+                echo "✅ App is ready (attempt $i)"
+                READY=1
+                break
+              fi
+              sleep 2
+            done
+            if [ "$READY" -ne 1 ]; then
+              echo '❌ Health check failed after 30 attempts'
+              echo '=== Recent PM2 Logs ==='
+              pm2 logs html-go --lines 80 || true
+              exit 1
             fi
-            sleep 2
-          done
-          if [ "$READY" -ne 1 ]; then
-            echo '❌ Health check failed after 30 attempts'
-            echo '=== Recent PM2 Logs ==='
-            pm2 logs html-go --lines 80 || true
-            exit 1
-          fi
-          echo '=== Deployment Complete ==='
-          EOF
+            echo '=== Deployment Complete ==='

@@ -1,0 +1,163 @@
+{
+  "timestamp": "2025-09-03T00:00:00.000Z",
+  "project": "html_deploy_project",
+  "analysis": {
+    "totalFiles": 13353,
+    "scannedFiles": 50,
+    "coveragePercentage": 0.37,
+    "modules": [
+      {
+        "name": "root",
+        "path": ".",
+        "type": "main",
+        "entry": "app.js",
+        "description": "主应用模块",
+        "scanned": true,
+        "coverage": 100,
+        "documentation": "complete"
+      },
+      {
+        "name": "models",
+        "path": "./models",
+        "type": "data",
+        "entry": "db.js",
+        "description": "数据模型模块",
+        "scanned": true,
+        "coverage": 100,
+        "documentation": "complete"
+      },
+      {
+        "name": "routes",
+        "path": "./routes",
+        "type": "api",
+        "entry": "pages.js",
+        "description": "路由模块",
+        "scanned": true,
+        "coverage": 100,
+        "documentation": "complete"
+      },
+      {
+        "name": "middleware",
+        "path": "./middleware",
+        "type": "middleware",
+        "entry": "auth.js",
+        "description": "中间件模块",
+        "scanned": true,
+        "coverage": 100,
+        "documentation": "complete"
+      },
+      {
+        "name": "utils",
+        "path": "./utils",
+        "type": "utility",
+        "entry": "memoryOptimizer.js",
+        "description": "工具模块",
+        "scanned": true,
+        "coverage": 100,
+        "documentation": "complete"
+      },
+      {
+        "name": "views",
+        "path": "./views",
+        "type": "ui",
+        "entry": "index-modern.ejs",
+        "description": "视图模板模块",
+        "scanned": false,
+        "coverage": 0,
+        "documentation": "basic"
+      },
+      {
+        "name": "public",
+        "path": "./public",
+        "type": "static",
+        "entry": "js/main.js",
+        "description": "静态资源模块",
+        "scanned": false,
+        "coverage": 0,
+        "documentation": "basic"
+      },
+      {
+        "name": "scripts",
+        "path": "./scripts",
+        "type": "deployment",
+        "entry": "deploy.sh",
+        "description": "部署脚本模块",
+        "scanned": false,
+        "coverage": 0,
+        "documentation": "basic"
+      },
+      {
+        "name": "tests",
+        "path": "./tests",
+        "type": "test",
+        "entry": "phase2-test.js",
+        "description": "测试模块",
+        "scanned": false,
+        "coverage": 0,
+        "documentation": "basic"
+      },
+      {
+        "name": "docs",
+        "path": "./docs",
+        "type": "documentation",
+        "entry": "API-Documentation-v2.md",
+        "description": "文档模块",
+        "scanned": false,
+        "coverage": 0,
+        "documentation": "basic"
+      }
+    ],
+    "ignoredFiles": {
+      "node_modules": 13303,
+      "git": 50,
+      "totalIgnored": 13353
+    },
+    "keyFindings": {
+      "architecture": "Express.js MVC with modular structure",
+      "database": "SQLite3 with file-based sessions",
+      "authentication": "Multi-auth (session, API token, API key)",
+      "features": [
+        "HTML code sharing with password protection",
+        "Admin dashboard with API key management",
+        "Performance monitoring and memory optimization",
+        "Content rendering (HTML, Markdown, Mermaid, SVG)",
+        "Docker deployment with CI/CD pipeline"
+      ],
+      "apiVersions": [
+        "Legacy API (/api/pages/*)",
+        "Modern API (/api/v2/pages/*)",
+        "Admin API (/api/admin/*)"
+      ],
+      "gaps": [
+        "View templates not fully analyzed",
+        "Static assets not detailed review",
+        "Test coverage not evaluated",
+        "Documentation depth varies by module"
+      ]
+    },
+    "nextSteps": [
+      "Deep scan view templates for complete UI architecture analysis",
+      "Analyze static assets and frontend JavaScript structure",
+      "Review test coverage and quality metrics",
+      "Enhance documentation for less-covered modules"
+    ],
+    "documentationStatus": {
+      "completeModules": 5,
+      "basicModules": 5,
+      "totalModules": 10,
+      "completionPercentage": 50,
+      "generatedFiles": [
+        "CLAUDE.md",
+        "models/CLAUDE.md",
+        "routes/CLAUDE.md",
+        "middleware/CLAUDE.md",
+        "utils/CLAUDE.md",
+        "views/CLAUDE.md",
+        "public/CLAUDE.md",
+        "scripts/CLAUDE.md",
+        "tests/CLAUDE.md",
+        "docs/CLAUDE.md"
+      ]
+    }
+  }
+}

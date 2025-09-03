@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     container_name: html-go
     restart: unless-stopped
     env_file:
@@ -15,8 +16,23 @@ services:
       - ./db:/usr/src/app/db
       - ./sessions:/usr/src/app/sessions
       - ./public:/usr/src/app/public:ro
+      - ./logs:/var/log/html-go
     networks:
       - web
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
 networks:
   web:

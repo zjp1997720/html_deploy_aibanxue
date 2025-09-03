@@ -4,12 +4,15 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const compression = require('compression');
 const morgan = require('morgan');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const fs = require('fs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { initDatabase } = require('./models/db');
 
 // 添加调试日志
@@ -38,6 +41,12 @@ const { apiKeyAuth, validateApiKeyMiddleware, requirePermissions } = require('./
 
 // 导入性能监控中间件
 const { responseTimeMonitor, getPerformanceStats, getDetailedPerformanceReport, cleanupOldLogs } = require('./middleware/responseTimeMonitor');
+
+// 导入监控中间件
+const { monitoringMiddleware, getStats, healthCheck, getPrometheusMetrics } = require('./middleware/monitoring');
+
+// 导入告警管理器
+const alertManager = require('./utils/alertManager');
 
 // 导入内存优化工具
 const { 
@@ -69,14 +78,92 @@ const PORT = config.port;
 // 将配置添加到应用本地变量中，便于在中间件中访问
 app.locals.config = config;
 
+// 安全中间件设置
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "https:"],
+      fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// 响应压缩
+app.use(compression({
+  level: 6, // 压缩级别 (1-9, 6是默认值)
+  threshold: 1024, // 只有大于1KB的响应才压缩
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      // 不压缩x-no-compression头
+      return false;
+    }
+    // 默认压缩所有响应
+    return compression.filter(req, res);
+  }
+}));
+
+// 配置CORS
+const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
+app.use(cors({
+  origin: corsOrigins,
+  credentials: true,
+}));
+
+// API限流
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分钟
+  max: 100, // 限制每个IP 15分钟内最多100个请求
+  message: {
+    success: false,
+    error: '请求过于频繁，请稍后再试'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// 页面创建限流
+const createLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1小时
+  max: 20, // 限制每个IP每小时最多创建20个页面
+  message: {
+    success: false,
+    error: '创建页面过于频繁，请稍后再试'
+  },
+  skipSuccessfulRequests: true,
+});
+
 // 中间件设置
 app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
-app.use(cors()); // 跨域支持
 app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15MB
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
 app.use(cookieParser()); // 解析 Cookie
-app.use('/static', express.static(path.join(__dirname, 'public'))); // 静态文件
-app.use(express.static(path.join(__dirname, 'public'))); // 兼容旧路径 /css /js /icon
+
+// 静态资源缓存
+const staticOptions = {
+  maxAge: process.env.NODE_ENV === 'production' ? 365 * 24 * 60 * 60 * 1000 : 0, // 生产环境缓存1年
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      // HTML文件不缓存
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (/\.(js|css|png|jpg|jpeg|gif|ico|svg)$/.test(path)) {
+      // 静态资源长期缓存
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+};
+
+app.use('/static', express.static(path.join(__dirname, 'public'), staticOptions)); // 静态文件
+app.use(express.static(path.join(__dirname, 'public'), staticOptions)); // 兼容旧路径 /css /js /icon
 
 // 版本查询接口
 app.get('/version', (req, res) => {
@@ -138,6 +225,49 @@ app.set('view engine', 'ejs');
 // ===== Phase 3: 性能监控中间件 =====
 app.use(responseTimeMonitor);
 console.log('✅ 性能监控中间件已启用');
+
+// ===== 监控中间件 =====
+app.use(monitoringMiddleware);
+console.log('✅ 监控中间件已启用');
+
+// 监控相关路由
+// 健康检查
+app.get('/health', healthCheck);
+
+// 监控统计
+app.get('/admin/stats', isAuthenticated, (req, res) => {
+  res.json({ success: true, data: getStats() });
+});
+
+// Prometheus 指标
+app.get('/metrics', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.send(getPrometheusMetrics());
+});
+
+// 告警管理路由
+app.get('/admin/alerts', isAuthenticated, (req, res) => {
+  res.json({ 
+    success: true, 
+    data: {
+      active: alertManager.getActiveAlerts(),
+      history: alertManager.getAlertHistory()
+    }
+  });
+});
+
+app.post('/admin/alerts/:alertId/resolve', isAuthenticated, (req, res) => {
+  const { alertId } = req.params;
+  alertManager.resolveAlert(alertId);
+  res.json({ success: true, message: '告警已解决' });
+});
+
+app.post('/admin/alerts/:name/suppress', isAuthenticated, (req, res) => {
+  const { name } = req.params;
+  const { duration = 3600000 } = req.body;
+  alertManager.suppressAlert(name, duration);
+  res.json({ success: true, message: `告警 ${name} 已抑制` });
+});
 
 // 登录路由
 app.get('/login', (req, res) => {
@@ -238,8 +368,11 @@ app.post('/api/pages/create', isAuthenticatedOrApiKey, async (req, res) => {
   }
 });
 
+// 应用API限流
+app.use('/api/', apiLimiter);
+
 // 其他 API 不需要认证
-app.use('/api/pages', pagesRoutes);
+app.use('/api/pages', createLimiter, pagesRoutes);
 
 // 密码验证路由 - 用于AJAX验证
 app.get('/validate-password/:id', async (req, res) => {
@@ -320,6 +453,14 @@ app.get('/admin/pages', isAuthenticated, (req, res) => {
   res.render('admin/pages', {
     title: '页面管理 - HTML-GO Admin',
     currentPath: '/admin/pages'
+  });
+});
+
+// 系统监控页面
+app.get('/admin/monitoring', isAuthenticated, (req, res) => {
+  res.render('admin/monitoring', {
+    title: '系统监控 - HTML-GO Admin',
+    currentPath: '/admin/monitoring'
   });
 });
 

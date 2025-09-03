@@ -1,0 +1,128 @@
+{
+  "name": "html-go-express",
+  "version": "1.0.0",
+  "description": "HTML代码分享工具 - Express版本",
+  "main": "app.js",
+  "scripts": {
+    "start": "NODE_ENV=production node --max-old-space-size=1024 app.js",
+    "dev": "cross-env NODE_ENV=development nodemon app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest tests/__tests__/unit",
+    "test:integration": "jest tests/__tests__/integration",
+    "test:e2e": "playwright test",
+    "test:performance": "node tests/performance/load-test.js",
+    "test:security": "jest tests/__tests__/security",
+    "test:ci": "npm run test:coverage && npm run test:e2e",
+    "test:report": "node scripts/generate-test-report.js",
+    "prod": "NODE_ENV=production node --max-old-space-size=1024 app.js"
+  },
+  "keywords": [
+    "html",
+    "share",
+    "express",
+    "ejs",
+    "testing",
+    "jest",
+    "playwright"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "jsdom": "^26.0.0",
+    "marked": "^15.0.7",
+    "mermaid": "^11.6.0",
+    "mermaid-render": "^1.0.9",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.7.0",
+    "session-file-store": "^1.5.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "cross-env": "^10.0.0",
+    "nodemon": "^2.0.22",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "@types/jest": "^29.5.8",
+    "@types/supertest": "^2.0.16",
+    "nyc": "^15.1.0",
+    "istanbul-reporter": "^3.0.0",
+    "jest-environment-node": "^29.7.0",
+    "jest-html-reporter": "^3.10.2",
+    "express-xss-clean": "^0.6.0",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "loadtest": "^8.0.9"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html",
+      "clover"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/",
+      "/coverage/",
+      "/test-results/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "testTimeout": 10000,
+    "verbose": true,
+    "collectCoverageFrom": [
+      "app.js",
+      "models/**/*.js",
+      "routes/**/*.js",
+      "middleware/**/*.js",
+      "utils/**/*.js",
+      "!**/node_modules/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov",
+      "html",
+      "clover"
+    ],
+    "exclude": [
+      "**/tests/**",
+      "**/coverage/**",
+      "**/node_modules/**",
+      "**/test-results/**"
+    ],
+    "check-coverage": true,
+    "branches": 70,
+    "functions": 70,
+    "lines": 70,
+    "statements": 70
+  }
+}

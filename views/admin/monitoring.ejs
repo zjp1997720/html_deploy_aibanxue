@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统监控 - HTML代码分享工具</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <style>
+        .metric-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .status-healthy { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-critical { color: #dc3545; }
+        .alert-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .alert-warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+        .alert-critical { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; border: 1px solid #bee5eb; }
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="admin-nav">
+            <a href="/admin/dashboard" class="active">控制台</a>
+            <a href="/admin/pages">页面管理</a>
+            <a href="/admin/apikeys">API密钥</a>
+            <a href="/admin/monitoring" class="active">系统监控</a>
+            <a href="/admin/settings">设置</a>
+            <a href="/logout">退出</a>
+        </nav>
+
+        <div class="admin-content">
+            <h1>系统监控</h1>
+            
+            <div class="grid">
+                <!-- 系统状态 -->
+                <div class="metric-card">
+                    <div class="metric-label">系统状态</div>
+                    <div class="metric-value status-healthy" id="systemStatus">健康</div>
+                </div>
+                
+                <!-- 运行时间 -->
+                <div class="metric-card">
+                    <div class="metric-label">运行时间</div>
+                    <div class="metric-value" id="uptime">-</div>
+                </div>
+                
+                <!-- 内存使用 -->
+                <div class="metric-card">
+                    <div class="metric-label">内存使用率</div>
+                    <div class="metric-value" id="memoryUsage">-</div>
+                </div>
+                
+                <!-- 平均响应时间 -->
+                <div class="metric-card">
+                    <div class="metric-label">平均响应时间</div>
+                    <div class="metric-value" id="avgResponseTime">-</div>
+                </div>
+            </div>
+
+            <!-- 请求统计 -->
+            <div class="metric-card full-width">
+                <h3>请求统计</h3>
+                <div class="grid">
+                    <div>
+                        <div class="metric-label">总请求数</div>
+                        <div class="metric-value" id="totalRequests">0</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">成功请求</div>
+                        <div class="metric-value status-healthy" id="successRequests">0</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">错误请求</div>
+                        <div class="metric-value status-critical" id="errorRequests">0</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">限流请求</div>
+                        <div class="metric-value status-warning" id="rateLimitedRequests">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 活跃告警 -->
+            <div class="metric-card full-width">
+                <h3>活跃告警</h3>
+                <div id="activeAlerts">
+                    <p>暂无活跃告警</p>
+                </div>
+            </div>
+
+            <!-- 热点端点 -->
+            <div class="metric-card full-width">
+                <h3>热点端点</h3>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>路径</th>
+                                <th>请求数</th>
+                                <th>平均响应时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topEndpoints">
+                            <tr>
+                                <td colspan="3" class="text-center">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取监控数据
+        async function fetchStats() {
+            try {
+                const response = await fetch('/admin/stats');
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateDashboard(result.data);
+                }
+            } catch (error) {
+                console.error('获取监控数据失败:', error);
+            }
+        }
+
+        // 更新仪表板
+        function updateDashboard(data) {
+            // 更新系统状态
+            const isHealthy = data.memory.percentage < 90 && data.responseTime.avg < 1000;
+            const statusEl = document.getElementById('systemStatus');
+            statusEl.textContent = isHealthy ? '健康' : '异常';
+            statusEl.className = `metric-value ${isHealthy ? 'status-healthy' : 'status-critical'}`;
+
+            // 更新运行时间
+            document.getElementById('uptime').textContent = formatUptime(data.uptime);
+
+            // 更新内存使用
+            const memoryEl = document.getElementById('memoryUsage');
+            memoryEl.textContent = data.memory.percentage + '%';
+            memoryEl.className = `metric-value ${
+                data.memory.percentage > 90 ? 'status-critical' : 
+                data.memory.percentage > 80 ? 'status-warning' : 'status-healthy'
+            }`;
+
+            // 更新响应时间
+            const responseEl = document.getElementById('avgResponseTime');
+            responseEl.textContent = data.responseTime.avg + 'ms';
+            responseEl.className = `metric-value ${
+                data.responseTime.avg > 2000 ? 'status-critical' : 
+                data.responseTime.avg > 1000 ? 'status-warning' : 'status-healthy'
+            }`;
+
+            // 更新请求统计
+            document.getElementById('totalRequests').textContent = data.requests.total.toLocaleString();
+            document.getElementById('successRequests').textContent = data.requests.success.toLocaleString();
+            document.getElementById('errorRequests').textContent = data.requests.error.toLocaleString();
+            document.getElementById('rateLimitedRequests').textContent = data.requests.rateLimited.toLocaleString();
+
+            // 更新热点端点
+            const endpointsHtml = data.topEndpoints.map(ep => `
+                <tr>
+                    <td>${ep.path}</td>
+                    <td>${ep.count.toLocaleString()}</td>
+                    <td>${ep.avgResponseTime}ms</td>
+                </tr>
+            `).join('');
+            document.getElementById('topEndpoints').innerHTML = endpointsHtml || 
+                '<tr><td colspan="3" class="text-center">暂无数据</td></tr>';
+        }
+
+        // 格式化运行时间
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) {
+                return `${days}天 ${hours}小时`;
+            } else if (hours > 0) {
+                return `${hours}小时 ${minutes}分钟`;
+            } else {
+                return `${minutes}分钟`;
+            }
+        }
+
+        // 获取告警数据
+        async function fetchAlerts() {
+            try {
+                const response = await fetch('/admin/alerts');
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateAlerts(result.data);
+                }
+            } catch (error) {
+                console.error('获取告警数据失败:', error);
+            }
+        }
+
+        // 更新告警显示
+        function updateAlerts(data) {
+            const alertsHtml = data.active.map(alert => `
+                <div class="alert-item alert-${alert.level}">
+                    <div>
+                        <strong>${alert.level.toUpperCase()}</strong>: ${alert.message}
+                        <br>
+                        <small>时间: ${new Date(alert.timestamp).toLocaleString()}</small>
+                    </div>
+                    <button onclick="resolveAlert('${alert.id}')" class="btn btn-sm">解决</button>
+                </div>
+            `).join('');
+            
+            document.getElementById('activeAlerts').innerHTML = 
+                alertsHtml || '<p>暂无活跃告警</p>';
+        }
+
+        // 解决告警
+        async function resolveAlert(alertId) {
+            try {
+                const response = await fetch(`/admin/alerts/${alertId}/resolve`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    fetchAlerts();
+                }
+            } catch (error) {
+                console.error('解决告警失败:', error);
+            }
+        }
+
+        // 定期刷新数据
+        setInterval(() => {
+            fetchStats();
+            fetchAlerts();
+        }, 5000);
+
+        // 初始加载
+        fetchStats();
+        fetchAlerts();
+    </script>
+</body>
+</html>

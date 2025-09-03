@@ -132,6 +132,10 @@ jobs:
               exit $PM2_EXIT
             fi
             echo "✅ Reloaded PM2 service"
+            
+            # 等待应用启动
+            echo "==> Waiting for application to start..."
+            sleep 10
 
             # 清理临时文件
             rm -f /tmp/release.tar.gz /tmp/version.json .env.backup

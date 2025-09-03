@@ -66,6 +66,7 @@ const config = require('./config');
 
 // 路由导入
 const pagesRoutes = require('./routes/pages');
+const databaseRoutes = require('./routes/database');
 
 // 初始化应用
 const app = express();
@@ -373,6 +374,7 @@ app.use('/api/', apiLimiter);
 
 // 其他 API 不需要认证
 app.use('/api/pages', createLimiter, pagesRoutes);
+app.use('/api/database', databaseRoutes);
 
 // 密码验证路由 - 用于AJAX验证
 app.get('/validate-password/:id', async (req, res) => {

@@ -12,6 +12,7 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const fs = require('fs');
 const helmet = require('helmet');
+const { saveSessionWithTimeout } = require('./utils/sessionUtils');
 const rateLimit = require('express-rate-limit');
 const { initDatabase } = require('./models/db');
 
@@ -88,7 +89,14 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
       imgSrc: ["'self'", "data:", "https:"],
       fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      // 允许 Google Fonts 相关的预连接与资源获取，避免 CSP 阻断导致样式异常
+      connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://cdnjs.cloudflare.com"
+      ],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
@@ -221,8 +229,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    // 只在 HTTPS 环境下设置 secure为 true
-    secure: process.env.NODE_ENV === 'production',
+    // 使用 auto 根据请求是否安全自动设置，避免生产HTTP下 Cookie 丢失
+    secure: 'auto',
     maxAge: 24 * 60 * 60 * 1000, // 24小时
     httpOnly: true,
     sameSite: 'lax'
@@ -316,24 +324,29 @@ app.post('/login', (req, res) => {
     req.session.isAuthenticated = true;
     console.log('- 设置会话认证标记');
 
-    // 2. 设置 Cookie
+    // 2. 设置 Cookie（根据请求是否安全自动决定 secure）
     res.cookie('auth', 'true', {
       maxAge: 24 * 60 * 60 * 1000, // 24小时
       httpOnly: true,
-      secure: false, // 如果使用 HTTPS，设置为 true
+      secure: !!req.secure,
       sameSite: 'lax'
     });
     console.log('- 设置认证 Cookie');
 
-    // 等待会话保存完成后再重定向
-    req.session.save((err) => {
-      if (err) {
-        console.error('会话保存失败:', err);
-        return res.status(500).json({ success: false, error: '会话保存失败' });
+    // 等待会话保存完成后再重定向（带超时回退，避免长时间卡住）
+    saveSessionWithTimeout(
+      req,
+      1500,
+      () => {
+        console.log('- 会话保存完成或超时回退，重定向到首页');
+        return res.redirect('/');
+      },
+      (err) => {
+        console.error('会话保存失败（错误回调）:', err);
+        // 即使保存失败，仍尝试继续（依赖 auth Cookie 作为兜底）
+        return res.redirect('/');
       }
-      console.log('- 会话保存成功，重定向到首页');
-      return res.redirect('/');
-    });
+    );
   } else {
     console.log('- 密码不匹配，显示错误');
     // 密码错误，显示错误信息

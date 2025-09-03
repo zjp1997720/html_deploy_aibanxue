@@ -172,7 +172,16 @@ app.get('/version', (req, res) => {
 });
 
 // 创建会话目录
-const sessionDir = path.join(__dirname, 'sessions');
+// 根据环境选择会话目录路径
+let sessionDir;
+if (process.env.NODE_ENV === 'production' && process.env.SESSION_DIR) {
+  // 生产环境：使用环境变量指定的路径
+  sessionDir = process.env.SESSION_DIR;
+} else {
+  // 开发环境或未指定：使用相对路径
+  sessionDir = path.join(__dirname, 'sessions');
+}
+
 console.log('会话目录:', sessionDir);
 if (!fs.existsSync(sessionDir)) {
   console.log('创建会话目录...');
@@ -315,9 +324,15 @@ app.post('/login', (req, res) => {
     });
     console.log('- 设置认证 Cookie');
 
-    // 先尝试直接重定向，不等待会话保存
-    console.log('- 重定向到首页');
-    return res.redirect('/');
+    // 等待会话保存完成后再重定向
+    req.session.save((err) => {
+      if (err) {
+        console.error('会话保存失败:', err);
+        return res.status(500).json({ success: false, error: '会话保存失败' });
+      }
+      console.log('- 会话保存成功，重定向到首页');
+      return res.redirect('/');
+    });
   } else {
     console.log('- 密码不匹配，显示错误');
     // 密码错误，显示错误信息

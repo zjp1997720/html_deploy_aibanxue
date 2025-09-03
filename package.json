@@ -36,7 +36,6 @@
     "jsdom": "^26.0.0",
     "marked": "^15.0.7",
     "mermaid": "^11.6.0",
-    "mermaid-render": "^1.0.9",
     "morgan": "^1.10.0",
     "node-fetch": "^2.7.0",
     "response-time": "^2.3.2",

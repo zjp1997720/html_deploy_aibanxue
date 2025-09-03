@@ -110,6 +110,27 @@ jobs:
             fi
 
             echo "==> Node version on server: $(node -v || echo 'node not found')"
+            
+            # 检查Node.js版本，如果不是v20则升级
+            NODE_VERSION=$(node -v 2>/dev/null || echo "v0")
+            if [[ "$NODE_VERSION" != v20* ]]; then
+              echo "⚠️  Node.js version is $NODE_VERSION, upgrading to v20..."
+              # 创建升级脚本
+              cat > /tmp/upgrade-nodejs.sh << 'EOF'
+#!/bin/bash
+set -e
+echo "Upgrading Node.js to v20..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get update
+sudo apt-get install -y nodejs
+echo "✅ Node.js upgraded to $(node -v)"
+EOF
+              chmod +x /tmp/upgrade-nodejs.sh
+              sudo /tmp/upgrade-nodejs.sh
+              rm -f /tmp/upgrade-nodejs.sh
+            else
+              echo "✅ Node.js v20 is already installed"
+            fi
 
             # 安装/更新依赖（跳过 puppeteer 下载）
             if command -v npm >/dev/null 2>&1; then

@@ -7,8 +7,7 @@ const { marked } = require('marked');
 const { JSDOM } = require('jsdom');
 const { CODE_TYPES } = require('./codeDetector');
 
-// 使用 mermaid-render 包来渲染 Mermaid 图表
-const { renderMermaid: mermaidRenderer } = require('mermaid-render');
+// Mermaid 图表将使用前端 CDN 渲染，不依赖服务端渲染包
 
 /**
  * u6e32u67d3HTMLu5185u5bb9

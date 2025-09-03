@@ -299,6 +299,8 @@
   resize: vertical;
   font-family: inherit;
   line-height: var(--line-height-normal);
+  width: 100%;
+  display: block;
 }
 
 /* 输入状态 */

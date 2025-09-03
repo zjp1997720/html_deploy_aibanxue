@@ -33,8 +33,20 @@
     const theme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', theme);
   </script>
+  
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <!-- Loading Indicator -->
+  <div id="loading-indicator" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 9999;">
+    <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+  </div>
+  
   <div id="app" class="min-h-screen bg-primary">
     <!-- 全局导航 -->
     <nav class="sticky top-0 z-50 bg-elevated border-b border-primary backdrop-blur-sm">
@@ -160,7 +172,7 @@
             class="form-input form-textarea font-mono text-sm"
             rows="12"
             placeholder="在这里粘贴或输入您的HTML、Markdown、SVG或Mermaid代码..."
-            style="min-height: 300px; resize: vertical;"
+            style="min-height: 300px; resize: vertical; width: 100%; display: block;"
           ></textarea>
           
           <!-- 文件上传（隐藏） -->
@@ -543,22 +555,30 @@ document.addEventListener('DOMContentLoaded', function() {
     HTMLGOUtils.showLoading();
     
     try {
+      // 调试：查看发送的数据
+      const requestData = {
+        htmlContent: content,
+        isProtected: !!currentPassword,
+        password: currentPassword
+      };
+      console.log('发送数据:', requestData);
+      
       const response = await fetch('/api/pages/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          html_content: content,
-          password: currentPassword,
-          is_protected: !!currentPassword
+          htmlContent: content,
+          isProtected: !!currentPassword,
+          password: currentPassword
         })
       });
       
       const data = await response.json();
       
       if (data.success) {
-        const url = `${window.location.origin}/view/${data.id}`;
+        const url = data.url; // 直接使用返回的URL
         shareUrl.value = url;
         resultSection.classList.remove('hidden');
         
@@ -689,6 +709,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 全局工具函数
     window.HTMLGOUtils = {
+      showLoading() {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+          loadingIndicator.style.display = 'flex';
+        }
+        
+        // 禁用按钮
+        const generateBtn = document.getElementById('generate-button') || document.querySelector('button[aria-label="生成分享链接"]');
+        const previewBtn = document.getElementById('preview-button') || document.querySelector('button[aria-label="预览"]');
+        
+        if (generateBtn) generateBtn.disabled = true;
+        if (previewBtn) previewBtn.disabled = true;
+      },
+      
+      hideLoading() {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+          loadingIndicator.style.display = 'none';
+        }
+        
+        // 恢复按钮状态
+        const content = document.getElementById('html-input')?.value || 
+                        document.querySelector('textarea[aria-label*="代码"]')?.value || '';
+        const hasContent = content.trim().length > 0;
+        
+        const generateBtn = document.getElementById('generate-button') || document.querySelector('button[aria-label="生成分享链接"]');
+        const previewBtn = document.getElementById('preview-button') || document.querySelector('button[aria-label="预览"]');
+        
+        if (generateBtn) generateBtn.disabled = !hasContent;
+        if (previewBtn) previewBtn.disabled = !hasContent;
+      },
+      
       showToast(message, type = 'info', duration = 5000) {
         const container = document.getElementById('toast-container');
         if (!container) return;

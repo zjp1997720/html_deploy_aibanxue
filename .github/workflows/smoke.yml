@@ -1,0 +1,69 @@
+name: production-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "目标站点基础地址(含协议)"
+        required: false
+        default: "https://htmlshare.aibanxue.top"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ github.event.inputs.base_url || vars.BASE_URL || 'https://htmlshare.aibanxue.top' }}
+      AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq curl
+
+      - name: Show target
+        run: |
+          echo "BASE_URL=$BASE_URL"
+          if [ -z "$AUTH_PASSWORD" ]; then
+            echo "::error::缺少 Secrets.AUTH_PASSWORD"; exit 1; fi
+
+      - name: Health check
+        run: |
+          code=$(curl -sS -o /tmp/version.json -w '%{http_code}' "$BASE_URL/version")
+          test "$code" = "200" || { echo "::error::/version 返回码=$code"; exit 1; }
+          cat /tmp/version.json
+
+      - name: Login and store cookies
+        run: |
+          # 登陆应返回 302 并下发两枚 Cookie
+          code=$(curl -sS -i -c cookies.txt -d "password=$AUTH_PASSWORD" "$BASE_URL/login" | tee /tmp/login.headers | awk 'END{print $2}')
+          echo "HTTP_CODE=$code"
+          grep -q "Set-Cookie: auth=" /tmp/login.headers || { echo "::error::未发现 auth Cookie"; exit 1; }
+          grep -q "Set-Cookie: connect.sid=" /tmp/login.headers || { echo "::error::未发现 connect.sid Cookie"; exit 1; }
+          test "$code" = "302" || { echo "::warning::登录未返回302，继续尝试但请关注"; }
+
+      - name: Create page via API
+        run: |
+          payload='{"htmlContent":"<p>Smoke OK $(date -u +%FT%TZ)</p>","isProtected":false,"codeType":"html","name":"ci-smoke"}'
+          resp=$(curl -sS -b cookies.txt -H 'Content-Type: application/json' -d "$payload" "$BASE_URL/api/pages/create")
+          echo "$resp" | jq .
+          ok=$(echo "$resp" | jq -r '.success // false')
+          test "$ok" = "true" || { echo "::error::创建页面失败"; exit 1; }
+          url=$(echo "$resp" | jq -r '.url')
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "SMOKE_URL=$url" >> $GITHUB_ENV
+
+      - name: Verify page is reachable
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "$SMOKE_URL")
+          test "$code" = "200" || { echo "::error::页面不可达 code=$code"; exit 1; }
+
+      - name: Summary
+        run: |
+          echo "✅ 冒烟成功: $SMOKE_URL"
+

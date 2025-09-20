@@ -150,8 +150,8 @@ jobs:
             echo "✅ Updated dependencies"
 
             # 使用PM2进行零停机重启
-            echo "==> Reloading PM2 process: html-go"
-            pm2 reload html-go || pm2 restart html-go
+            echo "==> Reloading PM2 process: html-go (with --update-env)"
+            pm2 reload html-go --update-env || pm2 restart html-go --update-env
             PM2_EXIT=$?
             if [ "$PM2_EXIT" -ne 0 ]; then
               echo "❌ PM2 reload/restart failed with code $PM2_EXIT"

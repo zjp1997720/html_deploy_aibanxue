@@ -43,3 +43,11 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+db/*.db*
+db/*-wal
+db/*-shm
+.qoder/
+tmp-check.js
+c.txt
+resp.json

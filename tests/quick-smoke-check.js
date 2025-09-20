@@ -94,6 +94,8 @@ function buildCookieHeader(setCookieHeaders) {
     if (apikeyPage.status !== 200) throw new Error(`/admin/apikeys 访问失败: ${apikeyPage.status}`);
     const apikeyHtml = await apikeyPage.text();
     if (/onclick\s*=/.test(apikeyHtml)) throw new Error('admin/apikeys 存在内联事件，违反 CSP');
+    if (!apikeyHtml.includes('class="table-action view"')) throw new Error('操作按钮缺少 table-action view 样式');
+    if (!apikeyHtml.includes('modal-clean detail-modal')) throw new Error('详情模态未应用新样式');
 
     // 5) API Keys 列表 API 应返回 200（验证表结构存在）
     const listResp = await fetch(`${BASE}/api/admin/apikeys`, { headers: { 'Cookie': cookies } });

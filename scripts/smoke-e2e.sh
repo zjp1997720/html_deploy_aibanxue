@@ -67,7 +67,9 @@ main() {
   url=$(create_page)
   verify_url "$url"
   echo "✅ 冒烟成功: $url"
+  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+    echo "smoke_url=$url" >>"$GITHUB_OUTPUT"
+  fi
 }
 
 main "$@"
-

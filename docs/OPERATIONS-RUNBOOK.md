@@ -16,7 +16,11 @@
 3. `POST /api/pages/create`（带 Cookie）：`success=true` 且返回 `url`
 4. `GET <url>`：200
 
-触发成功后，工作流会在 Summary 输出可访问的页面 URL。
+触发成功后，工作流会在 Summary 输出可访问的页面 URL。若希望本地手动验证，可执行：
+
+```
+AUTH_PASSWORD=实际密码 BASE_URL=https://htmlshare.aibanxue.top ./scripts/smoke-e2e.sh
+```
 
 ## 二、Nginx 安全片段（可选、零停机）
 
@@ -52,6 +56,12 @@ nginx -t && systemctl reload nginx
 ## 三、数据库与日志
 
 ### 1) 结构修复（已执行过，记录在此）
+
+系统启动时会自动检测并补齐以下结构：
+- `pages` 表缺失 `name` 列时自动 `ALTER TABLE`
+- `performance_logs` 表及索引自动创建
+
+如需手动执行（或出现异常时排查可直接运行）：
 
 ```
 sqlite3 db/html-go.db "ALTER TABLE pages ADD COLUMN name TEXT;"   -- 若已存在会提示重复，可忽略
@@ -114,3 +124,6 @@ EOF
 
 本次只新增工作流、文档与 Nginx 片段，不改业务代码；线上仅在你执行 reload、crontab 等命令时生效，且均可回滚。
 
+附：`DB_PATH` 环境变量
+- 若设置 `DB_PATH`（绝对路径或相对项目根路径），应用会读取该 SQLite 文件并在同目录写入 `backups/`
+- 未设置时默认使用 `./db/html-go.db`

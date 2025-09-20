@@ -109,6 +109,20 @@ jobs:
               echo "✅ Restored .env file"
             fi
 
+            # === Enforce PAGE_ID_STRATEGY via pipeline (default base62) ===
+            DESIRED_STRATEGY="${PAGE_ID_STRATEGY:-base62}"
+            DESIRED_RETRIES="${PAGE_ID_MAX_RETRIES:-5}"
+            if grep -q '^PAGE_ID_STRATEGY=' .env 2>/dev/null; then
+              sed -i "s/^PAGE_ID_STRATEGY=.*/PAGE_ID_STRATEGY=${DESIRED_STRATEGY}/" .env
+            else
+              echo "PAGE_ID_STRATEGY=${DESIRED_STRATEGY}" >> .env
+            fi
+            if grep -q '^PAGE_ID_MAX_RETRIES=' .env 2>/dev/null; then
+              sed -i "s/^PAGE_ID_MAX_RETRIES=.*/PAGE_ID_MAX_RETRIES=${DESIRED_RETRIES}/" .env
+            else
+              echo "PAGE_ID_MAX_RETRIES=${DESIRED_RETRIES}" >> .env
+            fi
+            echo "? Ensured PAGE_ID_STRATEGY=${DESIRED_STRATEGY} (retries=${DESIRED_RETRIES})"
             echo "==> Node version on server: $(node -v || echo 'node not found')"
             
             # 检查Node.js版本，如果不是v20则升级

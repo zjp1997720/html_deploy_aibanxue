@@ -24,6 +24,9 @@
     background-color: var(--admin-light);
     color: var(--admin-dark);
     line-height: 1.6;
+    /* 恢复后台页面滚动：覆盖全局 styles.css 对 body 的 overflow:hidden 设置 */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* 布局容器 */

@@ -105,7 +105,7 @@ const breadcrumb = [
     </p>
   </div>
   <div class="page-actions">
-    <button class="btn btn-primary" onclick="showCreateModal()">
+    <button class="btn btn-primary" id="btnOpenCreateKey">
       <i class="fas fa-plus"></i>
       创建新Key
     </button>
@@ -171,7 +171,7 @@ const breadcrumb = [
       API Key列表
     </h2>
     <div class="data-card-actions">
-      <button class="btn btn-sm btn-secondary" onclick="refreshKeyList()">
+      <button class="btn btn-sm btn-secondary" id="btnRefreshKeys">
         <i class="fas fa-sync-alt"></i>
         刷新
       </button>
@@ -208,7 +208,7 @@ const breadcrumb = [
         <i class="fas fa-key empty-icon"></i>
         <h3>还没有API Key</h3>
         <p>点击"创建新Key"按钮开始创建您的第一个API Key</p>
-        <button class="btn btn-primary" onclick="showCreateModal()">
+        <button class="btn btn-primary" id="btnOpenCreateKeyEmpty">
           <i class="fas fa-plus"></i>
           创建新Key
         </button>
@@ -230,7 +230,7 @@ const breadcrumb = [
           <p class="modal-subtitle">配置API访问权限和使用限制</p>
         </div>
       </div>
-      <button class="modal-close modal-close-enhanced" onclick="hideCreateModal()" aria-label="关闭对话框">
+      <button class="modal-close modal-close-enhanced" id="btnCloseCreateModal" aria-label="关闭对话框">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -365,11 +365,11 @@ const breadcrumb = [
     </div>
     
     <div class="modal-footer modal-footer-enhanced">
-      <button type="button" class="btn btn-secondary btn-enhanced" onclick="hideCreateModal()">
+      <button type="button" class="btn btn-secondary btn-enhanced" id="btnCancelCreateModal">
         <i class="fas fa-times"></i>
         取消
       </button>
-      <button type="button" class="btn btn-primary btn-enhanced btn-loading-capable" onclick="createApiKey()" id="createKeyBtn">
+      <button type="button" class="btn btn-primary btn-enhanced btn-loading-capable" id="createKeyBtn">
         <span class="btn-content">
           <i class="fas fa-key"></i>
           创建API Key
@@ -391,7 +391,7 @@ const breadcrumb = [
         <i class="fas fa-info-circle"></i>
         API Key详情
       </h3>
-      <button class="modal-close" onclick="hideKeyDetailModal()">
+      <button class="modal-close" id="btnCloseKeyDetail">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -403,7 +403,7 @@ const breadcrumb = [
     </div>
     
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="hideKeyDetailModal()">关闭</button>
+      <button type="button" class="btn btn-secondary" id="btnCloseKeyDetail2">关闭</button>
     </div>
   </div>
 </div>
@@ -428,7 +428,7 @@ const breadcrumb = [
         <label class="form-label">您的API Key：</label>
         <div class="api-key-display">
           <input type="text" id="newApiKey" class="form-input" readonly>
-          <button class="btn btn-primary" onclick="copyApiKey()">
+          <button class="btn btn-primary" id="btnCopyKey">
             <i class="fas fa-copy"></i>
             复制
           </button>
@@ -444,7 +444,7 @@ const breadcrumb = [
     </div>
     
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="hideKeySuccessModal()">
+      <button type="button" class="btn btn-secondary" id="btnCloseSuccessModal">
         我已保存
       </button>
     </div>
@@ -457,8 +457,10 @@ let apiKeys = [];
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
+  bindEventListeners();
   loadApiKeys();
   loadStatistics();
+  if (typeof __initAfterBind === 'function') __initAfterBind();
 });
 
 // 加载API Key列表
@@ -531,15 +533,15 @@ function renderKeyList() {
       </td>
       <td>
         <div class="action-buttons">
-          <button class="btn btn-sm btn-info" onclick="showKeyDetail('${key.key_id}')" title="查看详情">
+          <button class="btn btn-sm btn-info" data-action="view" data-key-id="${key.key_id}" title="查看详情">
             <i class="fas fa-info-circle"></i>
           </button>
           <button class="btn btn-sm ${key.is_active ? 'btn-warning' : 'btn-success'}" 
-                  onclick="toggleKey('${key.key_id}', ${!key.is_active})" 
+                  data-action="toggle" data-key-id="${key.key_id}" data-next-active="${!key.is_active}" 
                   title="${key.is_active ? '禁用' : '启用'}">
             <i class="fas ${key.is_active ? 'fa-pause' : 'fa-play'}"></i>
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteKey('${key.key_id}')" title="删除">
+          <button class="btn btn-sm btn-danger" data-action="delete" data-key-id="${key.key_id}" data-key-name="${escapeHtml(key.name)}" title="删除">
             <i class="fas fa-trash"></i>
           </button>
         </div>
@@ -555,35 +557,75 @@ async function loadStatistics() {
     const data = await response.json();
     
     if (data.success) {
-      document.getElementById('totalKeys').textContent = data.stats.totalKeys;
-      document.getElementById('activeKeys').textContent = data.stats.activeKeys;
-      document.getElementById('totalCalls').textContent = data.stats.todayCalls;
-      document.getElementById('avgResponseTime').textContent = data.stats.avgResponseTime + 'ms';
+      const elTotal = document.getElementById('totalKeys');
+      const elActive = document.getElementById('activeKeys');
+      const elToday = document.getElementById('todayCalls');
+      const elAvg = document.getElementById('avgResponseTime');
+      if (elTotal) elTotal.textContent = data.stats.totalKeys;
+      if (elActive) elActive.textContent = data.stats.activeKeys;
+      if (elToday) elToday.textContent = data.stats.todayCalls;
+      if (elAvg) elAvg.textContent = data.stats.avgResponseTime + 'ms';
     }
   } catch (error) {
     console.error('加载统计信息错误:', error);
   }
 }
 
-// 显示创建模态框
-function showCreateModal() {
-  document.getElementById('createModal').style.display = 'flex';
-  document.getElementById('keyName').focus();
-}
+/**
+ * 绑定页面事件（替代内联事件，满足CSP）
+ * - 解决内联事件因 Helmet 的 `script-src-attr 'none'` 被拦截的问题
+ * - 统一绑定静态按钮及表格内的动态操作（查看/启用/禁用/删除）
+ */
+function bindEventListeners() {
+  const byId = (id) => document.getElementById(id);
 
-// 隐藏创建模态框
-function hideCreateModal() {
-  document.getElementById('createModal').style.display = 'none';
-  document.getElementById('createKeyForm').reset();
+  const bind = (id, event, handler) => {
+    const el = byId(id);
+    if (el) el.addEventListener(event, handler);
+  };
+
+  bind('btnOpenCreateKey', 'click', () => showCreateModal());
+  bind('btnOpenCreateKeyEmpty', 'click', () => showCreateModal());
+  bind('btnCloseCreateModal', 'click', () => hideCreateModal());
+  bind('btnCancelCreateModal', 'click', () => hideCreateModal());
+  bind('createKeyBtn', 'click', () => createApiKey());
+  bind('btnCopyKey', 'click', () => copyApiKey());
+  bind('btnCloseSuccessModal', 'click', () => hideKeySuccessModal());
+  bind('btnCloseKeyDetail', 'click', () => hideKeyDetailModal());
+  bind('btnCloseKeyDetail2', 'click', () => hideKeyDetailModal());
+  bind('btnRefreshKeys', 'click', () => refreshKeyList());
+
+  const tbody = byId('keyListBody');
+  if (tbody) {
+    tbody.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      const keyId = btn.getAttribute('data-key-id');
+      if (!keyId) return;
+      if (action === 'view') {
+        showKeyDetail(keyId);
+      } else if (action === 'toggle') {
+        const next = btn.getAttribute('data-next-active') === 'true';
+        toggleKey(keyId, next);
+      } else if (action === 'delete') {
+        deleteKey(keyId);
+      }
+    });
+  }
 }
 
 // 页面加载完成后初始化增强功能
-document.addEventListener('DOMContentLoaded', function() {
-  loadApiKeys();
-  loadStatistics();
+// 初始表单增强能力由 bindEventListeners 之后调用
+// 注意：bindEventListeners 在 DOMContentLoaded 中先行执行
+/**
+ * 在事件绑定完成后初始化表单增强与校验
+ * 目的：解耦 DOMContentLoaded 中的顺序与依赖
+ */
+function __initAfterBind() {
   initFormValidation();
   initFormEnhancements();
-});
+}
 
 // 初始化表单验证
 function initFormValidation() {

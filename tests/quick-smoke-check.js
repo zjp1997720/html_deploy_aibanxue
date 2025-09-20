@@ -89,6 +89,20 @@ function buildCookieHeader(setCookieHeaders) {
     const html = await homeResp.text();
     if (!/HTML-GO/.test(html)) throw new Error('首页内容校验失败');
 
+    // 4) API Key 管理页应无内联事件（CSP 合规）
+    const apikeyPage = await fetch(`${BASE}/admin/apikeys`, { headers: { 'Cookie': cookies } });
+    if (apikeyPage.status !== 200) throw new Error(`/admin/apikeys 访问失败: ${apikeyPage.status}`);
+    const apikeyHtml = await apikeyPage.text();
+    if (/onclick\s*=/.test(apikeyHtml)) throw new Error('admin/apikeys 存在内联事件，违反 CSP');
+
+    // 5) API Keys 列表 API 应返回 200（验证表结构存在）
+    const listResp = await fetch(`${BASE}/api/admin/apikeys`, { headers: { 'Cookie': cookies } });
+    if (listResp.status !== 200) throw new Error(`/api/admin/apikeys 返回码异常: ${listResp.status}`);
+    const listJson = await listResp.json();
+    if (!listJson || listJson.success !== true || !Array.isArray(listJson.keys)) {
+      throw new Error('API Key 列表返回结构异常');
+    }
+
     console.log('✅ 冒烟检查通过');
     process.exit(0);
   } catch (err) {
@@ -100,4 +114,3 @@ function buildCookieHeader(setCookieHeaders) {
     }
   }
 })();
-

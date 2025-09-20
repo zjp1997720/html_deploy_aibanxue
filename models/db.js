@@ -201,6 +201,55 @@ async function initializeSchema(connection) {
   for (const statement of performanceIndexes) {
     await runStatement(statement);
   }
+
+  // api_keys 表
+  await runStatement(`
+    CREATE TABLE IF NOT EXISTS api_keys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key_id TEXT UNIQUE NOT NULL,
+      key_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      permissions TEXT DEFAULT 'read,write',
+      max_requests_per_hour INTEGER DEFAULT 1000,
+      max_requests_per_day INTEGER DEFAULT 10000,
+      expires_at INTEGER,
+      is_active INTEGER DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      last_used_at INTEGER
+    )
+  `);
+
+  // api_usage_logs 表
+  await runStatement(`
+    CREATE TABLE IF NOT EXISTS api_usage_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key_id TEXT NOT NULL,
+      endpoint TEXT NOT NULL,
+      method TEXT NOT NULL,
+      request_ip TEXT,
+      user_agent TEXT,
+      status_code INTEGER,
+      response_time INTEGER,
+      error_message TEXT,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (key_id) REFERENCES api_keys (key_id)
+    )
+  `);
+
+  // 相关索引
+  const apiIndexes = [
+    'CREATE INDEX IF NOT EXISTS idx_api_keys_key_id ON api_keys(key_id)',
+    'CREATE INDEX IF NOT EXISTS idx_api_keys_active ON api_keys(is_active)',
+    'CREATE INDEX IF NOT EXISTS idx_api_usage_logs_key_id ON api_usage_logs(key_id)',
+    'CREATE INDEX IF NOT EXISTS idx_api_usage_logs_created_at ON api_usage_logs(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_api_usage_logs_endpoint ON api_usage_logs(endpoint)'
+  ];
+
+  for (const statement of apiIndexes) {
+    await runStatement(statement);
+  }
 }
 
 // =============================
@@ -334,4 +383,3 @@ module.exports = {
   restoreFromBackup,
   getDatabaseStatus
 };
-

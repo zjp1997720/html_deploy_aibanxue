@@ -1,41 +1,56 @@
 # Repository Guidelines
 
-> 面向贡献者的精炼协作指南（本库：Express + EJS）。
-
 ## 项目结构与模块组织
-- 入口：`app.js`（Express + EJS），配置：`config.js`。
-- 目录：`routes/`、`models/`、`middleware/`、`utils/`、`views/`、`public/`、`tests/`、`scripts/`、`docs/`、`db/`、`sessions/`。
-- 示例：`utils/cacheManager.js`、`middleware/apiKey.js`、`views/index-modern.ejs`、`tests/login-automation.spec.js`。
+- `app.js` 与 `config.js` 驱动 Express+EJS 服务，`cluster.js` 与 `ecosystem.config.js` 负责多进程与 PM2 配置。
+- 业务代码按职责拆分：`routes/` 定义路由，`models/` 管理 SQLite3 数据访问，`middleware/` 存放鉴权与速率控制，`utils/` 提供缓存和日志等工具。
+- 视图置于 `views/`，静态资源归档 `public/`，自动化脚本位于 `scripts/`，端到端测试集中在 `tests/`。
 
 ## 构建、测试与开发命令
-- 安装依赖：`npm install`。
-- 本地开发：`npm run dev`（nodemon，`http://localhost:5678`）。
-- 生产运行：`npm start` 或 `npm run prod`（端口 `8888`）。
-- 端到端测试：先启动应用，再执行 `npx playwright test`。
-- 场景脚本：`node tests/phase2-test.js`、`node tests/phase3-performance-test.js`、`node test-api-calls.js`。
+- `npm install`：安装并锁定依赖；首次拉取或锁文件变动后必跑。
+- `npm run dev`：经 nodemon 在 `http://localhost:5678` 热重载；调试期优先。
+- `npm start` / `npm run prod`：生产等价入口，默认监听 `8888`；用于冒烟验证。
+- `npx playwright test`：运行全量 Playwright 套件，生成 `playwright-report/`。
+- `node tests/phase2-test.js` 与 `node test-api-calls.js`：快速回归性能与 API 健康。
 
-## 代码风格与命名
-- 缩进 2 空格；使用分号；优先单引号。
-- JS 文件名小驼峰：如 `apiKeys.js`、`responseTimeMonitor.js`。
-- 视图/静态资源使用短横线命名：如 `views/index-modern.ejs`、`public/js/...`。
-- 偏好小而纯的函数；导出工具使用 JSDoc；避免隐式全局变量。
+## 代码风格与命名约定
+- JavaScript 统一 2 空格缩进、分号结尾、单引号；函数保持单一职责，复杂逻辑拆到 `utils/`。
+- 文件命名遵循小驼峰（如 `apiKeys.js`），视图及静态资源使用短横线（如 `views/index-modern.ejs`）。
+- 提交前运行 `npm run lint`（若无脚本请补充 eslint 配置），确保不引入隐式全局或未使用变量。
 
-## 测试规范
-- 框架：Playwright（`@playwright/test`），测试位于 `tests/*.spec.js`。
-- 运行单测例：`npx playwright test tests/login-automation.spec.js`。
-- API 快检：`node test-api-calls.js`。
-- 覆盖率：暂无强制门槛；测试应可复现且相互独立。
-- 鉴权：`.env` 中的 `AUTH_PASSWORD`（默认 `admin123`）。
+## 测试指南
+- 采用 `@playwright/test`，测试文件命名 `*.spec.js` 并保持独立，可视需求分层放置夹具。
+- 本地修改需至少覆盖关键路径的端到端场景，若新增 API，请补充到 `test-api-calls.js` 或新增自检脚本。
+- 若发现回归，先以最小用例复现，再补充断言进入主线测试，守住“先写失败用例再修复”的 TDD 节奏。
 
-## 提交与拉取请求
-- 提交遵循 Conventional Commits，可配表情：
-  - `feat: 添加页面管理API`
-  - `🐛 fix: 修复会话存储路径问题`
-  - `🎨 refactor(admin): 优化导航结构`
-- PR 必含：变更摘要、动机与影响、关联 issue、测试计划（命令与期望结果）、UI 变更的截图/GIF。
-- 合并前：应用可本地启动、Playwright 通过、无敏感信息泄漏、API 变更同步至 `docs/`。
+## 提交与合并请求规范
+- 遵循 Conventional Commits，可选表情：如 `feat: 新增导出任务`, `🐛 fix: 调整会话清理`, `🔧 chore: 更新 playwright 配置`。
+- PR 必附：变更摘要、动机与影响、关联 issue 编号、测试计划（含命令/结果）、若改动 UI 请提供截图或 GIF。
+- 合并前确认应用可启动、Playwright 通过、`docs/` 同步相关接口说明，并确保“不破坏用户空间”。
 
-## 安全与配置
-- 复制 `env.example` 或 `.env.example` 为 `.env`；本地可设 `AUTH_ENABLED=true`、`AUTH_PASSWORD=admin123`。
-- 切勿提交密钥；`db/*.db*`、`sessions/` 已忽略；轮换 API Key，避免记录敏感头。
-- 生产：`NODE_ENV=production`、`AUTH_ENABLED=true`；建议使用 `start-production.sh` 或 Docker/Compose。
+## 安全与配置提示
+- 根据 `env.example` 生成 `.env`，本地常用 `AUTH_ENABLED=true` 与 `AUTH_PASSWORD=admin123`，生产需重置强密码。
+- 避免提交 `db/*.db*`、`sessions/` 等持久化数据；轮换 API 密钥并在日志中脱敏。
+- 部署场景建议使用 `start-production.sh` 或 Docker Compose，搭配 `NODE_ENV=production` 与反向代理保障可观测性。
+
+## CI/CD 与发布事实记录（已跑通）
+- 工作流文件：
+  - 部署：`.github/workflows/main.yml`（push 到 `main` 自动触发，亦支持手动触发）。
+  - 冒烟：`.github/workflows/smoke.yml`（手动触发，依赖 `Secrets.AUTH_PASSWORD`）。
+- 部署流水线要点：
+  - `actions/checkout@v4` 拉取代码，Node v20 环境安装生产依赖（忽略 dev 与 puppeteer 下载）。
+  - 使用 `git archive` 生成 `release.tar.gz`，通过 `appleboy/scp-action` 传至服务器 `/tmp/`。
+  - 服务器端 `appleboy/ssh-action` 解包到 `/root/html_deploy_aibanxue`，保留 `.env/ db/ sessions/ node_modules/`，其余清理后覆盖更新。
+  - 写入 `version.json`，并通过 `pm2 reload html-go --update-env` 零停机重载。
+  - 健康检查以生产域名为准：`https://htmlshare.aibanxue.top/` 与 `https://htmlshare.aibanxue.top/version`。
+  - 说明：内部服务仍监听 `127.0.0.1:8888`（被 Nginx 反代），该地址仅用于服务器侧备用自检，不作为对外入口。
+- 环境变量与短链策略：
+  - 流水线会根据变量 `PAGE_ID_STRATEGY` 与 `PAGE_ID_MAX_RETRIES` 更新服务器 `.env`；未显式设置时默认 `base62` 与 `5`。
+  - 老链接不受影响，新建页面遵循当次策略（符合 Never break userspace）。
+- 最近一次成功发布与验证：
+  - 修复 `models/pages.js` 导出，恢复 `createPage/getAllPages` 等接口后已推送 `main`，部署工作流顺利完成，站点可用。
+  - 通过页面“生成分享链接”确认生成 10 位 base62 短链成功（策略默认为 `base62`）。
+- 本地/手动验证建议：
+  - 健康：访问 `https://htmlshare.aibanxue.top/` 与 `https://htmlshare.aibanxue.top/version` 均为 200。
+  - 登录→`POST /api/pages/create` 返回 `success=true` 与 `url`；尾段长度 7（md5）或 10（base62）。
+- 回滚策略：
+  - 直接在 Git 仓库 `revert` 问题提交并 push 到 `main`，工作流会自动下发；必要时在服务器以 PM2 回滚上一次 release（或使用 `docs/fix-502-rewrite-pagesjs.md` 中的备份文件快速恢复模型层）。

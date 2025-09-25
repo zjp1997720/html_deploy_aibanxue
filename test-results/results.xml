@@ -1,2 +1,332 @@
-<testsuites id="" name="" tests="0" failures="0" skipped="0" errors="0" time="0.05028800000000001">
+<testsuites id="" name="" tests="20" failures="20" skipped="0" errors="0" time="3.635322">
+<testsuite name="admin-ui.spec.js" timestamp="2025-09-22T09:24:04.824Z" hostname="chromium" tests="4" failures="4" skipped="0" time="0.016" errors="0">
+<testcase name="后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:37:3 API Key 管理页的创建模态应可滚动且操作按钮需具备文本" type="FAILURE">
+<![CDATA[  [chromium] › admin-ui.spec.js:37:3 › 后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本 ─────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 概览页快捷操作需无边框展示" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:70:3 概览页快捷操作需无边框展示" type="FAILURE">
+<![CDATA[  [chromium] › admin-ui.spec.js:70:3 › 后台界面极简体验基线 › 概览页快捷操作需无边框展示 ──────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:84:3 页面管理侧栏应移除无序列表圆点" type="FAILURE">
+<![CDATA[  [chromium] › admin-ui.spec.js:84:3 › 后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点 ────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:93:3 页面编辑模态体需具备滚动能力避免割裂体验" type="FAILURE">
+<![CDATA[  [chromium] › admin-ui.spec.js:93:3 › 后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验 ───────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
+<testsuite name="admin-ui.spec.js" timestamp="2025-09-22T09:24:04.824Z" hostname="firefox" tests="4" failures="4" skipped="0" time="0.018" errors="0">
+<testcase name="后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本" classname="admin-ui.spec.js" time="0.005">
+<failure message="admin-ui.spec.js:37:3 API Key 管理页的创建模态应可滚动且操作按钮需具备文本" type="FAILURE">
+<![CDATA[  [firefox] › admin-ui.spec.js:37:3 › 后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本 ──────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\firefox-1489\firefox\firefox.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 概览页快捷操作需无边框展示" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:70:3 概览页快捷操作需无边框展示" type="FAILURE">
+<![CDATA[  [firefox] › admin-ui.spec.js:70:3 › 后台界面极简体验基线 › 概览页快捷操作需无边框展示 ───────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\firefox-1489\firefox\firefox.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点" classname="admin-ui.spec.js" time="0.005">
+<failure message="admin-ui.spec.js:84:3 页面管理侧栏应移除无序列表圆点" type="FAILURE">
+<![CDATA[  [firefox] › admin-ui.spec.js:84:3 › 后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点 ─────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\firefox-1489\firefox\firefox.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:93:3 页面编辑模态体需具备滚动能力避免割裂体验" type="FAILURE">
+<![CDATA[  [firefox] › admin-ui.spec.js:93:3 › 后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验 ────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\firefox-1489\firefox\firefox.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
+<testsuite name="admin-ui.spec.js" timestamp="2025-09-22T09:24:04.824Z" hostname="webkit" tests="4" failures="4" skipped="0" time="0.015" errors="0">
+<testcase name="后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:37:3 API Key 管理页的创建模态应可滚动且操作按钮需具备文本" type="FAILURE">
+<![CDATA[  [webkit] › admin-ui.spec.js:37:3 › 后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本 ───────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 概览页快捷操作需无边框展示" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:70:3 概览页快捷操作需无边框展示" type="FAILURE">
+<![CDATA[  [webkit] › admin-ui.spec.js:70:3 › 后台界面极简体验基线 › 概览页快捷操作需无边框展示 ────────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:84:3 页面管理侧栏应移除无序列表圆点" type="FAILURE">
+<![CDATA[  [webkit] › admin-ui.spec.js:84:3 › 后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点 ──────────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:93:3 页面编辑模态体需具备滚动能力避免割裂体验" type="FAILURE">
+<![CDATA[  [webkit] › admin-ui.spec.js:93:3 › 后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验 ─────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
+<testsuite name="admin-ui.spec.js" timestamp="2025-09-22T09:24:04.824Z" hostname="Mobile Chrome" tests="4" failures="4" skipped="0" time="0.016" errors="0">
+<testcase name="后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:37:3 API Key 管理页的创建模态应可滚动且操作按钮需具备文本" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › admin-ui.spec.js:37:3 › 后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本 ────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 概览页快捷操作需无边框展示" classname="admin-ui.spec.js" time="0.004">
+<failure message="admin-ui.spec.js:70:3 概览页快捷操作需无边框展示" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › admin-ui.spec.js:70:3 › 后台界面极简体验基线 › 概览页快捷操作需无边框展示 ─────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点" classname="admin-ui.spec.js" time="0.005">
+<failure message="admin-ui.spec.js:84:3 页面管理侧栏应移除无序列表圆点" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › admin-ui.spec.js:84:3 › 后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点 ───────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:93:3 页面编辑模态体需具备滚动能力避免割裂体验" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › admin-ui.spec.js:93:3 › 后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验 ──────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\chromium_headless_shell-1181\chrome-win\headless_shell.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
+<testsuite name="admin-ui.spec.js" timestamp="2025-09-22T09:24:04.824Z" hostname="Mobile Safari" tests="4" failures="4" skipped="0" time="0.012" errors="0">
+<testcase name="后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:37:3 API Key 管理页的创建模态应可滚动且操作按钮需具备文本" type="FAILURE">
+<![CDATA[  [Mobile Safari] › admin-ui.spec.js:37:3 › 后台界面极简体验基线 › API Key 管理页的创建模态应可滚动且操作按钮需具备文本 ────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 概览页快捷操作需无边框展示" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:70:3 概览页快捷操作需无边框展示" type="FAILURE">
+<![CDATA[  [Mobile Safari] › admin-ui.spec.js:70:3 › 后台界面极简体验基线 › 概览页快捷操作需无边框展示 ─────────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:84:3 页面管理侧栏应移除无序列表圆点" type="FAILURE">
+<![CDATA[  [Mobile Safari] › admin-ui.spec.js:84:3 › 后台界面极简体验基线 › 页面管理侧栏应移除无序列表圆点 ───────────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+<testcase name="后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验" classname="admin-ui.spec.js" time="0.003">
+<failure message="admin-ui.spec.js:93:3 页面编辑模态体需具备滚动能力避免割裂体验" type="FAILURE">
+<![CDATA[  [Mobile Safari] › admin-ui.spec.js:93:3 › 后台界面极简体验基线 › 页面编辑模态体需具备滚动能力避免割裂体验 ──────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\Administrator\AppData\Local\ms-playwright\webkit-2191\Playwright.exe
+    ╔═════════════════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright Test or Playwright was just installed or updated. ║
+    ║ Please run the following command to download new browsers:              ║
+    ║                                                                         ║
+    ║     npx playwright install                                              ║
+    ║                                                                         ║
+    ║ <3 Playwright Team                                                      ║
+    ╚═════════════════════════════════════════════════════════════════════════╝
+]]>
+</failure>
+</testcase>
+</testsuite>
 </testsuites>

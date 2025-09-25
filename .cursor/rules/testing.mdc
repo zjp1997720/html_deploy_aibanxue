@@ -1,0 +1,19 @@
+# 测试栈
+- 单元/集成：Jest（见 [jest.config.js](mdc:jest.config.js)）
+- 端到端：Playwright（见 [playwright.config.js](mdc:playwright.config.js)）
+
+# 关键用例
+- v2 API 健康与监控：`/api/v2/health`, `/api/v2/performance/status`, `/api/v2/memory/status`
+- Pages CRUD：`/api/v2/pages/*`（含创建、查询、列表、更新、删除）
+- 统计：`/api/v2/stats/*`
+
+# 运行脚本
+- `npm test`、`npm run test:watch`、`npm run test:coverage`
+
+# 约定
+- 新增端点必须添加/更新对应测试；失败用例优先修复实现。
+- 用例中如需认证，使用 `apiKeyAuth` 生成的有效 API Key 或模拟旧 Token 方案。
+description:
+globs:
+alwaysApply: false
+---

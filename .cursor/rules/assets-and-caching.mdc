@@ -1,0 +1,21 @@
+# 目录与映射
+- 资源目录： [public/](mdc:public)
+  - CSS: `public/css/*`
+  - JS: `public/js/*`、`public/static/js/*`
+  - 图标与 PWA：`public/icon/*`
+- 映射：
+  - `/static/*` 与 `/css|/js|/icon` 由 [app.js](mdc:app.js) 同时提供
+
+# 缓存策略
+- HTML：`Cache-Control: no-cache`
+- JS/CSS/图片：`Cache-Control: public, max-age=31536000, immutable`
+- 依据实现：`staticOptions.setHeaders`（见 [app.js](mdc:app.js) 静态资源配置）
+
+# 安全与性能注意
+- CSP 来源受 [helmet](mdc:app.js) 配置影响，外链域名需在 `connectSrc/scriptSrc/styleSrc/fontSrc` 中显式允许
+- 资源命名建议包含文件指纹（如通过构建管线产生）以配合长期缓存
+- 避免将动态内容放入 `public/`，防止被长期缓存
+description:
+globs:
+alwaysApply: false
+---

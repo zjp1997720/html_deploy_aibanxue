@@ -1,16 +1,41 @@
 ---
 alwaysApply: true
-description: "项目文件结构和目录说明"
 ---
 
-# 项目结构说明
+# 项目结构总览
 
-- 主入口文件为 [app.js](mdc:app.js)
-- 配置文件为 [config.js](mdc:config.js)
-- 路由定义在 [routes/](mdc:routes/) 目录
-- 数据模型在 [models/](mdc:models/) 目录
-- 中间件在 [middleware/](mdc:middleware/) 目录
-- 静态资源在 [public/](mdc:public/) 目录
+- **入口与运行**
+  - 主入口: [app.js](mdc:app.js)
+  - 集群运行: [cluster.js](mdc:cluster.js)、PM2 配置: [ecosystem.config.js](mdc:ecosystem.config.js)
+  - 容器与编排: [Dockerfile](mdc:Dockerfile), [docker-compose.yml](mdc:docker-compose.yml)
+- **配置**
+  - 环境配置加载: [config.js](mdc:config.js)，示例变量: [env.example](mdc:env.example)
+  - 关键环境变量: `NODE_ENV`, `PORT`, `AUTH_ENABLED`, `AUTH_PASSWORD`, `API_TOKEN`, `DB_PATH`, `SESSION_DIR`
+- **路由**
+  - 现代 API v2 均在入口集中注册，路径前缀为 `/api/v2/*`（参见: [app.js](mdc:app.js)）
+  - 兼容旧版 API 与页面相关辅助路由: [routes/pages.js](mdc:routes/pages.js)
+  - 数据库维护路由: [routes/database.js](mdc:routes/database.js)
+- **模型 / 数据库**
+  - SQLite 适配器与初始化: [models/db.js](mdc:models/db.js)
+  - 页面实体与列表/统计: [models/pages.js](mdc:models/pages.js)
+  - API Key 与用量日志: [models/apiKeys.js](mdc:models/apiKeys.js)
+- **中间件（概览）**
+  - 安全与性能: [middleware/responseTimeMonitor.js](mdc:middleware/responseTimeMonitor.js), [middleware/monitoring.js](mdc:middleware/monitoring.js)
+  - 认证与鉴权: [middleware/auth.js](mdc:middleware/auth.js), [middleware/apiKey.js](mdc:middleware/apiKey.js)
+  - 详细执行顺序请参见“中间件顺序规则”。
+- **视图与静态资源**
+  - EJS 视图: [views/](mdc:views)
+  - 静态资源: [public/](mdc:public)（通过 `/static` 与根路径同时提供；HTML 不缓存，JS/CSS/图片长缓存）
+- **测试**
+  - Jest 与 Playwright: [jest.config.js](mdc:jest.config.js), [playwright.config.js](mdc:playwright.config.js), [tests/](mdc:tests)
+- **文档**
+  - API v2 文档: [docs/API-Documentation-v2.md](mdc:docs/API-Documentation-v2.md)
+  - 运维与部署: [docs/DEPLOYMENT-GUIDE-v2.md](mdc:docs/DEPLOYMENT-GUIDE-v2.md), [docs/OPERATIONS-RUNBOOK.md](mdc:docs/OPERATIONS-RUNBOOK.md)
+
+> 编辑提示：
+> - 新增/修改 API 时，请同步更新 `docs/API-Documentation-v2.md` 与相关测试用例（见 `tests/`）。
+> - 中间件的执行顺序与 CSP 配置与性能/安全强相关，修改前务必查阅“中间件顺序规则”。
+
 - 视图模板在 [views/](mdc:views/) 目录
 - 数据库相关脚本在 [db/](mdc:db/) 目录
 - 实用工具函数在 [utils/](mdc:utils/) 目录

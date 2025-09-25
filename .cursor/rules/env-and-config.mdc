@@ -1,0 +1,26 @@
+# 环境与配置
+- 统一读取： [config.js](mdc:config.js)、`.env`（示例见 [env.example](mdc:env.example)）
+- 关键项：
+  - `NODE_ENV`: development|test|production
+  - `PORT`: 默认 5678（dev）/ 8888（prod）
+  - `AUTH_ENABLED`, `AUTH_PASSWORD`, `API_TOKEN`
+  - `DB_PATH`: SQLite 文件路径
+  - `SESSION_DIR`, `SESSION_SECRET`
+  - `CORS_ORIGINS`: 逗号分隔来源白名单
+
+# 安全
+- CSP 由 `helmet` 配置控制，外链域名需显式允许（`cdn.jsdelivr.net`, `cdnjs.cloudflare.com`, `fonts.googleapis.com`, `fonts.gstatic.com`）。
+- 生产建议设置 `trust proxy` 以保证 `secure` Cookie 正常工作（见 [app.js](mdc:app.js)）。
+
+# CORS
+- 来源列表来自 `CORS_ORIGINS`；需跨站访问时添加对应域名。
+
+# 会话
+- 生产环境使用 `SESSION_DIR` 指定可写路径；容器部署请挂载该目录。
+
+# 变更流程
+- 修改配置项需同步更新：部署脚本/容器编排文件、CI/CD 变量以及相关文档。
+description:
+globs:
+alwaysApply: false
+---

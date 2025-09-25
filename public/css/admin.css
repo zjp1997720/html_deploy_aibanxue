@@ -634,15 +634,6 @@
     width: min(760px, 94vw);
 }
 
-.modal-clean.detail-modal .modal-body {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-bottom: 1.8rem;
-}
-
-
-}
-
 .modal-clean .modal-header {
     padding: 1.4rem 1.6rem 1.1rem;
     border-bottom: 1px solid #f1f5f9;
@@ -675,7 +666,9 @@
     padding: 1.6rem;
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 1.2rem;
+    max-height: min(70vh, calc(100vh - 200px));
+    overflow-y: auto;
 }
 
 .modal-clean .modal-footer {
@@ -1755,4 +1748,114 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-} 
+}
+
+/* ===== Minimal admin UI overrides ===== */
+.sidebar-nav .nav-list,
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toolbar-text-btn {
+    padding: 0.5rem 0.9rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--admin-dark);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.toolbar-text-btn:hover,
+.toolbar-text-btn:focus-visible {
+    color: var(--admin-primary);
+    outline: none;
+}
+
+.stats-container::before {
+    display: none;
+}
+
+.stats-container,
+.stats-compact .stat-card,
+.card-clean,
+.card,
+.metric-card,
+.endpoint-item {
+    box-shadow: none;
+    background: white;
+    border-color: var(--admin-border);
+}
+
+.stats-container:hover {
+    transform: none;
+}
+
+.bg-blue-gradient,
+.bg-green-gradient,
+.bg-orange-gradient,
+.bg-purple-gradient {
+    background: #e2e8f0;
+    color: #1f2937;
+    box-shadow: none;
+}
+
+.table-action {
+    width: auto;
+    height: auto;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--admin-primary);
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.table-action.danger {
+    color: var(--admin-danger);
+}
+
+.table-action.toggle {
+    color: var(--admin-warning);
+}
+
+.table-action:hover,
+.table-action:focus-visible {
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+    text-decoration: underline;
+    outline: none;
+}
+
+.actions-group {
+    gap: 0.4rem;
+}
+
+.stat-icon {
+    box-shadow: none;
+    background: #e2e8f0;
+    color: #1f2937;
+}
+
+.modal-clean {
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.modal-header-main,
+.detail-header {
+    gap: 0.75rem;
+}
+
+.detail-card,
+.endpoint-item,
+.metric-card {
+    border: 1px solid var(--admin-border);
+    background: var(--admin-light);
+}
+

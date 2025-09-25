@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: HTML 一键部署服务
+  description: 一个能将 HTML 代码片段快速部署为公开网页链接的工具。
+  version: 1.1.0
+servers:
+  - url: https://htmlshare.aibanxue.top
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
+paths:
+  /api/v2/pages/create:
+    post:
+      operationId: deployHtml
+      summary: 部署HTML代码
+      description: "提供HTML代码和API Key（Authorization: Bearer hg_xxx），将其部署为公开网页链接。"
+      security: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: "填写为: Bearer hg_xxx (注意包含 Bearer 和空格)"
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                htmlContent:
+                  type: string
+                  description: 需要部署的HTML代码片段。
+                isProtected:
+                  type: boolean
+                  description: 是否启用页面访问密码（默认 false）。
+                codeType:
+                  type: string
+                  description: 代码类型（html/markdown/svg/mermaid），默认 html。
+                name:
+                  type: string
+                  description: 页面名称（可选）。
+              required:
+                - htmlContent
+      responses:
+        '200':
+          description: 部署成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 页面ID
+                        example: abc1234
+                      url:
+                        type: string
+                        description: 部署后的公开访问链接
+                        example: https://htmlshare.aibanxue.top/view/abc1234
+                      password:
+                        type: string
+                        description: 若启用保护，返回访问密码
+                        example: "12345"
+                      isProtected:
+                        type: boolean
+                        example: false
+                      name:
+                        type: string
+                        nullable: true
+                        example: 我的页面
+                      codeType:
+                        type: string
+                        example: html
+                  timestamp:
+                    type: string
+                    description: 响应时间戳（由服务端增强中间件添加）
+                    example: "2025-09-25T12:00:00.000Z"
+        '400':
+          description: 请求不完整或无效
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: 请提供HTML内容
+                  code:
+                    type: string
+                    example: MISSING_CONTENT
+        '401':
+          description: 未授权（缺少或无效的 Authorization 头）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Unauthorized: Please provide valid API Token or API Key"
+        '403':
+          description: 权限不足（需要 write 权限）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: 权限不足
+                  code:
+                    type: string
+                    example: INSUFFICIENT_PERMISSIONS
+        '429':
+          description: 频率限制
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: 已超出使用限制
+                  code:
+                    type: string
+                    example: RATE_LIMIT_EXCEEDED

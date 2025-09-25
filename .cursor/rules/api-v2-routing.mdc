@@ -1,0 +1,34 @@
+# API v2 路由约定
+- 页面相关（认证：`apiKeyAuth(['write'])` 用于写操作，`apiKeyAuth(['read'])` 用于读操作）
+  - POST `/api/v2/pages/create`（write）
+  - GET `/api/v2/pages/:id`（read）
+  - GET `/api/v2/pages`（read，支持分页/搜索/筛选，参见实现）
+  - PUT `/api/v2/pages/:id`（write）
+  - DELETE `/api/v2/pages/:id`（write）
+- 统计与监控（认证：`apiKeyAuth(['read'])`）
+  - GET `/api/v2/stats/system`
+  - GET `/api/v2/stats/apikey/:keyId`
+  - GET `/api/v2/stats/apikey/:keyId/detailed`
+- 公开状态（无认证）
+  - GET `/api/v2/performance/status`
+  - GET `/api/v2/memory/status`
+  - GET `/api/v2/health`
+
+规则来源与实现参考：
+- 路由集中注册： [app.js](mdc:app.js)
+- 详细说明： [docs/API-Documentation-v2.md](mdc:docs/API-Documentation-v2.md)
+- 鉴权与增强响应： [middleware/apiKey.js](mdc:middleware/apiKey.js)
+
+# 返回结构与增强
+- 成功响应默认包含 `success: true`；带 API Key 的成功响应会追加 `usage` 与 `timestamp` 字段。
+- 创建页面返回包含：`url`, `password`, `isProtected`。
+
+# 修改规范
+- 新增/调整端点时：
+  1) 更新 [docs/API-Documentation-v2.md](mdc:docs/API-Documentation-v2.md)
+  2) 新增或更新对应测试（见 `tests/`）
+  3) 若权限变化，更新本规则与实现（`apiKeyAuth([...])`）
+description:
+globs:
+alwaysApply: false
+---

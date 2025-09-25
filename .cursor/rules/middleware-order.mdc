@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+description: 中间件顺序与关键安全/性能约定（Helmet、压缩、CORS、会话、监控、API Key）
+---
+
+# 中间件执行顺序（必须遵循）
+
+参考 [app.js](mdc:app.js) 实际注册顺序：
+
+1. Helmet CSP 与安全头（`helmet`）
+2. 压缩（`compression`）
+3. CORS（`cors`）
+4. 日志（`morgan`）
+5. 体解析（`bodyParser.json/urlencoded`，限制 15MB）
+6. Cookie 解析（`cookie-parser`）
+7. 静态资源（`/static` 与根路径，HTML 不缓存、静态资源长缓存）
+8. 会话（`express-session` + `session-file-store`，目录见 `SESSION_DIR` 或 `./sessions`）
+9. 视图引擎（EJS）
+10. 性能监控（[middleware/responseTimeMonitor.js](mdc:middleware/responseTimeMonitor.js)）
+11. 运行时监控与指标（[middleware/monitoring.js](mdc:middleware/monitoring.js)）
+12. 健康检查、监控端点（`/health`, `/metrics`, `/admin/stats`）
+13. 认证路由（`/login`, `/logout`）
+14. 现代 API v2 与权限控制（在 `app.js` 中集中：`/api/v2/*`）
+15. 视图/HTML 动态渲染（`/view/:id`）
+
+# 重要约定
+- 修改顺序会影响 CSP、会话、性能采集与速率限制，严禁随意调整。
+- v2 API 使用组合中间件 [middleware/apiKey.js](mdc:middleware/apiKey.js) 的 `apiKeyAuth([permissions])`：
+  - 自动验证、限流检查、用量记录、增强响应（追加 `usage` 与 `timestamp`）。
+- 旧版向后兼容：`isAuthenticatedOrApiKey` 允许 Web 会话、旧 Token、API Key 三选一。
+- 静态文件缓存策略：HTML `no-cache`，其余资源 `immutable, max-age=31536000`。
+- 生产环境建议 `app.set('trust proxy', 1)` 已在入口启用，避免 `secure` Cookie 丢失。

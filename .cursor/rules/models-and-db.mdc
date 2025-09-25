@@ -1,0 +1,31 @@
+# 数据库与模型
+- 数据库适配与初始化： [models/db.js](mdc:models/db.js)
+  - 表结构：
+    - `pages(id, html_content, created_at, password, is_protected, code_type, name)`
+    - `performance_logs(...)`（端点级性能日志与指标）
+    - `api_keys(...)`（仅存储 `key_hash`，不存明文）
+    - `api_usage_logs(...)`（API Key 使用轨迹）
+  - 查询助手：`query(sql)`, `get(sql)`, `run(sql)`
+  - 备份/恢复：启动或 schema 迁移后自动创建备份；最多保留 7 份
+- 页面模型： [models/pages.js](mdc:models/pages.js)
+  - `createPage(html, isProtected, codeType, name)`（ID 冲突自动重试）
+  - `getPageById`, `getPagesList`, `getAllPages`, `getPagesStats`
+  - `batchDeletePages`, `batchUpdateProtection`, `updatePage`, `deletePage`
+- API Key 模型： [models/apiKeys.js](mdc:models/apiKeys.js)
+  - `createApiKey`, `validateApiKey`, `updateLastUsed`
+  - `checkUsageLimits`, `logApiUsage`
+  - 统计：`getApiKeyStats`, `getDetailedApiKeyStats`, `getOverallApiStats`
+
+# 环境变量与路径
+- `DB_PATH`：数据库文件路径（默认 `./db/html-go.db`），支持绝对/相对路径
+- `PAGE_ID_STRATEGY`：`md5`（默认，7位）或 `base62`（10位）
+- `PAGE_ID_MAX_RETRIES`：ID 冲突重试次数（默认 5）
+
+# 约定与注意
+- 生产环境下勿直接修改数据库文件；通过提供的模型方法或迁移脚本进行。
+- 新增列使用 `ensureColumn` 方式向后兼容；避免破坏已有数据。
+- `api_keys` 仅存 hash；若需明文，仅在创建时下发保存。
+description:
+globs:
+alwaysApply: false
+---

@@ -1,0 +1,20 @@
+# 视图结构与约定
+- 视图目录： [views/](mdc:views)
+  - 布局：`views/layouts/*`
+  - 管理后台：`views/admin/*`
+  - 登录页：`views/login-modern.ejs`
+  - 首页/仪表盘：`views/index-modern.ejs`, `views/dashboard-modern.ejs`
+  - 受保护访问：`views/password.ejs`
+
+# 动态视图路由
+- `/view/:id` 由 [app.js](mdc:app.js) 提供动态 HTML 渲染
+- 受保护页面通过 `password` 参数解锁（参考 `views/password.ejs` 行为）
+- 注意：`/view/:id` 为动态内容，不应被 CDN 缓存
+
+# 开发提示
+- 新增页面时复用布局与公共片段（`views/partials/*`），确保一致的样式与导航
+- 若页面引用静态资源，请放置在 `public/` 并遵循“静态资源与缓存规则”
+description:
+globs:
+alwaysApply: false
+---

@@ -82,27 +82,7 @@ app.locals.config = config;
 
 // 安全中间件设置
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-      imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
-      // 允许 Google Fonts 相关的预连接与资源获取，避免 CSP 阻断导致样式异常
-      connectSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net",
-        "https://fonts.googleapis.com",
-        "https://fonts.gstatic.com",
-        "https://cdnjs.cloudflare.com"
-      ],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      formAction: ["'self'"],
-    },
-  },
+  contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
 

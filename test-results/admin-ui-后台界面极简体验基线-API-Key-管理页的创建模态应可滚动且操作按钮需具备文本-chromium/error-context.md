@@ -1,0 +1,66 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - text: 🚀
+  - heading "HTML-GO" [level=1]
+  - link "首页":
+    - /url: /
+  - link "管理后台":
+    - /url: /admin/dashboard
+  - button ""
+- main:
+  - heading "分享AI生成内容的 最佳方式" [level=1]
+  - paragraph: 简单、快速、安全地分享HTML、Markdown、SVG等内容。 专为AI时代的内容创作者设计。
+  - button " 立即开始"
+  - link " 管理后台":
+    - /url: /admin/dashboard
+  - heading "粘贴您的内容" [level=2]
+  - paragraph: 支持HTML、Markdown、SVG、Mermaid等多种格式
+  - text:  HTML 自动检测内容类型
+  - button ""
+  - button ""
+  - button ""
+  - textbox "在这里粘贴或输入您的HTML、Markdown、SVG或Mermaid代码..."
+  - button "Choose File"
+  - heading "密码保护" [level=4]
+  - paragraph: 为您的内容添加访问密码
+  - checkbox
+  - button " 预览" [disabled]
+  - button " 生成分享链接" [disabled]
+  - heading "为什么选择 HTML-GO" [level=2]
+  - paragraph: 专为现代内容创作者设计的分享平台
+  - text: 
+  - heading "极速分享" [level=3]
+  - paragraph: 粘贴内容即可立即生成分享链接，无需注册或复杂配置
+  - text: 
+  - heading "安全可靠" [level=3]
+  - paragraph: 支持密码保护，确保您的内容只有授权用户才能访问
+  - text: 
+  - heading "智能识别" [level=3]
+  - paragraph: 自动识别HTML、Markdown、SVG、Mermaid等多种内容格式
+  - heading "平台数据" [level=3]
+  - text: 1,234 今日分享 56,789 总访问量 99.9% 可用性 < 1s 响应时间
+- contentinfo:
+  - text: 🚀
+  - heading "HTML-GO" [level=3]
+  - paragraph: 专业的HTML内容分享平台，让AI生成的内容轻松分享给世界。简单、快速、安全。
+  - heading "快速链接" [level=4]
+  - list:
+    - listitem:
+      - link "首页":
+        - /url: /
+    - listitem:
+      - link "管理后台":
+        - /url: /admin/dashboard
+  - heading "联系我们" [level=4]
+  - list:
+    - listitem:
+      - link " Twitter":
+        - /url: https://x.com/vista8
+  - paragraph: © 2025 HTML-GO. All rights reserved.
+  - paragraph:
+    - text: Made with ❤️ by
+    - link "向阳乔木":
+      - /url: https://x.com/vista8
+```

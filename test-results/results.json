@@ -160,23 +160,47 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 4,
+                      "status": "timedOut",
+                      "duration": 31714,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js",
+                            "column": 14,
+                            "line": 11
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'change_me_strong_password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m }\n \u001b[90m 13 |\u001b[39m\n \u001b[90m 14 |\u001b[39m \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at adminLogin (E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:11:14)\u001b[22m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:38:5\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.096Z",
+                      "startTime": "2025-09-29T00:14:25.279Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-API-Key-管理页的创建模态应可滚动且操作按钮需具备文本-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-API-Key-管理页的创建模态应可滚动且操作按钮需具备文本-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-API-Key-管理页的创建模态应可滚动且操作按钮需具备文本-chromium\\error-context.md"
+                        }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -202,23 +226,47 @@
                     {
                       "workerIndex": 1,
                       "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 4,
+                      "status": "timedOut",
+                      "duration": 31711,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js",
+                            "column": 14,
+                            "line": 11
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'change_me_strong_password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m }\n \u001b[90m 13 |\u001b[39m\n \u001b[90m 14 |\u001b[39m \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at adminLogin (E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:11:14)\u001b[22m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:71:5\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.124Z",
+                      "startTime": "2025-09-29T00:14:25.282Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-概览页快捷操作需无边框展示-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-概览页快捷操作需无边框展示-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-概览页快捷操作需无边框展示-chromium\\error-context.md"
+                        }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -244,23 +292,47 @@
                     {
                       "workerIndex": 2,
                       "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 4,
+                      "status": "timedOut",
+                      "duration": 31757,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js",
+                            "column": 14,
+                            "line": 11
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'change_me_strong_password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m }\n \u001b[90m 13 |\u001b[39m\n \u001b[90m 14 |\u001b[39m \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at adminLogin (E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:11:14)\u001b[22m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:85:5\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.062Z",
+                      "startTime": "2025-09-29T00:14:25.304Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面管理侧栏应移除无序列表圆点-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面管理侧栏应移除无序列表圆点-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面管理侧栏应移除无序列表圆点-chromium\\error-context.md"
+                        }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -286,23 +358,47 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 4,
+                      "status": "timedOut",
+                      "duration": 31564,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js",
+                            "column": 14,
+                            "line": 11
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"**/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"password\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'change_me_strong_password'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'button[type=\"submit\"]'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'**/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m }\n \u001b[90m 13 |\u001b[39m\n \u001b[90m 14 |\u001b[39m \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at adminLogin (E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:11:14)\u001b[22m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\admin-ui.spec.js:94:5\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.164Z",
+                      "startTime": "2025-09-29T00:14:25.283Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面编辑模态体需具备滚动能力避免割裂体验-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面编辑模态体需具备滚动能力避免割裂体验-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\admin-ui-后台界面极简体验基线-页面编辑模态体需具备滚动能力避免割裂体验-chromium\\error-context.md"
+                        }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -312,9 +408,26 @@
               "file": "admin-ui.spec.js",
               "line": 93,
               "column": 3
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "login.spec.js",
+      "file": "login.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "登录功能测试",
+          "file": "login.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
             {
-              "title": "API Key 管理页的创建模态应可滚动且操作按钮需具备文本",
+              "title": "成功登录到管理后台",
               "ok": false,
               "tags": [],
               "tests": [
@@ -322,41 +435,65 @@
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 4,
                       "parallelIndex": 4,
-                      "status": "failed",
-                      "duration": 5,
+                      "status": "timedOut",
+                      "duration": 31559,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js",
+                            "column": 16,
+                            "line": 18
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5678/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m 16 |\u001b[39m     \n \u001b[90m 17 |\u001b[39m     \u001b[90m// 等待跳转到管理后台\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'http://localhost:5678/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 19 |\u001b[39m     \n \u001b[90m 20 |\u001b[39m     \u001b[90m// 验证登录成功\u001b[39m\n \u001b[90m 21 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'管理后台'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js:18:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.160Z",
+                      "startTime": "2025-09-29T00:14:25.281Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-成功登录到管理后台-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-成功登录到管理后台-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-成功登录到管理后台-chromium\\error-context.md"
+                        }
+                      ]
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "61137e1aaff39a5bdcb6-7b1c1bbc9d459e5f94ab",
-              "file": "admin-ui.spec.js",
-              "line": 37,
+              "id": "badc1754af1944f68b2b-3dead31d12537e6bbc69",
+              "file": "login.spec.js",
+              "line": 4,
               "column": 3
             },
             {
-              "title": "概览页快捷操作需无边框展示",
+              "title": "密码错误时显示错误信息",
               "ok": false,
               "tags": [],
               "tests": [
@@ -364,83 +501,107 @@
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 5,
                       "parallelIndex": 5,
                       "status": "failed",
-                      "duration": 4,
+                      "duration": 11799,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.alert-danger') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.alert-danger') to be visible\u001b[22m\n\n    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js:39:16",
+                        "location": {
+                          "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js",
+                          "column": 16,
+                          "line": 39
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 37 |\u001b[39m     \n \u001b[90m 38 |\u001b[39m     \u001b[90m// 等待错误消息显示\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 39 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'.alert-danger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 40 |\u001b[39m     \n \u001b[90m 41 |\u001b[39m     \u001b[90m// 验证错误信息\u001b[39m\n \u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'.alert-danger'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'密码错误'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js",
+                            "column": 16,
+                            "line": 39
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.alert-danger') to be visible\u001b[22m\n\n\n\u001b[0m \u001b[90m 37 |\u001b[39m     \n \u001b[90m 38 |\u001b[39m     \u001b[90m// 等待错误消息显示\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 39 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'.alert-danger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 40 |\u001b[39m     \n \u001b[90m 41 |\u001b[39m     \u001b[90m// 验证错误信息\u001b[39m\n \u001b[90m 42 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'.alert-danger'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'密码错误'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js:39:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.264Z",
+                      "startTime": "2025-09-29T00:14:25.309Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-密码错误时显示错误信息-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-密码错误时显示错误信息-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-密码错误时显示错误信息-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js",
+                        "column": 16,
+                        "line": 39
+                      }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "61137e1aaff39a5bdcb6-86e440bfcfca5ef61f3b",
-              "file": "admin-ui.spec.js",
-              "line": 70,
+              "id": "badc1754af1944f68b2b-9467eb9d61192463ee11",
+              "file": "login.spec.js",
+              "line": 25,
               "column": 3
             },
             {
-              "title": "页面管理侧栏应移除无序列表圆点",
-              "ok": false,
+              "title": "未登录访问管理页面时重定向到登录页",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 6,
                       "parallelIndex": 6,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1539,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.134Z",
+                      "startTime": "2025-09-29T00:14:25.308Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "61137e1aaff39a5bdcb6-942751a9a31ea798688c",
-              "file": "admin-ui.spec.js",
-              "line": 84,
+              "id": "badc1754af1944f68b2b-7718edd12f9a58ab21d0",
+              "file": "login.spec.js",
+              "line": 45,
               "column": 3
             },
             {
-              "title": "页面编辑模态体需具备滚动能力避免割裂体验",
+              "title": "登录后可以访问页面",
               "ok": false,
               "tags": [],
               "tests": [
@@ -448,541 +609,61 @@
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 7,
                       "parallelIndex": 7,
-                      "status": "failed",
-                      "duration": 4,
+                      "status": "timedOut",
+                      "duration": 31690,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\firefox-1489\\firefox\\firefox.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js",
+                            "column": 16,
+                            "line": 60
+                          },
+                          "message": "Error: page.waitForURL: Test timeout of 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5678/admin/dashboard\" until \"load\"\n============================================================\n\n\u001b[0m \u001b[90m 58 |\u001b[39m     \n \u001b[90m 59 |\u001b[39m     \u001b[90m// 等待跳转\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 60 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[32m'http://localhost:5678/admin/dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 61 |\u001b[39m     \n \u001b[90m 62 |\u001b[39m     \u001b[90m// 访问主页\u001b[39m\n \u001b[90m 63 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'http://localhost:5678/'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\tests\\__tests__\\e2e\\login.spec.js:60:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-22T09:24:06.188Z",
+                      "startTime": "2025-09-29T00:14:25.324Z",
                       "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-e6694d8d393549f264cc",
-              "file": "admin-ui.spec.js",
-              "line": 93,
-              "column": 3
-            },
-            {
-              "title": "API Key 管理页的创建模态应可滚动且操作按钮需具备文本",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 8,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 4,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "attachments": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.515Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-28b1093cad3a068fd4b7",
-              "file": "admin-ui.spec.js",
-              "line": 37,
-              "column": 3
-            },
-            {
-              "title": "概览页快捷操作需无边框展示",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 9,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 4,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-登录后可以访问页面-chromium\\test-failed-1.png"
+                        },
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.544Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-057a4764b8b339a9ffb8",
-              "file": "admin-ui.spec.js",
-              "line": 70,
-              "column": 3
-            },
-            {
-              "title": "页面管理侧栏应移除无序列表圆点",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 10,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 4,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-登录后可以访问页面-chromium\\video.webm"
+                        },
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "E:\\第一桶金\\AI Breakthrough\\AI-coding\\html_deploy_project\\test-results\\login-登录功能测试-登录后可以访问页面-chromium\\error-context.md"
                         }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.523Z",
-                      "annotations": [],
-                      "attachments": []
+                      ]
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "61137e1aaff39a5bdcb6-541e799a172967c401b3",
-              "file": "admin-ui.spec.js",
-              "line": 84,
-              "column": 3
-            },
-            {
-              "title": "页面编辑模态体需具备滚动能力避免割裂体验",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 11,
-                      "parallelIndex": 4,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.542Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-d0899c3db989d5085d19",
-              "file": "admin-ui.spec.js",
-              "line": 93,
-              "column": 3
-            },
-            {
-              "title": "API Key 管理页的创建模态应可滚动且操作按钮需具备文本",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 12,
-                      "parallelIndex": 6,
-                      "status": "failed",
-                      "duration": 4,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.550Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-f72f7e1b7b973cec56dc",
-              "file": "admin-ui.spec.js",
-              "line": 37,
-              "column": 3
-            },
-            {
-              "title": "概览页快捷操作需无边框展示",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 13,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 4,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.541Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-d39419c4cc1a041740a6",
-              "file": "admin-ui.spec.js",
-              "line": 70,
-              "column": 3
-            },
-            {
-              "title": "页面管理侧栏应移除无序列表圆点",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 14,
-                      "parallelIndex": 7,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.572Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-712fb2bb113684704b3e",
-              "file": "admin-ui.spec.js",
-              "line": 84,
-              "column": 3
-            },
-            {
-              "title": "页面编辑模态体需具备滚动能力避免割裂体验",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 15,
-                      "parallelIndex": 5,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1181\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:07.608Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-14d209181a44fea02e98",
-              "file": "admin-ui.spec.js",
-              "line": 93,
-              "column": 3
-            },
-            {
-              "title": "API Key 管理页的创建模态应可滚动且操作按钮需具备文本",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 17,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:08.337Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-c8585b777be1ae9e4595",
-              "file": "admin-ui.spec.js",
-              "line": 37,
-              "column": 3
-            },
-            {
-              "title": "概览页快捷操作需无边框展示",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 16,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:08.342Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-f316631da63e6e919924",
-              "file": "admin-ui.spec.js",
-              "line": 70,
-              "column": 3
-            },
-            {
-              "title": "页面管理侧栏应移除无序列表圆点",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 19,
-                      "parallelIndex": 4,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:08.358Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-987868816f67e0814c36",
-              "file": "admin-ui.spec.js",
-              "line": 84,
-              "column": 3
-            },
-            {
-              "title": "页面编辑模态体需具备滚动能力避免割裂体验",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 18,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 3,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\Administrator\\AppData\\Local\\ms-playwright\\webkit-2191\\Playwright.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-09-22T09:24:08.347Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "61137e1aaff39a5bdcb6-4938e976aac110ec6657",
-              "file": "admin-ui.spec.js",
-              "line": 93,
+              "id": "badc1754af1944f68b2b-50e70891ccf37f6519a2",
+              "file": "login.spec.js",
+              "line": 53,
               "column": 3
             }
           ]
@@ -992,11 +673,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-22T09:24:04.768Z",
-    "duration": 3635.322,
-    "expected": 0,
+    "startTime": "2025-09-29T00:14:22.168Z",
+    "duration": 35694.254,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 20,
+    "unexpected": 7,
     "flaky": 0
   }
 }

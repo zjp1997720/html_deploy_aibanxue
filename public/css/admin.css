@@ -1563,53 +1563,72 @@
     font-size: 1rem;
 }
 
-/* 按钮样式 */
+/* 按钮样式 - 极简版本 */
 .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
     border-radius: 6px;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    transition: var(--admin-transition);
-    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .btn-primary {
     background-color: var(--admin-primary);
     color: white;
+    border-color: var(--admin-primary);
 }
 
 .btn-primary:hover {
     background-color: var(--admin-primary-hover);
+    border-color: var(--admin-primary-hover);
 }
 
 .btn-secondary {
-    background-color: var(--admin-secondary);
-    color: white;
+    background-color: white;
+    color: #6b7280;
+    border-color: #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background-color: #f8fafc;
+    color: #1f2937;
+    border-color: #cbd5e1;
 }
 
 .btn-success {
     background-color: var(--admin-success);
     color: white;
+    border-color: var(--admin-success);
 }
 
 .btn-warning {
     background-color: var(--admin-warning);
     color: white;
+    border-color: var(--admin-warning);
 }
 
 .btn-danger {
     background-color: var(--admin-danger);
     color: white;
+    border-color: var(--admin-danger);
+}
+
+.btn-info {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
 }
 
 .btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 6px 12px;
+    font-size: 13px;
 }
 
 /* 卡片样式 */
@@ -1763,8 +1782,8 @@
     border: 1px solid transparent;
     border-radius: 6px;
     background: transparent;
-    color: var(--admin-dark);
-    font-size: 0.85rem;
+    color: #1f2937;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: color 0.2s ease;
@@ -1773,6 +1792,7 @@
 .toolbar-text-btn:hover,
 .toolbar-text-btn:focus-visible {
     color: var(--admin-primary);
+    background: #f8fafc;
     outline: none;
 }
 
@@ -1788,18 +1808,19 @@
 .endpoint-item {
     box-shadow: none;
     background: white;
-    border-color: var(--admin-border);
+    border-color: #e2e8f0;
 }
 
 .stats-container:hover {
     transform: none;
+    box-shadow: none;
 }
 
 .bg-blue-gradient,
 .bg-green-gradient,
 .bg-orange-gradient,
 .bg-purple-gradient {
-    background: #e2e8f0;
+    background: transparent;
     color: #1f2937;
     box-shadow: none;
 }
@@ -1807,13 +1828,14 @@
 .table-action {
     width: auto;
     height: auto;
-    padding: 0.35rem 0.65rem;
+    padding: 6px 12px;
     border-radius: 6px;
     border: 1px solid transparent;
     background: transparent;
     color: var(--admin-primary);
     font-weight: 500;
-    transition: color 0.2s ease;
+    font-size: 13px;
+    transition: all 0.15s ease;
 }
 
 .table-action.danger {
@@ -1821,41 +1843,45 @@
 }
 
 .table-action.toggle {
-    color: var(--admin-warning);
+    color: #6b7280;
 }
 
-.table-action:hover,
-.table-action:focus-visible {
+.table-action:hover {
     transform: none;
     box-shadow: none;
-    background: transparent;
-    text-decoration: underline;
-    outline: none;
+    background: #f8fafc;
+    border-color: currentColor;
+}
+
+.table-action:focus-visible {
+    outline: 2px solid var(--admin-primary);
+    outline-offset: 2px;
 }
 
 .actions-group {
-    gap: 0.4rem;
+    gap: 8px;
 }
 
 .stat-icon {
     box-shadow: none;
-    background: #e2e8f0;
-    color: #1f2937;
+    background: transparent;
+    color: #6b7280;
 }
 
 .modal-clean {
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
 }
 
 .modal-header-main,
 .detail-header {
-    gap: 0.75rem;
+    gap: 12px;
 }
 
 .detail-card,
 .endpoint-item,
 .metric-card {
-    border: 1px solid var(--admin-border);
-    background: var(--admin-light);
+    border: 1px solid #e2e8f0;
+    background: white;
 }
 

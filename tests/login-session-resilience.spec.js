@@ -33,8 +33,35 @@ test.describe('登录韧性与CSP', () => {
 
     // 断言CSP头包含fonts.google域名（避免样式丢失）
     const csp = mainResponse.headers()['content-security-policy'] || '';
-    expect(csp).toContain('fonts.googleapis.com');
-    expect(csp).toContain('fonts.gstatic.com');
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(csp).toContain("img-src 'self' data:");
+    const requiredScriptSources = [
+      'cdn.bootcdn.net',
+      'cdn.jsdelivr.net',
+      'cdnjs.cloudflare.com',
+      'cdn.tailwindcss.com',
+      'polyfill.io',
+      'www.jsdelivr.com'
+    ];
+    requiredScriptSources.forEach(domain => {
+      expect(csp).toContain(domain);
+    });
+    const requiredStyleSources = [
+      'cdn.bootcdn.net',
+      'cdn.jsdelivr.net',
+      'cdnjs.cloudflare.com'
+    ];
+    requiredStyleSources.forEach(domain => {
+      expect(csp).toContain(domain);
+    });
+    const requiredFontSources = [
+      'cdn.bootcdn.net',
+      'cdnjs.cloudflare.com'
+    ];
+    requiredFontSources.forEach(domain => {
+      expect(csp).toContain(domain);
+    });
 
     // 等待CSS资源加载并校验
     const cssResp = await page.waitForResponse(r => /\/css\/design-system\.css$/.test(r.url()));
@@ -43,4 +70,3 @@ test.describe('登录韧性与CSP', () => {
     expect(ct.includes('text/css')).toBeTruthy();
   });
 });
-

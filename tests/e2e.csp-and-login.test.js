@@ -64,12 +64,42 @@ afterAll(() => {
   }
 });
 
-test('CSP 包含 Google Fonts 域名且 CSS 可达', async () => {
+test('CSP 指令涵盖所需 CDN 域名且 CSS 可达', async () => {
   const resp = await fetch(`${BASE}/login`);
   expect(resp.status).toBe(200);
   const csp = resp.headers.get('content-security-policy') || '';
-  expect(csp).toContain('fonts.googleapis.com');
-  expect(csp).toContain('fonts.gstatic.com');
+  expect(csp).toContain("default-src 'self'");
+  expect(csp).toContain('script-src');
+  expect(csp).toContain('style-src');
+  expect(csp).toContain('img-src');
+  const requiredScriptSources = [
+    'cdn.bootcdn.net',
+    'cdn.jsdelivr.net',
+    'cdnjs.cloudflare.com',
+    'cdn.tailwindcss.com',
+    'polyfill.io',
+    'www.jsdelivr.com'
+  ];
+  requiredScriptSources.forEach(domain => {
+    expect(csp).toContain(domain);
+  });
+  const requiredStyleSources = [
+    'cdn.bootcdn.net',
+    'cdn.jsdelivr.net',
+    'cdnjs.cloudflare.com'
+  ];
+  requiredStyleSources.forEach(domain => {
+    expect(csp).toContain(domain);
+  });
+  const requiredFontSources = [
+    'cdn.bootcdn.net',
+    'cdnjs.cloudflare.com'
+  ];
+  requiredFontSources.forEach(domain => {
+    expect(csp).toContain(domain);
+  });
+  expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+  expect(csp).toContain("img-src 'self' data:");
 
   const cssResp = await fetch(`${BASE}/css/design-system.css`);
   expect(cssResp.status).toBe(200);
@@ -106,4 +136,3 @@ test('登录后可访问首页（无卡顿）', async () => {
   const html = await homeResp.text();
   expect(html).toMatch(/HTML-GO/);
 });
-

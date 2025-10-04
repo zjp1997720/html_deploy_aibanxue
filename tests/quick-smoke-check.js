@@ -59,9 +59,48 @@ function buildCookieHeader(setCookieHeaders) {
     const resp = await fetch(`${BASE}/login`);
     if (resp.status !== 200) throw new Error(`/login status ${resp.status}`);
     const csp = resp.headers.get('content-security-policy') || '';
-    if (!csp.includes('fonts.googleapis.com') || !csp.includes('fonts.gstatic.com')) {
-      throw new Error('CSP 缺少 Google Fonts 域名');
-    }
+    const requiredClauses = [
+      "default-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:"
+    ];
+    requiredClauses.forEach(clause => {
+      if (!csp.includes(clause)) {
+        throw new Error(`CSP 缺少指令: ${clause}`);
+      }
+    });
+    const requiredScriptSources = [
+      'cdn.bootcdn.net',
+      'cdn.jsdelivr.net',
+      'cdnjs.cloudflare.com',
+      'cdn.tailwindcss.com',
+      'polyfill.io',
+      'www.jsdelivr.com'
+    ];
+    requiredScriptSources.forEach(domain => {
+      if (!csp.includes(domain)) {
+        throw new Error(`CSP 缺少脚本域: ${domain}`);
+      }
+    });
+    const requiredStyleSources = [
+      'cdn.bootcdn.net',
+      'cdn.jsdelivr.net',
+      'cdnjs.cloudflare.com'
+    ];
+    requiredStyleSources.forEach(domain => {
+      if (!csp.includes(domain)) {
+        throw new Error(`CSP 缺少样式域: ${domain}`);
+      }
+    });
+    const requiredFontSources = [
+      'cdn.bootcdn.net',
+      'cdnjs.cloudflare.com'
+    ];
+    requiredFontSources.forEach(domain => {
+      if (!csp.includes(domain)) {
+        throw new Error(`CSP 缺少字体域: ${domain}`);
+      }
+    });
 
     // 2) 检查 CSS 可达
     const cssResp = await fetch(`${BASE}/css/design-system.css`);

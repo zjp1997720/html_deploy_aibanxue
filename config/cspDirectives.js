@@ -14,6 +14,7 @@ function createCspDirectives() {
     defaultSrc: ["'self'"],
     scriptSrc: [
       "'self'",
+      "'unsafe-inline'", // 为保证本项目课件的可用性，短期放行少量内联初始化脚本
       'https:',
       'blob:',
       'data:',

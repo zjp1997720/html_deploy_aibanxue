@@ -74,6 +74,7 @@ test('CSP 指令涵盖所需 CDN 域名且 CSS 可达', async () => {
   expect(csp).toContain('img-src');
   const requiredScriptSources = [
     "'self'",
+    "'unsafe-inline'",
     'https:',
     'blob:',
     'data:',

@@ -12,6 +12,7 @@ describe('CSP 配置策略', () => {
   test('脚本策略必须允许 https scheme 与三层 CDN', () => {
     expect(directives.scriptSrc).toEqual(expect.arrayContaining([
       "'self'",
+      "'unsafe-inline'",
       'https:',
       'https://cdn.bootcdn.net',
       'https://cdn.jsdelivr.net',

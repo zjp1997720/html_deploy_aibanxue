@@ -73,17 +73,24 @@ test('CSP 指令涵盖所需 CDN 域名且 CSS 可达', async () => {
   expect(csp).toContain('style-src');
   expect(csp).toContain('img-src');
   const requiredScriptSources = [
+    "'self'",
+    'https:',
+    'blob:',
+    'data:',
     'cdn.bootcdn.net',
     'cdn.jsdelivr.net',
     'cdnjs.cloudflare.com',
-    'cdn.tailwindcss.com',
-    'polyfill.io',
-    'www.jsdelivr.com'
+    'polyfill.io'
   ];
   requiredScriptSources.forEach(domain => {
     expect(csp).toContain(domain);
   });
   const requiredStyleSources = [
+    "'self'",
+    "'unsafe-inline'",
+    'https:',
+    'blob:',
+    'data:',
     'cdn.bootcdn.net',
     'cdn.jsdelivr.net',
     'cdnjs.cloudflare.com'
@@ -92,7 +99,12 @@ test('CSP 指令涵盖所需 CDN 域名且 CSS 可达', async () => {
     expect(csp).toContain(domain);
   });
   const requiredFontSources = [
+    "'self'",
+    'https:',
+    'data:',
+    'blob:',
     'cdn.bootcdn.net',
+    'cdn.jsdelivr.net',
     'cdnjs.cloudflare.com'
   ];
   requiredFontSources.forEach(domain => {

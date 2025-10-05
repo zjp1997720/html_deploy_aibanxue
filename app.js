@@ -64,57 +64,7 @@ const { cache } = require('./utils/cacheManager');
 
 // 导入配置
 const config = require('./config');
-
-const cspDirectives = {
-  defaultSrc: ["'self'"],
-  scriptSrc: [
-    "'self'",
-    'https:',
-    'blob:',
-    'data:',
-    'https://cdn.bootcdn.net',
-    'https://cdn.jsdelivr.net',
-    'https://cdnjs.cloudflare.com',
-    'https://cdn.tailwindcss.com',
-    'https://polyfill.io',
-    'https://www.jsdelivr.com'
-  ],
-  styleSrc: [
-    "'self'",
-    "'unsafe-inline'",
-    'https:',
-    'blob:',
-    'data:',
-    'https://cdn.bootcdn.net',
-    'https://cdn.jsdelivr.net',
-    'https://cdnjs.cloudflare.com',
-    'https://fonts.googleapis.com'
-  ],
-  fontSrc: [
-    "'self'",
-    'https:',
-    'data:',
-    'blob:',
-    'https://cdn.bootcdn.net',
-    'https://cdnjs.cloudflare.com',
-    'https://fonts.gstatic.com'
-  ],
-  imgSrc: [
-    "'self'",
-    'data:',
-    'blob:'
-  ],
-  connectSrc: [
-    "'self'",
-    'https:',
-    'wss:'
-  ],
-  objectSrc: ["'none'"],
-  frameAncestors: ["'none'"],
-  baseUri: ["'self'"],
-  formAction: ["'self'"],
-  upgradeInsecureRequests: []
-};
+const { cspDirectives } = require('./config/cspDirectives');
 
 // 路由导入
 const pagesRoutes = require('./routes/pages');

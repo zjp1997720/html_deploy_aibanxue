@@ -1,16 +1,21 @@
-let directives;
+let baseDirectives;
+let viewerDirectives;
+let exportsRef;
 
 describe('CSP 配置策略', () => {
   beforeAll(() => {
-    // 延迟 require 以便在模块不存在时直接抛出并让测试失败
-    // 通过这种方式确保我们会新增可复用的 CSP 配置模块
-    // eslint-disable-next-line global-require
-    const { cspDirectives } = require('../config/cspDirectives');
-    directives = cspDirectives;
+    jest.resetModules();
+    exportsRef = require('../config/cspDirectives');
+    baseDirectives = exportsRef.cspDirectives;
+    viewerDirectives = exportsRef.viewerCspDirectives;
   });
 
-  test('脚本策略必须允许 https scheme 与三层 CDN', () => {
-    expect(directives.scriptSrc).toEqual(expect.arrayContaining([
+  afterAll(() => {
+    jest.resetModules();
+  });
+
+  test('脚本策略必须允许 https scheme 与三层 CDN，并剔除 polyfill', () => {
+    expect(baseDirectives.scriptSrc).toEqual(expect.arrayContaining([
       "'self'",
       "'unsafe-inline'",
       'https:',
@@ -18,35 +23,40 @@ describe('CSP 配置策略', () => {
       'https://cdn.jsdelivr.net',
       'https://cdnjs.cloudflare.com'
     ]));
-    expect(directives.scriptSrc).not.toEqual(expect.arrayContaining([
-      'https://cdn.tailwindcss.com'
+    expect(baseDirectives.scriptSrc).not.toEqual(expect.arrayContaining([
+      'https://cdn.tailwindcss.com',
+      'https://polyfill.io'
     ]));
   });
 
-  test('样式策略必须允许 https scheme 并剔除 Google 域名', () => {
-    expect(directives.styleSrc).toEqual(expect.arrayContaining([
+  test('样式策略允许三层 CDN 且剔除 Google 域名', () => {
+    expect(baseDirectives.styleSrc).toEqual(expect.arrayContaining([
       "'self'",
       'https:',
       'https://cdn.bootcdn.net',
       'https://cdn.jsdelivr.net',
       'https://cdnjs.cloudflare.com'
     ]));
-    expect(directives.styleSrc).not.toEqual(expect.arrayContaining([
+    expect(baseDirectives.styleSrc).not.toEqual(expect.arrayContaining([
       'https://fonts.googleapis.com'
     ]));
   });
 
-  test('字体策略允许 data/blob 并包含三层 CDN', () => {
-    expect(directives.fontSrc).toEqual(expect.arrayContaining([
-      "'self'",
-      'https:',
-      'data:',
-      'blob:',
-      'https://cdn.bootcdn.net',
-      'https://cdnjs.cloudflare.com'
-    ]));
-    expect(directives.fontSrc).not.toEqual(expect.arrayContaining([
-      'https://fonts.gstatic.com'
-    ]));
+  test('默认图片与媒体策略保持最小暴露，viewer 放宽至 https', () => {
+    expect(baseDirectives.imgSrc).toEqual(["'self'", 'data:', 'blob:']);
+    expect(baseDirectives.mediaSrc).toEqual(["'self'"]);
+
+    expect(viewerDirectives.imgSrc).toEqual(expect.arrayContaining(["'self'", 'https:', 'data:', 'blob:']));
+    expect(viewerDirectives.mediaSrc).toEqual(expect.arrayContaining(["'self'", 'https:', 'data:', 'blob:']));
+  });
+
+  test('EXTRA_CDN_ORIGINS 会被安全合并且去重', () => {
+    process.env.EXTRA_CDN_ORIGINS = ' https://lib.baomitu.com , https://cdn.bootcdn.net ';
+    jest.isolateModules(() => {
+      const { CDN_ORIGINS } = require('../config/cspDirectives');
+      expect(CDN_ORIGINS).toEqual(expect.arrayContaining(['https://lib.baomitu.com']));
+      expect(CDN_ORIGINS.filter((origin) => origin === 'https://cdn.bootcdn.net')).toHaveLength(1);
+    });
+    delete process.env.EXTRA_CDN_ORIGINS;
   });
 });

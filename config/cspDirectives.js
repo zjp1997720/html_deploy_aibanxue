@@ -1,25 +1,45 @@
-const CDN_ORIGINS = [
+const DEFAULT_CDN_ORIGINS = [
   'https://cdn.bootcdn.net',
   'https://cdn.jsdelivr.net',
   'https://cdnjs.cloudflare.com'
 ];
 
 /**
- * 构建统一的 CSP 指令集合，确保在可用性优先的前提下放宽至 https scheme，
- * 同时落实三层 CDN 兜底策略并剔除高风险的外部来源。
- * @returns {import('helmet').HelmetCspDirectives} 标准化的 CSP 指令配置
+ * 解析 EXTRA_CDN_ORIGINS 环境变量，得到去重的额外可信 CDN 域名。
+ * @returns {string[]} 附加 CDN 域名列表
  */
-function createCspDirectives() {
-  return {
+function resolveExtraCdnOrigins() {
+  const extraOrigins = process.env.EXTRA_CDN_ORIGINS || '';
+  return Array.from(
+    new Set(
+      extraOrigins
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+const EXTRA_CDN_ORIGINS = resolveExtraCdnOrigins();
+const CDN_ORIGINS = Array.from(new Set([...DEFAULT_CDN_ORIGINS, ...EXTRA_CDN_ORIGINS]));
+
+/**
+ * 构建基础 CSP 指令，适配不同业务场景的细粒度开关。
+ * @param {object} options - 指令构建选项
+ * @param {boolean} [options.allowRemoteImages=false] - 是否允许远程图片资源
+ * @param {boolean} [options.allowRemoteMedia=false] - 是否允许远程音/视频资源
+ * @returns {import('helmet').HelmetCspDirectives} CSP 指令集合
+ */
+function buildDirectives({ allowRemoteImages = false, allowRemoteMedia = false } = {}) {
+  const directives = {
     defaultSrc: ["'self'"],
     scriptSrc: [
       "'self'",
-      "'unsafe-inline'", // 为保证本项目课件的可用性，短期放行少量内联初始化脚本
+      "'unsafe-inline'",
       'https:',
       'blob:',
       'data:',
-      ...CDN_ORIGINS,
-      'https://polyfill.io'
+      ...CDN_ORIGINS
     ],
     styleSrc: [
       "'self'",
@@ -41,6 +61,7 @@ function createCspDirectives() {
       'data:',
       'blob:'
     ],
+    mediaSrc: ["'self'"],
     connectSrc: [
       "'self'",
       'https:',
@@ -52,12 +73,44 @@ function createCspDirectives() {
     formAction: ["'self'"],
     upgradeInsecureRequests: []
   };
+
+  if (allowRemoteImages) {
+    directives.imgSrc = ["'self'", 'https:', 'data:', 'blob:'];
+  }
+
+  if (allowRemoteMedia) {
+    directives.mediaSrc = ["'self'", 'https:', 'data:', 'blob:'];
+  }
+
+  return directives;
+}
+
+/**
+ * 创建默认（后台/管理端）使用的 CSP 指令。
+ * @returns {import('helmet').HelmetCspDirectives}
+ */
+function createCspDirectives() {
+  return buildDirectives();
+}
+
+/**
+ * 创建课件查看页（/view）使用的 CSP 指令，允许远程图片与音视频。
+ * @returns {import('helmet').HelmetCspDirectives}
+ */
+function createViewerCspDirectives() {
+  return buildDirectives({ allowRemoteImages: true, allowRemoteMedia: true });
 }
 
 const cspDirectives = createCspDirectives();
+const viewerCspDirectives = createViewerCspDirectives();
 
 module.exports = {
+  DEFAULT_CDN_ORIGINS,
+  EXTRA_CDN_ORIGINS,
   CDN_ORIGINS,
+  buildDirectives,
+  createCspDirectives,
+  createViewerCspDirectives,
   cspDirectives,
-  createCspDirectives
+  viewerCspDirectives
 };

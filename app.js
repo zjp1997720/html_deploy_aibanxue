@@ -63,8 +63,32 @@ const {
 const { cache } = require('./utils/cacheManager');
 
 // 导入配置
+const {
+  cspDirectives,
+  viewerCspDirectives
+} = require('./config/cspDirectives');
 const config = require('./config');
-const { cspDirectives } = require('./config/cspDirectives');
+
+/**
+ * 深拷贝 CSP 指令，避免多个 helmet 实例共享同一引用被串改。
+ * @param {import('helmet').HelmetCspDirectives} directives - 原始指令对象
+ * @returns {import('helmet').HelmetCspDirectives} - 深拷贝后的指令对象
+ */
+function cloneCspDirectives(directives) {
+  return JSON.parse(JSON.stringify(directives));
+}
+
+const isCspReportOnly = String(process.env.CSP_REPORT_ONLY || 'false').toLowerCase() === 'true';
+const cspReportEndpoint = process.env.CSP_REPORT_URI || '/csp-report';
+const shouldExposeCspReport = isCspReportOnly || Boolean(process.env.CSP_REPORT_URI);
+
+const baseCspDirectives = cloneCspDirectives(cspDirectives);
+const viewerCspDirectivesConfig = cloneCspDirectives(viewerCspDirectives);
+
+if (shouldExposeCspReport) {
+  baseCspDirectives.reportUri = [cspReportEndpoint];
+  viewerCspDirectivesConfig.reportUri = [cspReportEndpoint];
+}
 
 // 路由导入
 const pagesRoutes = require('./routes/pages');
@@ -85,9 +109,19 @@ app.locals.config = config;
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: false,
-    directives: cspDirectives
+    directives: baseCspDirectives,
+    reportOnly: isCspReportOnly
   },
-  crossOriginEmbedderPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
+app.use('/view', helmet({
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: viewerCspDirectivesConfig,
+    reportOnly: isCspReportOnly
+  },
+  crossOriginEmbedderPolicy: false
 }));
 
 // 响应压缩
@@ -136,8 +170,15 @@ const createLimiter = rateLimit({
 
 // 中间件设置
 app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
-app.use(bodyParser.json({ limit: '15mb' })); // JSON 解析，增加限制为15MB
+app.use(bodyParser.json({ limit: '15mb', type: ['application/json', 'application/csp-report'] })); // JSON 解析，增加限制为15MB
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
+
+if (shouldExposeCspReport) {
+  app.post(cspReportEndpoint, (req, res) => {
+    console.warn('[CSP-REPORT]', req.body);
+    res.status(204).end();
+  });
+}
 app.use(cookieParser()); // 解析 Cookie
 
 // 静态资源缓存

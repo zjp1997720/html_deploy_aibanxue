@@ -78,6 +78,14 @@ function cloneCspDirectives(directives) {
   return JSON.parse(JSON.stringify(directives));
 }
 
+// ================================
+// CSP（内容安全策略）总开关配置
+// ================================
+// 在私有部署环境中，可通过设置 ENABLE_CSP=false 完全禁用 CSP
+// 默认启用以保持安全性，公网环境务必保持启用状态
+const ENABLE_CSP = String(process.env.ENABLE_CSP || 'true').toLowerCase() !== 'false';
+console.log(`🔒 CSP 状态: ${ENABLE_CSP ? '已启用（推荐）' : '已禁用（私有部署模式）'}`);
+
 const isCspReportOnly = String(process.env.CSP_REPORT_ONLY || 'false').toLowerCase() === 'true';
 const cspReportEndpoint = process.env.CSP_REPORT_URI || '/csp-report';
 const shouldExposeCspReport = isCspReportOnly || Boolean(process.env.CSP_REPORT_URI);
@@ -105,24 +113,42 @@ const PORT = config.port;
 // 将配置添加到应用本地变量中，便于在中间件中访问
 app.locals.config = config;
 
+// ================================
 // 安全中间件设置
-app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: false,
-    directives: baseCspDirectives,
-    reportOnly: isCspReportOnly
-  },
-  crossOriginEmbedderPolicy: false
-}));
+// ================================
+if (ENABLE_CSP) {
+  // 启用 CSP：管理后台使用严格策略
+  app.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: baseCspDirectives,
+      reportOnly: isCspReportOnly
+    },
+    crossOriginEmbedderPolicy: false
+  }));
 
-app.use('/view', helmet({
-  contentSecurityPolicy: {
-    useDefaults: false,
-    directives: viewerCspDirectivesConfig,
-    reportOnly: isCspReportOnly
-  },
-  crossOriginEmbedderPolicy: false
-}));
+  // 启用 CSP：查看页使用宽松策略（允许远程资源）
+  app.use('/view', helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: viewerCspDirectivesConfig,
+      reportOnly: isCspReportOnly
+    },
+    crossOriginEmbedderPolicy: false
+  }));
+
+  console.log(`✅ CSP 双层策略已生效${isCspReportOnly ? '（仅报告模式）' : ''}`);
+} else {
+  // 禁用 CSP：适用于私有部署无外部威胁的场景
+  // 注意：公网环境务必启用 CSP 以防御 XSS 攻击
+  app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+  }));
+
+  console.warn('⚠️  CSP 已完全禁用 - 仅适用于私有部署环境');
+  console.warn('⚠️  公网部署请设置 ENABLE_CSP=true');
+}
 
 // 响应压缩
 app.use(compression({
@@ -173,11 +199,12 @@ app.use(morgan(config.logLevel)); // 使用配置文件中的日志级别
 app.use(bodyParser.json({ limit: '15mb', type: ['application/json', 'application/csp-report'] })); // JSON 解析，增加限制为15MB
 app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' })); // 增加限制为15MB
 
-if (shouldExposeCspReport) {
+if (ENABLE_CSP && shouldExposeCspReport) {
   app.post(cspReportEndpoint, (req, res) => {
     console.warn('[CSP-REPORT]', req.body);
     res.status(204).end();
   });
+  console.log(`📊 CSP 违规上报端点: ${cspReportEndpoint}`);
 }
 app.use(cookieParser()); // 解析 Cookie
 

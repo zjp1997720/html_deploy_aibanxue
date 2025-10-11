@@ -78,7 +78,18 @@ PORT=3000
 AUTH_ENABLED=true
 AUTH_PASSWORD=your_password_here
 DB_PATH=./db/database.sqlite
+
+# CSP（内容安全策略）配置
+ENABLE_CSP=true              # 是否启用 CSP，私有部署可设为 false
+CSP_REPORT_ONLY=false        # 仅报告模式（不阻止资源加载）
+CSP_REPORT_URI=/csp-report   # CSP 违规上报端点
+EXTRA_CDN_ORIGINS=           # 额外可信 CDN 域名（逗号分隔）
 ```
+
+**CSP 配置说明**：
+- `ENABLE_CSP=true`（默认）：启用内容安全策略，推荐公网部署使用
+- `ENABLE_CSP=false`：禁用 CSP，适用于私有部署无外部威胁的场景
+- 详细说明请参考 [CSP 开关特性说明](./docs/CSP开关特性说明.md)
 
 ### 4. 启动应用
 
@@ -178,6 +189,10 @@ docker run -p 8888:8888 html-go-express
 - **会话管理**：使用文件存储的安全会话
 - **密码保护**：支持为页面设置访问密码
 - **认证系统**：保护页面创建功能
+- **内容安全策略（CSP）**：可配置的 CSP 策略，防御 XSS 攻击
+  - 支持双层策略：管理后台严格，查看页宽松
+  - 私有部署可通过 `ENABLE_CSP=false` 禁用
+  - 详见 [CSP 开关特性说明](./docs/CSP开关特性说明.md)
 - **CORS支持**：安全的跨域请求处理
 - **输入验证**：防止恶意输入
 
